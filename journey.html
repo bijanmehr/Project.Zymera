@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — The Journey</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0;color:var(--accent)}
+  .comp{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:40px 0 4px}
+  .layer{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:14px 0}
+  .layer div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+  .layer h4{margin:0 0 4px;color:var(--accent-d);font-size:14px}
+  .layer p{margin:0;font-size:12.8px;color:var(--mut)}
+  .era{font-size:12.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent-d);font-weight:800;margin:26px 0 2px}
+  .tl{position:relative;margin:12px 0 0;padding-left:28px;border-left:3px solid var(--line)}
+  .tl-item{position:relative;margin-bottom:16px}
+  .tl-item::before{content:'';position:absolute;left:-37px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .tl-item.dead::before{background:var(--bad)} .tl-item.winc::before{background:var(--good)} .tl-item.insight::before{background:var(--warn)}
+  .mname{font-weight:800;font-size:14px} .tl-item p{margin:3px 0 0;font-size:13.3px;color:#334}
+  .mv{color:var(--bad);font-weight:700} .kp{color:var(--good);font-weight:700}
+  .badge{font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;padding:1px 6px;border-radius:8px;margin-left:6px}
+  .b-win{background:#e9f7ee;color:var(--good)} .b-dead{background:#fdecea;color:var(--bad)} .b-ins{background:#fff7e6;color:var(--warn)}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk active" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>The journey — a layered research program</h1>
+  <p class="sub">Zymera is not one experiment. It's a stack of layers unified by a single question — <b>how covert, stealthy misbehaviour propagates from one agent (micro) to mission failure (macro), and how resilient the mission is</b>. This page compartmentalizes the whole program: the theory, the empirical journey, the networks, the paper, the field maps, and the outputs.</p>
+
+  <div class="toc2">
+    <a href="#map">① Project map — the layers</a>
+    <a href="#theory">② Theory — the resiliency formalism</a>
+    <a href="#empirical">③ The empirical journey (6 eras — incl. the 2026 pivot)</a>
+    <a href="#nets">④ Networks &amp; learning stack</a>
+    <a href="#paper">⑤ The paper — Stealth Attacks on Swarms</a>
+    <a href="#maps">⑥ Field maps &amp; references</a>
+    <a href="#connect">⑦ How the layers connect</a>
+  </div>
+
+  <!-- ================= 1 PROJECT MAP ================= -->
+  <span class="comp" id="map">① Project map</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The layers</h2>
+  <div class="layer">
+    <div><h4>Theory</h4><p><code>formalism.tex</code> — a mission-centered formal foundation: micro/macro/bridge, stealth &amp; propagation, resiliency metrics.</p></div>
+    <div><h4>Engine + experiments</h4><p><code>swarm_explore/</code> + <code>RedWithinBlue/</code> — the JAX testbed and the 5-era empirical journey.</p></div>
+    <div><h4>The paper</h4><p><code>report/</code> — <i>Stealth Attacks on Swarms</i>: the threat-model + resiliency study with the compromise sweep.</p></div>
+    <div><h4>Field maps</h4><p><code>marl_taxonomy/</code> + <code>docs/mission-taxonomy/</code> — a 70-entry field map and a mission taxonomy.</p></div>
+    <div><h4>Dissemination</h4><p><code>presentations/</code> + <code>references/</code> — the Red-within-Blue / Swarm-Resiliency decks and reference drafts.</p></div>
+  </div>
+
+  <!-- ================= 2 THEORY ================= -->
+  <span class="comp" id="theory">② Theory</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The resiliency formalism</h2>
+  <p class="meta"><code>formalism.tex</code> — the formal backbone of the whole question; everything informal elsewhere on this site is a special case of it.</p>
+  <p>A mission-centered formal foundation for the resiliency of decentralized teams under partial observability and adversarial pressure — built around the <b>mission</b>, not the agent, on a <b>Dec-POMDP backbone augmented with time-varying interaction graphs</b>.</p>
+  <ul>
+    <li><b>Three layers.</b> <i>Micro</i> (local decisions, policy <code>πᵢ(·|hᵢ)</code>) · <i>macro</i> (mission state, transition, reward) · the <b>interaction bridge</b> (messages <code>mⱼ→ᵢ</code>, aggregation, propagation) over the interaction graph <code>Gₜ</code>.</li>
+    <li><b>Mission as trajectory properties.</b> Health <code>Φ(s,t)∈[0,1]</code>, the <b>viability kernel</b> (states admitting ≥(1−δ) safe completion), and success / degradation / failure defined on trajectories — not on instantaneous coverage.</li>
+    <li><b>Deviation &amp; stealth.</b> A compromised set <code>C</code> of size <b>k</b>, an activation pattern, a perturbed policy, an <b>amplitude budget</b> (total-variation bound), a <b>stealth budget</b> (a <b>KL bound for local undetectability</b> — the formal meaning of "covert"), and an <b>intervention / break budget</b>.</li>
+    <li><b>Propagation.</b> A one-step influence <code>Eₜ^{i→j}</code> = the TV shift on agent <i>j</i>'s input caused by <i>i</i>'s deviation, with <b>hypotheses on adversarial amplification</b> (how micro deviations compound into macro damage).</li>
+    <li><b>The stealth–degradation trade-off.</b> The formal version of the <i>stealth–damage frontier</i>: how much macro damage is achievable per unit of detectability budget.</li>
+    <li><b>Resiliency metrics.</b> <b>Robustness</b> (worst-case performance ratio), <b>brittleness</b> (sharpness of collapse — the <i>brittleness frontier</i>), <b>elasticity</b> (graceful-degradation rate), and <b>recovery</b> (ratio + time).</li>
+    <li><b>Worked example.</b> Shared exploration with <b>phantom-coverage injection</b> — a covert agent's local lie propagates through frontier sharing into mission-level coverage loss.</li>
+  </ul>
+  <div class="callout key">Everything we called informal earlier has a formal home here: <b>covert</b> = the KL stealth budget; the <b>mission-safety K-budget</b> = the break/compromise budget <code>k</code>; <b>micro→macro amplification</b> = the propagation formalism + amplification hypotheses; the <b>stealth–damage frontier</b> = the stealth–degradation trade-off; <b>belief-as-signal</b> = mission health on the team posterior.</div>
+  <p style="margin-top:14px;font-size:15px"><b>Full formal treatment → <a href="theory.html">theory.html</a></b> — a dedicated Theory page now carries the complete formalism (all definitions, budgets, propagation, and resiliency metrics).</p>
+
+  <!-- ================= 3 EMPIRICAL JOURNEY ================= -->
+  <span class="comp" id="empirical">③ The empirical journey</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Six eras of experiments</h2>
+  <p class="meta">The engine work that turns the theory into measurements. <span style="color:var(--good)">●</span> win · <span style="color:var(--bad)">●</span> dead-end/pivot · <span style="color:var(--warn)">●</span> insight.</p>
+
+  <div class="era">Era 0 · from one agent to a swarm</div>
+  <div class="tl">
+    <div class="tl-item insight"><span class="mname">Starting point — the single-agent problem</span><span class="badge b-ins">predecessor</span><p>The program began with one agent, not a swarm: train a <b>single RL policy</b> that maximizes coverage of an <b>arbitrary grid world within a horizon T</b>, and have the <i>same</i> policy <b>generalize across world size and obstacle layout</b>. The agent spawns at an unknown location with <b>no prior knowledge</b> of world size, boundaries, or its own position; it sees only a <b>k×k sensor window</b> (radius 3 / 5 / 7), builds its whole map from observations anchored at spawn (relative, not absolute coordinates), and discovers boundaries by reaching them. Deliberately <b>asymmetric information</b>: the policy runs on partial state at inference, while the critic and training-time modules get full ground truth — a free supervision signal.</p></div>
+    <div class="tl-item"><span class="mname">The baseline ladder &amp; win condition</span><p>Three rungs bracket the problem: <b>random walk</b> (lower bound), <b>frontier-based exploration</b> (the fair partial-info comparator), and a <b>Hamiltonian path with full information</b> (the oracle ceiling). The quantitative <b>win condition</b>: the trained policy must <b>beat frontier-based on coverage at horizon T and approach the Hamiltonian ceiling</b>.</p></div>
+    <div class="tl-item"><span class="mname">Five solution strategies considered</span><p><b>① Pure RL from scratch</b> (end-to-end, no priors; reward as sparse-terminal / dense-per-step / hybrid; gradient-based A2C·SAC·DQN·Rainbow vs evolutionary ES·CMA-ES·novelty-search). <b>② Bootstrapped RL</b> — behaviour-clone frontier or full-info Hamiltonian experts, then RL fine-tune. <b>③ Learning-augmented heuristic</b> — frontier spine with learned corrections (utility scores, override flags, terrain-aware adjustments) under full-state supervision. <b>④ Planning with a learned value</b> — search over the agent's belief (map + relative position + remaining horizon), value trained against ground-truth coverage and queried on partial belief — closer to POMCP than AlphaZero. <b>⑤ Model-based with map completion</b> — a learned model maps the partial map to a distribution over plausible full worlds, then plans against samples or expected utility. Shared scaffolding: an egocentric k×k encoder + accumulated-map encoder (size-invariant by construction), small nets (&lt;1M params), distillation, auxiliary "predict the unseen map" objectives, curriculum, and domain randomization.</p></div>
+    <div class="tl-item dead"><span class="mname">Single-agent coverage saturated</span><span class="badge b-dead">pivot</span><p>The single-agent target was hit and the metric saturated — no headroom left. The open problems live in <b>teams</b>, which motivated abandoning the solo problem and pivoting to the <b>multi-agent / adversarial</b> program below.</p></div>
+  </div>
+
+  <div class="era">Era 1 · MARL coverage (PPO) — coverage solved, the connectivity wall</div>
+  <div class="tl">
+    <div class="tl-item insight"><span class="mname">Honest re-baseline → visit-coverage</span><span class="badge b-ins">honesty</span><p>3×3 sensor-coverage was too generous → re-baselined to 1×1 visit-coverage; old checkpoints invalidated.</p></div>
+    <div class="tl-item winc"><span class="mname">Decentralization wins</span><span class="badge b-win">win</span><p>Indep 86.4% ≈ CTDE ≫ joint (70%/4% — fails).</p></div>
+    <div class="tl-item"><span class="mname">Clustered start (87%) · anti-overlap (91.4%) · return-norm (93.4%)</span><p>Start distribution is a lever; a connectivity <i>bonus</i> clumps; return-norm accelerates.</p></div>
+    <div class="tl-item winc"><span class="mname">Frontier attention — coverage cracked</span><span class="badge b-win">win</span><p>97.7%, size-agnostic (zero-shot ~96% @20²/24²).</p></div>
+    <div class="tl-item dead"><span class="mname">…connectivity collapsed to 32%</span><span class="badge b-dead">the wall</span><p>A pure coverage optimizer disperses the swarm. <span class="mv">→</span> connectivity is the problem.</p></div>
+    <div class="tl-item insight"><span class="mname">Attention ≠ incentive</span><span class="badge b-ins">insight</span><p>Capability (a head) and behaviour (the reward) are separate knobs.</p></div>
+    <div class="tl-item winc"><span class="mname">Threshold ≻ maximize → capped giant-component</span><span class="badge b-win">breakthrough</span><p>"3 connected + 1 roamer" scores like a clump → no clump incentive: 89.5%/87% giant/0 collisions.</p></div>
+    <div class="tl-item insight"><span class="mname">Collision hard, connectivity soft + curriculum</span><span class="badge b-ins">design</span><p>Action-masking beats env-override; masking-from-scratch collapses → curriculum.</p></div>
+    <div class="tl-item winc"><span class="mname">Local degree-floor ≻ global giant-component</span><span class="badge b-win">win</span><p>Local "keep ≥1 neighbour" dominates a global Fiedler value under partial info.</p></div>
+    <div class="tl-item dead"><span class="mname">The action-representation bottleneck</span><span class="badge b-dead">pivot</span><p>The ~69% re-tread ceiling is the 1-step move head, not perception/critic/memory → goal/candidate heads.</p></div>
+  </div>
+
+  <div class="era">Era 2 · the graph-belief swarm — design, decentralization, the role question</div>
+  <div class="tl">
+    <div class="tl-item insight"><span class="mname">3-module design + sub-goal action head</span><span class="badge b-ins">design</span><p>Compass + SLAM controller + Emergence; the learned action is a <b>goal over graph regions</b>, the fix for the bottleneck.</p></div>
+    <div class="tl-item insight"><span class="mname">Emergence-chain corrections</span><span class="badge b-ins">insight</span><p>Structured symmetry-break (NOT entropy — entropy preserves symmetry); central critic NOT required; anti-crowding general; shared belief neither sufficient nor necessary.</p></div>
+    <div class="tl-item dead"><span class="mname">Hard guardrail gridlocks → soft tether</span><span class="badge b-dead">fix</span><p>Hard shield + anti-crowding = ~5% gridlock; a soft tether makes it cohesive and mobile.</p></div>
+    <div class="tl-item dead"><span class="mname">Centralized prototype rejected → decentralized rebuild</span><span class="badge b-dead">pivot</span><p><code>swarm_explore</code>: certainty field (operate +1, diminishing reward, max-merge gossip), connectivity by choice.</p></div>
+    <div class="tl-item insight"><span class="mname">λ Pareto saturates; you can't out-range it</span><span class="badge b-ins">honest Pareto</span><p>λ=0.5…8 identical (penalty never beats an in-range target); cr-bump helps @16 but not @32. Connectivity is size-blind.</p></div>
+    <div class="tl-item dead"><span class="mname">Hand-coded cut-vertex role failed (72→42)</span><span class="badge b-dead">dead-end</span><p>The role policy had to be learned.</p></div>
+    <div class="tl-item winc"><span class="mname">Learned ES role policy works (77→85)</span><span class="badge b-win">win</span><p>129-param MLP, OpenAI-ES, fitness 0.6cov+0.4conn.</p></div>
+    <div class="tl-item winc"><span class="mname">Topology-gossip + active relay — the action is the live knob</span><span class="badge b-win">win</span><p>Relay <b>action</b> reaches cohesion 78→92 where λ couldn't; gossip a ~5-pt refinement; a no-op-flag bug was caught by an adversarial-audit workflow.</p></div>
+    <div class="tl-item dead"><span class="mname">GNN actor-critic → structure-blind roles</span><span class="badge b-dead">decision</span><p>Shared team advantage can't attribute roles → confirmed ES over AC.</p></div>
+    <div class="tl-item dead"><span class="mname">MARL-at-32 with a degree signal → CPU-blocked</span><span class="badge b-dead">pivot</span><p>32×32 compile too slow → commit to the host-side ES path.</p></div>
+  </div>
+
+  <div class="era">Era 3 · the three stacks consolidated</div>
+  <div class="tl">
+    <div class="tl-item"><span class="mname">Connectivity as mission-safety; λ dropped</span><p>Degree-budget (lose ≤K); hard guardrail beats soft by ~20 pts; re-calibrated at N=10.</p></div>
+    <div class="tl-item"><span class="mname">Stuck-relay fixed</span><p>Relay→herd centroid + hysteresis → balanced switching.</p></div>
+    <div class="tl-item winc"><span class="mname">Selective structure-aware relaying</span><span class="badge b-win">win</span><p>Cut-vertex relay 94% (vs 3%); transfers to 32×32 (78%).</p></div>
+    <div class="tl-item winc"><span class="mname">Size-invariant graph belief</span><span class="badge b-win">win</span><p>Snapshot estimator (91%) collapsed OOD → recurrent message-passing belief: 95.9%@16, 72.5±1.2% zero-shot@32, one-shot→80%.</p></div>
+  </div>
+
+  <div class="era">Era 4 · the wall, and the reframe to the research question</div>
+  <div class="tl">
+    <div class="tl-item dead"><span class="mname">The geometric wall</span><span class="badge b-dead">hard limit</span><p>Belief-wiring failed (clump/freeze/suppress); local switcher (60/36) best; relaying can't buy global connectivity at scale (compass breaks 97% of links).</p></div>
+    <div class="tl-item winc"><span class="mname">The reframe — to covert resilience</span><span class="badge b-win">the RQ</span><p>Failure modes are micro→macro amplifications → the governing question: covert single-agent misbehaviour → mission failure + resilience.</p></div>
+    <div class="tl-item insight"><span class="mname">The literature verdict</span><span class="badge b-ins">gap</span><p>Both flanks narrowed; the spatial + role-position + belief + stealth-frontier conjunction is the open seam (<a href="related-work.html">the gap</a>).</p></div>
+    <div class="tl-item"><span class="mname">Open questions / future-work seeds</span><span class="badge b-ins">seeds</span><p>Loose threads logged for the next push: <b>energy-aware agents</b> — adding a notion of energy / budget to each agent so movement and sensing have a cost. A <b>safety &amp; detectability study</b> spanning <b>control-barrier functions (CBF)</b>, <b>Koopman</b> operator views of the dynamics, and formal <b>stealthy-detection metrics</b>. <b>KKT conditions &amp; distributed optimization</b> as the analytic lens on the constrained team objective. And the reward-design distinction that keeps recurring: <b>zero-sum vs. general-sum</b> framing, and <b>agent-vs-agent vs. team-vs-team</b> contests — i.e. how the reward function differs for blue-agent-vs-red-agent versus team-blue-vs-team-red.</p></div>
+  </div>
+
+  <div class="era" style="color:var(--accent-d)">Era 5 · THE PIVOT — from architecture-chase to the coverage lever <span style="font-weight:600;text-transform:none;letter-spacing:0;color:var(--mut)">(2026-07 — the current direction)</span></div>
+  <div class="callout key" style="margin:8px 0 4px;border-left:4px solid var(--accent)">
+    <b>Where we switched, and why.</b> Eras 1–4 — and the obstacle / skills / ES / frontier / occupancy campaign that followed — chased <b>architecture</b>: more modules, richer perception, learned roles, warm-start. It plateaued. Connectivity saturated, "% of optimal" turned out ill-posed, and almost every new box was a <b>null lever</b>. So in <b>July 2026</b> we stopped adding modules and re-examined the <b>primitives</b>, and pivoted the whole program from <i>"which architecture?"</i> to <i>"what is the agent paid for, and aimed at?"</i> Everything below the line is the current direction; everything above it is the road that led here.</div>
+  <div class="tl">
+    <div class="tl-item insight"><span class="mname">The diagnosis — wrong primitives</span><span class="badge b-ins">reframe</span><p>The whole stack was assembled from <b>single-agent discovery + navigation</b> primitives — <b>frontier</b> (go to the edge of the known) and <b>A*</b> (shortest path) — which <b>structurally fight connectivity and division of labour</b>. The mission's <i>native</i> primitives are <b>partition</b> (own a region) and <b>marginal credit</b> (be paid for your unique contribution). The lever was never a new module — it's the <b>training signal and the action space</b>.</p></div>
+    <div class="tl-item insight"><span class="mname">The literature verdict — emergent vs authored roles</span><span class="badge b-ins">lit</span><p>An adversarial review (ROMA · RODE · CDS · difference-rewards · multi-robot relay work) landed on <b>DEPENDS</b>: for a <b>hard-connectivity</b> regime, explicit role structure is defensible — but RODE's real win is the <b>action-space</b>, not the role variable. We <b>deprecated</b> the "roles emerge from a flat homogeneous policy" proposal; roles return to being <b>load-bearing, credit-driven, and self-sizing</b>.</p></div>
+    <div class="tl-item winc"><span class="mname">Difference-reward credit breaks the huddle</span><span class="badge b-win">win</span><p>Paying each agent its <b>marginal contribution</b> (a per-agent advantage, not one shared team reward) rescues coverage on every map: <b>+7 to +23 points at 32²/10, 2–6×</b> over the shared-reward baseline. The predicted <b>huddle→sweep transition</b>, with credit as the control parameter, is real. <b>Credit is the coverage lever.</b></p></div>
+    <div class="tl-item dead"><span class="mname">…but credit alone over-spreads → connectivity gives at scale</span><span class="badge b-dead">the new wall</span><p>With every agent paid to cover and no one choosing to <i>hold</i>, the comm graph breaks at 32²/10. Credit moves the operating point <b>along</b> the coverage↔connectivity frontier; it doesn't reach the both-high corner alone.</p></div>
+    <div class="tl-item insight"><span class="mname">Explicit relay-backbone under credit — in progress</span><span class="badge b-ins">active</span><p>Adding an explicit <b>relay role</b> — a few agents actively holding the graph so explorers spread freely — the <b>active "anchor" relay dominates in open floor</b> (~85% connectivity <i>and</i> more coverage: a genuine frontier <i>shift</i>), while a static "hold" relay over-relays and hurts. <b>Rooms</b> (chokepoints) and the last points to 90 remain open — pointing at relay <i>positioning</i> and an explicit connectivity-centrality reward.</p></div>
+    <div class="tl-item insight"><span class="mname">Honesty check — the connectivity metric is noisy</span><span class="badge b-ins">measurement</span><p>An identical config reproduced at <b>51% vs 77% connectivity</b> across runs — the final-iteration connectivity metric is bimodal and high-variance under GPU non-determinism. <b>Coverage effects are solid; connectivity comparisons are being re-measured</b> with deterministic checkpoint evaluation and error bars <i>before</i> any number is trusted or published.</p></div>
+  </div>
+
+  <!-- ================= 4 NETWORKS ================= -->
+  <span class="comp" id="nets">④ Networks &amp; learning stack</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Every model, part by part</h2>
+  <table>
+    <tr><th>module · era</th><th>network</th><th>learning</th><th>inputs → outputs</th><th>size</th><th>result</th></tr>
+    <tr><td>Frontier-attention AC · E1</td><td>AC + spatial frontier cross-attention</td><td>PPO (IPPO/CTDE; return-norm)</td><td>grid+agent obs → move + value</td><td>~122k</td><td class="win">97.7% cov; conn 32%</td></tr>
+    <tr><td>Compass · Stack 1</td><td>deterministic heuristic</td><td>—</td><td>certainty field → goal cell</td><td>0</td><td>~99%@16 / 76%@32</td></tr>
+    <tr><td>ES role-switcher · Stack 2</td><td>MLP 7→16→1 + hysteresis</td><td>OpenAI-ES; mission-safety fitness</td><td>graph-criticality feats → P(relay)</td><td>~145</td><td class="win">cut-vertex relay 94%; transfers</td></tr>
+    <tr><td>Relay-gate · E2</td><td>MLP, 8 feats</td><td>ES</td><td>gate feats → relay gate</td><td>small</td><td class="win">@16 97/85/95</td></tr>
+    <tr><td>GNN actor-critic · E2 (dropped)</td><td>GCN actor + central GCN critic</td><td>A2C, MC returns</td><td>graph → role + value</td><td>—</td><td class="lose">structure-blind</td></tr>
+    <tr><td>Snapshot estimator · E3 (dropped)</td><td>GCN + bilinear decoder</td><td>supervised BCE</td><td>masked feats → adjacency</td><td>—</td><td class="lose">91%@16 → trivial@32</td></tr>
+    <tr><td>GCRN belief · Stack 3</td><td>per-node GRU + message-pass + bilinear</td><td>privileged distillation, BPTT; k-fold</td><td>F_IN=4 → full adjacency</td><td>HID 16</td><td class="win">95.9%@16; 72.5±1.2%@32</td></tr>
+    <tr><td>Belief-wired switcher · E4</td><td>11-feat ES MLP + belief relay action</td><td>ES</td><td>local+belief feats → P(relay)+target</td><td>~209</td><td class="lose">64/13 (the wall)</td></tr>
+  </table>
+  <div class="two">
+    <figure><img src="assets/figures/curves.png" alt="curves"><figcaption>E1 — PPO training curves.</figcaption></figure>
+    <figure><img src="assets/figures/pareto.png" alt="pareto"><figcaption>E2 — the λ Pareto saturation.</figcaption></figure>
+  </div>
+  <div class="two">
+    <figure><img src="assets/figures/gnnac.gif" alt="gnnac"><figcaption>E2 — GNN actor-critic (structure-blind → dropped).</figcaption></figure>
+    <figure><img src="assets/figures/swarm32.gif" alt="swarm32"><figcaption>E2/E4 — the 32×32 swarm fragments: the geometric wall.</figcaption></figure>
+  </div>
+  <div class="two">
+    <figure><img src="assets/figures/three-stack.gif" alt="three-stack"><figcaption>Stack 1+2 — relay (amber) vs frontier (blue).</figcaption></figure>
+    <figure><img src="assets/figures/transfer32.gif" alt="transfer32"><figcaption>Stack 3 — the size-invariant belief, zero-shot @32.</figcaption></figure>
+  </div>
+
+  <!-- ================= 5 PAPER ================= -->
+  <span class="comp" id="paper">⑤ The paper</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Stealth Attacks on Swarms</h2>
+  <p class="meta"><code>report/</code> — a NeurIPS-style results report (the empirical instantiation of the theory).</p>
+  <p>Frames the contest as a <b>two-player zero-sum POSG</b> with a <b>centralized adversary on k of n agents</b>, instantiated in <b>RedWithinBlue</b> (an open JAX testbed for cooperative grid exploration). A <b>compromise sweep</b> on a 16×16, 5-agent fixture shows:</p>
+  <ul>
+    <li>Damage manifests <b>jointly</b> across coverage, time-to-completion, <i>and the team's posterior</i> — no single aggregate captures it.</li>
+    <li><b>The attacker's leverage is withholding contribution to the shared belief, not direct destruction.</b> The shared belief is both the coordination substrate and the attack surface.</li>
+    <li>Therefore <b>aggregate-coverage monitoring misses the threat</b>, while <b>the posterior itself supplies a resilience signal</b> computable from the team's own scans.</li>
+    <li>Positioned as a <b>threat-model and resiliency study</b>, not the design of a specific attack.</li>
+  </ul>
+  <p class="meta">Sections: intro · related work · problem formulation · environment · threat model · method · experiments · results · discussion · conclusion. This is the direct precursor to the connectivity-aware / belief-driven extensions on this site.</p>
+
+  <!-- ================= 6 FIELD MAPS ================= -->
+  <span class="comp" id="maps">⑥ Field maps &amp; references</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Situating the work</h2>
+  <ul>
+    <li><b><code>marl_taxonomy/</code></b> — an auto-generated field map of multi-agent autonomous-systems research (2019–2026): <b>70 entries</b> across the interaction-mode axis (solo / cooperative / collaborative / competitive / mixed-motive), 6 surveys, plus ranked <b>gap</b> and <b>venue</b> reports and Graphviz diagrams.</li>
+    <li><b><code>docs/mission-taxonomy/</code></b> — a mission taxonomy (LaTeX) over classic references: Dudek 1996, Gerkey MRTA 2004, Chung aerial-swarm 2018, Brambilla swarm-robotics 2013, Schranz swarm-behaviours 2020, Amato/Oliehoek Dec-POMDP.</li>
+    <li><b>Systematic reviews (this site).</b> The connectivity-role-allocation and covert-misbehaviour gap analyses — see <a href="related-work.html">the gap</a>.</li>
+    <li><b><code>references/</code> drafts.</b> <i>Swarm Resiliency</i>, <i>mission family</i>, <i>advML</i>, <i>ExoRL</i> — supporting drafts and reference papers; <b><code>presentations/</code></b> holds the <i>Red within Blue</i> and <i>Swarm Resiliency (Boeing PI)</i> decks.</li>
+  </ul>
+
+  <!-- ================= 7 CONNECT ================= -->
+  <span class="comp" id="connect">⑦ How the layers connect</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The through-line</h2>
+  <div class="callout key">
+    The <b>formalism</b> defines the objects (health, viability, stealth/break budgets, propagation, the resiliency metrics); the <b>engine</b> turns them into measurements; the <b>paper</b> reports the compromise sweep and the posterior-as-resilience-signal finding; the <b>field maps</b> situate the gap. The empirical through-line: <i>coverage is local and size-invariant; connectivity is global and size-blind</i> — almost every dead-end came from conflating the two, and the arc is the slow untangling (local action over global leashes, threshold over maximize, structured symmetry-breaking, learned roles, the relay <i>action</i> over the connectivity <i>penalty</i>, a size-invariant belief) until the geometric wall reframed the work around <b>covert resilience</b> — exactly the question the formalism was built to make precise.
+  </div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

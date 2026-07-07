@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — About, Limitations & Resources</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk active" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>About, limitations &amp; resources</h1>
+
+  <h2>Defensible contribution</h2>
+  <div class="callout key">
+    We study <b>how covert, within-bounds misbehavior by a single agent propagates to mission-level failure in a learned, decentralized, connectivity-aware coverage swarm — and how that propagation is governed by the agent's role and graph-position</b>. The substrate is a size-invariant graph belief that doubles as the attacker's surface and the team's stealth detector; resilience is posed as a stealth–damage frontier rather than a single attack. This bridges three literatures that do not currently meet: connectivity-aware role allocation (homogeneous, no covert adversary), covert c-MARL poisoning (game benchmarks, trigger-based, no spatial/role structure), and resilient consensus / cascade modeling (detectable or non-adversarial). These objects are made precise in the project's <b>formalism</b> (<code>formalism.tex</code>): the stealth budget as KL-undetectability, the break budget, the propagation model, and the brittleness frontier — see the <a href="theory.html">theory page</a>.
+  </div>
+
+  <h2>Limitations &amp; threats to validity</h2>
+  <ul>
+    <li><b>Compute.</b> CPU-only; the host-side engine is fast at 16×16/4 but the MARL-at-32×32 path is slow, so several scale claims are zero-shot / few-shot transfer rather than full retrains.</li>
+    <li><b>Literature-review tooling.</b> The connectivity review completed cleanly (96→24). The covert-flank review's automated synthesis degraded (transient structured-output failures + an API overload), so that flank was re-established by direct search — treat it as direct-read, not PRISMA-verified.</li>
+    <li><b>Search coverage.</b> Both reviews were arXiv-weighted; IEEE / ACM / Springer robotics venues (ICRA, IROS, RSS, CoRL, T-RO) are under-represented. A targeted robotics-venue sweep is the outstanding check before locking any novelty claim.</li>
+    <li><b>Weakest novelty leg.</b> The covert single-agent → team-failure framing is partly taken (c-MARL backdoors); the defense leans on the spatial + role/position + belief + stealth-frontier conjunction, never the bare framing.</li>
+  </ul>
+
+  <h2>Open next steps</h2>
+  <ul>
+    <li>Targeted robotics-venue literature sweep + a clean re-run of the covert systematic review.</li>
+    <li>Connectivity as a λ₂ constraint (computed from the belief) and an r-robust topology objective for the adversarial setting.</li>
+    <li>Intent-signalling role negotiation (no consensus) wired into the ES switcher.</li>
+    <li>Inject covert misbehavior at the belief / relay / intent channels and measure the stealth–damage frontier.</li>
+  </ul>
+
+  <h2>Resources — the full program</h2>
+  <ul>
+    <li><b>Theory:</b> <code>formalism.tex</code> (workspace root) — the mission-centered resiliency formalism.</li>
+    <li><b>Engine + code:</b> <code>zymera_env/swarm_explore/</code> — host-side JAX engine (compass, ES role-switcher, GCRN belief, belief-wiring); <code>RedWithinBlue/</code> — the MARL experiments engine.</li>
+    <li><b>Experiment artifacts:</b> <code>zymera_env/experiments/swarm_explore/</code> — checkpoints, metrics, GIFs, per-run reports.</li>
+    <li><b>The paper:</b> <code>report/</code> — <i>Stealth Attacks on Swarms</i> (NeurIPS-style results report).</li>
+    <li><b>Field maps:</b> <code>marl_taxonomy/</code> (70-entry interaction-mode field map + gap reports) · <code>docs/mission-taxonomy/</code> + <code>docs/taxonomy-refs/</code>.</li>
+    <li><b>Drafts &amp; decks:</b> <code>references/</code> (<em>Swarm Resiliency</em>, <em>mission family</em>, <em>advML</em>, <em>ExoRL</em>) · <code>presentations/</code> (<em>Red within Blue</em>, <em>Swarm Resiliency / Boeing PI</em>).</li>
+    <li><b>Preserved source documents (in-site):</b> the project's source documents are now mirrored in-site under <code>assets/sources/</code> and indexed on the <a href="documents.html">Docs page</a> — the formalism (<code>formalism.tex</code> / <code>formalism.pdf</code>), the <em>Stealth Attacks on Swarms</em> paper plus its Overleaf source archive, the <em>Swarm Resiliency</em> and <em>Mission Families</em> drafts, the <em>advML</em> and <em>ExoRL</em> reports, and the full <code>marl_taxonomy</code> YAML.</li>
+  </ul>
+
+  <div class="footer">
+    Zymera research site · working draft, 2026-06 · built for GitHub Pages.<br>
+    To publish: push the <code>site/</code> folder to a repo and point GitHub Pages at it (or rename to <code>docs/</code> on the default branch).
+  </div>
+</div>
+</body>
+</html>

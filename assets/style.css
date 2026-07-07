@@ -1,0 +1,76 @@
+/* Zymera project site — shared styles */
+:root{
+  --ink:#1a2027; --mut:#5b6570; --line:#e4e8ec; --bg:#fbfcfd; --card:#ffffff;
+  --accent:#1f6feb; --accent-d:#0b4fb8; --good:#1f7a44; --bad:#c0392b; --warn:#b7791f;
+  --maxw:940px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);line-height:1.62;margin:0;background:var(--bg);font-size:15px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* top nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line)}
+.nav-inner{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:4px;
+  padding:10px 22px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.5px;margin-right:auto;font-size:16px;color:var(--ink)}
+.brand span{color:var(--accent)}
+.nav a.lnk{font-size:13.5px;color:var(--mut);padding:5px 10px;border-radius:7px}
+.nav a.lnk:hover{background:#eef3fb;color:var(--accent-d);text-decoration:none}
+.nav a.lnk.active{color:var(--accent-d);font-weight:700;background:#eef3fb}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px 90px}
+h1{font-size:30px;line-height:1.18;margin:34px 0 6px}
+h2{font-size:21px;margin-top:38px;border-top:1px solid var(--line);padding-top:18px}
+h3{font-size:16.5px;margin-top:26px;color:#11324f}
+p,li{font-size:14.6px}
+.sub{color:var(--mut);font-size:14px;margin-top:0}
+.meta{color:var(--mut);font-size:12.8px}
+code{background:#eef1f4;padding:1px 5px;border-radius:4px;font-size:12.8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* hero */
+.hero{background:linear-gradient(135deg,#0b1f3a,#123a6b);color:#eaf1fb;border-radius:16px;
+  padding:34px 32px;margin:26px 0 8px}
+.hero h1{color:#fff;margin-top:0}
+.hero .sub{color:#bcd2f0}
+.hero .pill{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+  border-radius:20px;padding:3px 12px;font-size:12.5px;margin:3px 6px 3px 0}
+
+/* cards grid */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin:18px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  transition:.15s;display:block;color:var(--ink)}
+.card:hover{border-color:var(--accent);box-shadow:0 4px 18px rgba(31,111,235,.10);text-decoration:none;transform:translateY(-2px)}
+.card h3{margin:0 0 4px;color:var(--accent-d)}
+.card p{margin:0;font-size:13.3px;color:var(--mut)}
+
+/* tables */
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13px;background:var(--card)}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#f1f4f7;font-weight:700}
+.win{color:var(--good);font-weight:700}.lose{color:var(--bad);font-weight:700}
+
+/* callouts */
+.callout{border-radius:10px;padding:13px 17px;font-size:13.8px;margin:16px 0;border:1px solid}
+.key{background:#e9f7ee;border-color:#a6e0bb}
+.gap{background:#eaf1ff;border-color:#bcd0ff}
+.warnbox{background:#fff7e6;border-color:#ffd8a8}
+.danger{background:#fdecea;border-color:#f5b7b1}
+
+/* figures */
+figure{margin:18px 0;text-align:center}
+figure img{max-width:100%;border:1px solid var(--line);border-radius:10px;background:#fff}
+figcaption{font-size:12.6px;color:var(--mut);margin-top:7px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.two{grid-template-columns:1fr}}
+
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;background:#eef1f4;color:#444;margin-right:4px}
+blockquote{border-left:3px solid var(--accent);margin:14px 0;padding:7px 16px;background:var(--card);color:#33414d;font-size:13.8px;border-radius:0 8px 8px 0}
+.footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;color:var(--mut);font-size:12.5px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center}
+.kpi b{display:block;font-size:24px;color:var(--accent-d);line-height:1.1}
+.kpi span{font-size:12px;color:var(--mut)}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Architecture</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk active" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Architecture — credit-driven, role-based</h1>
+  <p class="sub">The current design, after the <b>2026-07 pivot</b> (see the <a href="journey.html">journey</a>). The reframe: stop chasing perception modules and make the load-bearing decision <b>which role, paid by marginal contribution</b>. The agent is a small <b>multi-layer cognition</b> — heuristic execution, a disciplined skill menu, and one learned, credit-driven decision on top.</p>
+
+  <div class="callout key">
+    One idea runs through it. The team's <i>native</i> primitives are <b>partition</b> (own a region) and <b>marginal credit</b> (be paid for your unique contribution) — <b>not</b> the single-agent <b>frontier + A*</b> primitives the old stack was built from, which structurally fight connectivity and division of labour.
+  </div>
+
+  <h2>The three layers <span class="tag">multi-layer cognition</span></h2>
+
+  <h3>L1 · Execution &amp; perception <span class="tag">heuristic · 0 learned params</span></h3>
+  <p><b>Motion:</b> A* to a goal cell, collision avoidance, and the relay controllers — <i>hold</i> (a static beacon that keeps the bridge from where it stands) and <i>λ₂-anchor</i> (actively climb local connectivity). <b>Perception, always on:</b> a SLAM / occupancy belief (the neighbour-fused map), a <b>geodesic distance field</b> over that belief (true reach cost with walls respected — not Euclidean), and a decentralized <b>λ̂₂ (Fiedler) estimator</b> — how load-bearing each agent is to the comm graph. These are <b>capabilities, not choices</b>: rich, always available, never selected.</p>
+
+  <h3>L2 · Skills — the menu <span class="tag">small &amp; disciplined</span></h3>
+  <p>The handful of behaviours the decision toggles between — a disciplined menu, not a flat pile:</p>
+  <ul>
+    <li><b>CVT-explore</b> — own a Voronoi cell of the reachable region and rake it (the coverage skill; a <i>go-through</i> sweep, replacing frontier's <i>go-to-the-edge</i>).</li>
+    <li><b>Relay-backbone</b> — hold the graph (via <i>hold</i> or <i>λ₂-anchor</i>) so explorers can spread freely.</li>
+    <li><b>Flock / repair</b> — re-cohere when the graph is stretching toward a break.</li>
+  </ul>
+
+  <h3>L3 · The decision <span class="tag">learned · credit-driven</span></h3>
+  <p>One head picks each agent's role — <b>explorer (CVT)</b> vs <b>relay</b> — trained by <b>per-agent marginal credit</b>. Roles are <b>load-bearing and self-sizing</b>: a redundant relay earns ≈0 and flips to exploring, so the right relay count emerges per map instead of being an authored number. This is the deliberate reversal of the deprecated "roles emerge from a flat, homogeneous policy" proposal — our own experiments showed a homogeneous policy will <i>not</i> hold connectivity, because nothing chooses to hold.</p>
+
+  <h2>The training signal — difference-reward credit <span class="tag">the coverage lever</span></h2>
+  <p>Each agent is paid its <b>marginal contribution</b> <code>D<sub>i</sub> = G(team) − G(team without i)</code>, not one shared team reward. At <code>cover_r = 0</code> that is the fresh cells <i>only it</i> covered (coverage) plus its Fiedler-centrality (connectivity). This is the <b>coverage lever</b>: it breaks the <b>huddle</b> (agents clumped — connectivity satisfied, coverage dead) into a <b>sweep</b>, <b>+7 to +23 coverage points at 32²/10, 2–6×</b> over a shared reward (see <a href="findings.html">findings</a>). Under CTDE the central critic still trains on the team return; only the <i>policy</i> advantage becomes per-agent.</p>
+
+  <h2>Connectivity — soft, with a relay backbone <span class="tag">no hard mask</span></h2>
+  <p>Connectivity is held <b>softly</b> — a learned Lagrangian penalty on algebraic connectivity λ₂ — and <b>never a hard action mask</b>, on purpose: the research question is <i>how connectivity breaks</i> under a covert adversary, and a hard mask makes it unbreakable. Credit alone over-spreads and drops connectivity at scale (the new wall); a few <b>explicit relays</b> hold the graph so the rest cover freely. <b>Planned:</b> feed λ̂₂ as a decision <i>input</i> so the load-bearing agents <i>know</i> to hold — targeted holding, not a blunt global penalty (which only slides along the coverage↔connectivity frontier instead of moving it).</p>
+
+  <h2>What changed from the deprecated design</h2>
+  <table>
+    <tr><th>Deprecated (the old stack)</th><th>Current</th></tr>
+    <tr><td>Frontier — go to the edge of the known</td><td class="win">CVT partition — own &amp; rake a region</td></tr>
+    <tr><td>Shared team reward</td><td class="win">Difference-reward credit (per-agent marginal)</td></tr>
+    <tr><td>Role head demoted / emerge-from-flat-policy</td><td class="win">Roles load-bearing, credit-driven, self-sizing</td></tr>
+    <tr><td>A* as the coverage motion</td><td class="win">A* demoted to transit + warm-start teacher; coverage = the rake</td></tr>
+    <tr><td>Hard connectivity mask</td><td class="win">Soft λ₂ + relay backbone (breakable — for the resilience study)</td></tr>
+    <tr><td>Perception-module chase (attention, occupancy, extra channels)</td><td>Frozen — proven null levers</td></tr>
+  </table>
+
+  <h2>As built vs planned <span class="tag">honest status</span></h2>
+  <ul>
+    <li><b>Built &amp; tested.</b> The difference-reward credit (a gated <code>--credit agent</code> switch in the CTDE trainer, 122 tests green, default byte-identical); the explicit relay role (role-picker + hold / λ₂-anchor controllers); the <b>connected-sweep oracle</b> — the god-view Voronoi-partition-plus-relay ceiling that is the coverage denominator, the warm-start teacher, and the scripted baseline in one.</li>
+    <li><b>Planned.</b> The learned <b>CVT-explore</b> skill (the Voronoi coverage-control logic exists in the oracle; to be wired as a skill); <b>λ̂₂-as-input</b>; the explicit <b>connectivity-centrality reward</b>; and — before any connectivity number is trusted — a <b>deterministic re-measurement</b> (the final-iter connectivity metric proved bimodal and high-variance; coverage is solid, connectivity is being hardened).</li>
+  </ul>
+
+  <div class="callout key">
+    The spine: <b>belief → per-agent credit → who explores vs who holds → a partition that covers while a backbone keeps the graph connected.</b> Coverage is settled; the relay backbone and the last connectivity points are the active front. That same credit signal — each agent's marginal contribution — doubles as the resilience detector the covert-adversary study needs.
+  </div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

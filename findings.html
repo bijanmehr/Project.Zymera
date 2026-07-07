@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Experimental Findings</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk active" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Experimental findings</h1>
+  <p class="sub">The <b>current-architecture</b> results lead; the prior-architecture findings that <i>motivated</i> the 2026-07 pivot follow, then the resilience / adversarial core. Evaluation is stochastic-π (ε = 0), never argmax.</p>
+
+  <div class="callout key"><b>Status in one line:</b> credit is the coverage lever (solid, large); the relay backbone recovers connectivity in open floor (promising); the connectivity metric is being hardened before any headline number.</div>
+
+  <div style="margin:30px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:#fff;background:#1b7f76;display:inline-block;padding:4px 12px;border-radius:6px">Current architecture — credit-driven, role-based</div>
+
+  <h2>Difference-reward credit — the coverage lever</h2>
+  <p>Paying each agent its <b>per-agent marginal contribution</b> (instead of one shared team reward) breaks the "huddle" into a sweep. On the 32²/10 four-map panel, credit beats the shared baseline on <b>every</b> map (2-seed mean):</p>
+  <table>
+    <tr><th>map · 32²/10</th><th>shared coverage</th><th>credit coverage</th><th>Δ</th></tr>
+    <tr><td>open</td><td>4.4%</td><td class="win">27.7%</td><td class="win">+23.3</td></tr>
+    <tr><td>rooms</td><td>6.7%</td><td class="win">18.9%</td><td class="win">+12.2</td></tr>
+    <tr><td>mixed</td><td>1.7%</td><td class="win">14.7%</td><td class="win">+12.9</td></tr>
+    <tr><td>crowded</td><td>4.6%</td><td class="win">11.7%</td><td class="win">+7.1</td></tr>
+  </table>
+  <p><b>+7 to +23 points, 2–6×</b> — the predicted huddle→sweep transition, with credit as the control parameter. <b>But credit alone over-spreads and drops connectivity at scale</b> (the new wall): every agent is paid to cover, nothing chooses to hold.</p>
+
+  <h2>The relay backbone — recovering connectivity</h2>
+  <p>An explicit relay role (a few agents holding the graph so explorers spread) under credit, at 32²/10. The <b>active "anchor" relay dominates in open floor</b> — more coverage <i>and</i> more connectivity, a genuine frontier shift; a static "hold" relay over-relays and hurts.</p>
+  <table>
+    <tr><th>32²/10</th><th>no-role · cov / conn</th><th>anchor relay · cov / conn</th><th>verdict</th></tr>
+    <tr><td>open</td><td>27.9 / 77.4</td><td class="win">30.0 / 84.7</td><td class="win">dominates — both up</td></tr>
+    <tr><td>crowded</td><td>13.9 / 82.5</td><td>16.1 / 82.9</td><td>weak dominance</td></tr>
+    <tr><td>mixed</td><td>12.9 / 75.2</td><td>20.6 / 67.0</td><td>+cov, −conn</td></tr>
+    <tr><td>rooms</td><td>22.0 / 64.3</td><td>22.2 / 60.6</td><td class="lose">no help (chokepoints)</td></tr>
+  </table>
+  <p>Watch these in the <a href="report/index.html">simulator</a> — the credit huddle→sweep pairs and the relay arms.</p>
+
+  <div class="callout danger"><b>Honesty check.</b> The connectivity metric (final-iteration fraction of steps with λ₂ &gt; 0.5) is <b>bimodal and high-variance</b> — an identical config reproduced at <b>51% vs 77%</b> across runs. <b>Coverage effects are solid; the connectivity comparisons above are being re-measured</b> with deterministic checkpoint evaluation + error bars before any is treated as a headline number. The last points to 90 and the rooms case stay open — pointing at relay <i>positioning</i> (a λ₂-climbing relay + an explicit connectivity-centrality reward).</div>
+
+  <h2>Connectivity health — who stays together, who fragments</h2>
+  <p>Replaying every trained checkpoint and measuring, per run, the fraction of steps the <i>whole</i> team is one
+  connected component (from positions + comm range): <b>41 of 56 runs stay connected ≥ 90% of the time; 15 fragment</b>
+  — the <a href="report/index.html">simulator</a> now splits these into a separate ⚠ Fragmented section. The
+  fragmentation is not random; it lands exactly where the mechanism predicts:</p>
+  <table>
+    <tr><th>Stays connected (healthy)</th><th>Fragments</th></tr>
+    <tr><td><b>Every 16²/4 run</b> — small world, easy to stay in range (≈100%).</td><td class="lose"><b>32²/10 credit-alone</b> (no relay) — the sweep spreads past comm range, down to <b>30–48%</b> connected.</td></tr>
+    <tr><td><b>32²/10 with the active "anchor" relay</b> — a backbone holds the graph while the rest cover.</td><td class="lose"><b>32²/10 "hold" relay</b> — static relays over-freeze and cluster wrong, still fraying (47–63%).</td></tr>
+  </table>
+  <p>Same story as the coverage↔connectivity tables above, now seen frame-by-frame: <b>credit spreads the team; only a
+  few <i>active</i> relays buy that spread back into a connected sweep — and only once the world is big enough to need it.</b></p>
+
+  <h2>What we learned</h2>
+  <ul>
+    <li><b>The lever is the signal, not a module.</b> Changing <i>what each agent is paid for</i> — its marginal
+    contribution, not the team mean — moved coverage <b>+7 to +23 points</b>, more than any perception module ever did.
+    The old architecture-chase was looking in the wrong place.</li>
+    <li><b>Coverage and connectivity are separable knobs that compose.</b> Credit owns coverage; an explicit relay role
+    owns connectivity. Neither alone reaches both — but at 16²/4 they already do <i>together</i> (credit's coverage
+    <i>and</i> a connected graph).</li>
+    <li><b>Few active relays beat many static ones.</b> The "anchor" relay (a handful, actively holding) dominates open
+    floor; the "hold" relay (many, frozen) over-relays and hurts. "Bigger backbone" was the wrong instinct — a
+    <i>targeted</i> backbone is right.</li>
+    <li><b>Scale is where connectivity is won or lost.</b> 16²/4 is connected for free; the real problem is 32²/10, and
+    especially the chokepoint (rooms) maps, where the relay still can't find the doorway. That names the next build:
+    relay <i>positioning</i> (climb the team's λ₂) plus an explicit connectivity-<i>centrality</i> reward.</li>
+    <li><b>Trust the ruler before the number.</b> The connectivity metric reproduced at <b>51% vs 77%</b> for one
+    identical config — so we <i>state</i> the coverage claims and <i>hold</i> the connectivity claims pending a
+    deterministic re-measurement. That kept us from optimising noise.</li>
+  </ul>
+
+  <div style="margin:38px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:#fff;background:#6b7280;display:inline-block;padding:4px 12px;border-radius:6px">Prior architecture — the evidence that forced the pivot</div>
+  <p class="meta">Everything below is the <b>previous</b> stack (frontier + A* + ES / selector / graph-belief). It is kept because it is <i>why</i> we reframed — the geometric wall, the flooding, the null Fiedler oracle — not as current claims. The resilience &amp; sibling studies further down remain active (the covert-adversary thesis).</p>
+
+  <h2>Coverage ladder</h2>
+  <ul>
+    <li>3-variant PPO comm-coverage: <b>independent (IPPO) 86.4% ≈ CTDE ≫ joint</b>; IPPO emergently forms a stretched relay chain — decentralization wins.</li>
+    <li><b>Clustered start</b> rescues the joint variant (87.4%); zero-shot generalization to unseen obstacles.</li>
+    <li><b>Anti-overlap reward</b> pushes CTDE to <b>91.4%</b> (&gt;90%).</li>
+    <li><b>FrontierAttnAC</b> (frontier cross-attention + return-norm) reaches <b>~98% coverage</b> and generalizes across grid sizes — but <b>disperses the swarm (connectivity ~32%)</b>: the coverage–connectivity tension in its purest form.</li>
+  </ul>
+
+  <div class="two">
+    <figure><img src="assets/figures/curves.png" alt="training curves"><figcaption>Training curves across architecture variants (16×16).</figcaption></figure>
+    <figure><img src="assets/figures/pareto.png" alt="coverage-connectivity pareto at 32x32"><figcaption>Coverage–connectivity Pareto frontier at 32×32.</figcaption></figure>
+  </div>
+
+  <h2>Connectivity</h2>
+  <ul>
+    <li><b>Local degree-floor</b> (keep ≥ 1 in-range neighbor) dominates global giant-component / λ₂ leashes on <i>both</i> coverage and connectivity under partial information.</li>
+    <li><b>Hard connectivity guardrail</b> (mask moves that disconnect the comm graph) <b>guarantees integrity AND beats the soft degree-floor by ~20 pts coverage</b> — a hard constraint with free exploration within it.</li>
+  </ul>
+
+  <h2>Graph belief — transfer, reliability, few-shot</h2>
+  <table>
+    <tr><th></th><th>@16×16/4 (trained)</th><th>@32×32/10 (zero-shot)</th><th>trivial baseline</th></tr>
+    <tr><td>old snapshot estimator</td><td>88%</td><td class="lose">~trivial (no transfer)</td><td>—</td></tr>
+    <tr><td>GCRN (single split)</td><td>95.9%</td><td class="win">77–81%</td><td>45.9%</td></tr>
+    <tr><td>GCRN (5-fold CV, weight-decay 0.03)</td><td>95.6 ± 0.4%</td><td class="win">72.5 ± 1.2%</td><td>45.9%</td></tr>
+  </table>
+  <p><b>Few-shot:</b> a single 32×32 fine-tuning map lifts zero-shot 76.7% → 80.2%, plateauing ~81% (8 maps) within ~1.3 pts of the 82.1% full-data ceiling, and beating from-scratch most in the 1-shot regime (+4.1 pts) — the size-invariant pretraining buys <i>data efficiency</i>.</p>
+  <figure><img src="assets/figures/transfer32.gif" alt="zero-shot transfer to 32x32" style="width:55%"><figcaption>The 16×16-trained policy + belief running zero-shot at 32×32 / 10 agents.</figcaption></figure>
+
+  <h2>Role-switching — transfer &amp; health</h2>
+  <table>
+    <tr><th></th><th>relay ratio</th><th>switch rate</th><th>P(relay | cut-vertex)</th><th>P(relay | non-cut)</th></tr>
+    <tr><td>16×16/4 (trained)</td><td>~20%</td><td>9.4%/step</td><td class="win">94%</td><td>3%</td></tr>
+    <tr><td>32×32/10 (zero-shot)</td><td>~19%</td><td>9.9%/step</td><td class="win">78%</td><td>8%</td></tr>
+  </table>
+  <p>The structure-awareness <b>transfers</b>: the policy still relays cut-vertices ~4× more than redundant agents at the new scale, switching is balanced (no stuck-relay), relay ratio steady. The role decision is correct at scale; connectivity still fails for a <i>structural</i> reason (see <a href="emergence.html">the geometric wall</a>).</p>
+
+  <h2>Belief-wiring at 32×32 (held-out maps)</h2>
+  <table>
+    <tr><th>policy</th><th>coverage</th><th>full-connectivity</th><th>cohesion</th><th>safety-viol</th></tr>
+    <tr><td>compass (no relay)</td><td>70%</td><td>20%</td><td>68%</td><td>6.0%</td></tr>
+    <tr><td><b>local switcher (zero-shot)</b></td><td>60%</td><td class="win">36%</td><td>80%</td><td>5.0%</td></tr>
+    <tr><td>belief-wired (decision-only)</td><td>64%</td><td class="lose">13%</td><td>64%</td><td>8.7%</td></tr>
+    <tr><td>belief-wired (decision + action)</td><td>64%</td><td class="lose">13%</td><td>64%</td><td>8.7%</td></tr>
+  </table>
+  <p>The zero-shot local switcher (60 / 36) remained the best connectivity operating point; re-optimizing at 32×32 under a coverage-aware fitness destroyed its relay pattern — the geometric wall again.</p>
+  <figure><img src="assets/figures/belief-wired.gif" alt="belief-wired policy at 32x32" style="width:55%"><figcaption>Belief-wired role-switcher at 32×32 / 10 agents (held-out map).</figcaption></figure>
+
+  <h2>Adversarial &amp; compromise-sweep results (RedWithinBlue)</h2>
+  <p class="meta">From the RedWithinBlue compromise sweep and the n=60 adversarial-model validation — the empirical core of the covert-resilience question. Several results <i>qualify</i> the headline framing; they're reported honestly.</p>
+  <ul>
+    <li><b>Compromise-sweep headline:</b> safe baseline <b>S=46%</b>, benign <b>B=98.5%</b>, compromised <b>C1=89.6%</b> / <b>C2=87.1%</b>; the misbehaviour-budget <b>knee is at m=1</b> — a single compromised agent already drops the team below the 90% threshold, and m=2 inflates variance more than the mean.</li>
+    <li><b>The strong channel is <i>withholding</i>, not corrupting.</b> Actively injecting false belief (the MAP_UNKNOWN "belief-corruption" channel) is worth <b>≤1pp</b> of damage; the real cost is <b>post-detection exclusion-delay + redundant coverage</b> — the team excludes the compromised agent's scans and re-covers. This sharpens (not contradicts) the paper's "leverage = withholding contribution to the shared belief" thesis.</li>
+    <li><b>The quietest attacker is the most damaging.</b> A "stay"/no-action adversary (+14.79pp) beats the trained red (+13.55pp) — co-evolved blue routes around red's predictable corner-camp, so doing nothing detectable is the stronger covert move.</li>
+    <li><b>Damage scales with <i>k</i>, not ρ.</b> Mission damage is ~10× more sensitive to the number of compromised agents (+5.3pp/agent) than to the per-step attack rate ρ (flat-to-defender-favourable). Both closed-form damage models (additive Σρ, concentration max-ρ) were <b>falsified</b> at the held-out cell (z&gt;4).</li>
+    <li><b>Co-evolution is a defender-side <i>fragility</i>, not a defence.</b> Naive (non-co-evo) blue out-defends co-evo blue by ~7pp against the same red (z=7.18) — overfitting to the training adversary.</li>
+    <li><b>Insider attackers buy almost nothing.</b> An attacker initialized byte-identical to blue's trained policy is only ~3.5% more harmful (Cohen's d≈0.16) and leaves coverage statistically unchanged — initialization picks the entropy mode, not the harm level.</li>
+    <li><b>The connectivity guardrail is dual-use.</b> Damage is non-monotone in the disconnect-grace budget (attacker-optimal ~5 grace steps); at ε=∞ blue actually <i>beats</i> its ε=0 baseline (+0.089) — the hard guardrail had been partly helping the attacker by constraining blue's own motion.</li>
+    <li><b>Monitoring implication:</b> because damage manifests jointly across coverage, time, and the team's posterior, <b>aggregate-coverage monitoring misses the threat</b> — the <b>posterior itself is a resilience signal</b> computable from the team's own scans.</li>
+  </ul>
+  <div class="callout">Two algorithm-default cautions from the same corpus: <b>entropy regularization monotonically hurts coverage</b> here (ent_coef 0.01 costs ~10% relative coverage — the exploration reward already prevents collapse), and <b>argmax evaluation inflates catastrophic failure 0%→46%</b> by destroying spawn-time symmetry-breaking (always evaluate by sampling π at ε=0). Full document corpus on the <a href="documents.html">Docs</a> page.</div>
+
+  <h2>Last runs (2026-06-22) — coordination &amp; generalization</h2>
+  <p class="sub">Protocol: episode length <b>FIXED at 100 steps</b>; bigger worlds are compensated with <b>more agents, not more time</b> (extra time was the artifact that faked 100% coverage). New coordination metric: <b>REDUNDANCY = (Σ per-agent coverage) / (unique team coverage)</b> — 1.0 = perfect division of labor; higher = flooding/overlap.</p>
+
+  <h2 style="font-size:1.1em">Coordination diagnostic <span class="tag">fixed 100 steps · 3 seeds</span></h2>
+  <table>
+    <tr>
+      <th rowspan="2">grid / N</th>
+      <th colspan="3">heuristic</th>
+      <th colspan="3">learned-A</th>
+      <th colspan="3">learned-B</th>
+    </tr>
+    <tr>
+      <th>cov</th><th>conn</th><th>redund</th>
+      <th>cov</th><th>conn</th><th>redund</th>
+      <th>cov</th><th>conn</th><th>redund</th>
+    </tr>
+    <tr><td>16×16 / N4</td>  <td>100%</td><td>55%</td><td>3.13</td>  <td>77%</td><td class="win">100%</td><td>2.20</td>  <td>100%</td><td>62%</td><td>3.28</td></tr>
+    <tr><td>20×20 / N5</td>  <td>100%</td><td>54%</td><td>3.76</td>  <td>56%</td><td class="win">100%</td><td>2.94</td>  <td>100%</td><td>59%</td><td>3.99</td></tr>
+    <tr><td>24×24 / N6</td>  <td>95%</td><td>42%</td><td>3.67</td>   <td class="lose">42%</td><td class="win">100%</td><td>3.03</td>  <td>94%</td><td>36%</td><td>3.87</td></tr>
+    <tr><td>28×28 / N8</td>  <td>89%</td><td>17%</td><td>4.28</td>   <td class="lose">31%</td><td class="win">100%</td><td>3.03</td>  <td>91%</td><td>24%</td><td>4.12</td></tr>
+    <tr><td>32×32 / N10</td> <td>78%</td><td>28%</td><td>5.29</td>   <td class="lose">18%</td><td class="win">100%</td><td>3.80</td>  <td>88%</td><td>32%</td><td>4.85</td></tr>
+    <tr><td>40×40 / N16</td> <td>66%</td><td>15%</td><td class="lose">5.83</td>   <td class="lose">25%</td><td class="win">100%</td><td>4.83</td>  <td>79%</td><td>38%</td><td class="lose">5.88</td></tr>
+  </table>
+  <p>No controller divides labor: the redundancy floor is ≥ 2.2 everywhere, rising to ~6–8 at scale. learned-A holds connectivity at 100% <i>only</i> by huddling (coverage craters 77% → 25%).</p>
+
+  <h2 style="font-size:1.1em">Agent sweep @32×32 <span class="tag">learned-B · does adding agents divide or overlap?</span></h2>
+  <table>
+    <tr><th>N agents</th><th>coverage</th><th>connectivity</th><th>redundancy</th></tr>
+    <tr><td>N6</td>  <td>60%</td>  <td>44%</td><td>3.68</td></tr>
+    <tr><td>N10</td> <td>88%</td>  <td>32%</td><td>4.85</td></tr>
+    <tr><td>N14</td> <td>98%</td>  <td>36%</td><td>6.27</td></tr>
+    <tr><td>N18</td> <td>100%</td> <td>61%</td><td class="lose">7.87</td></tr>
+  </table>
+  <p>This is the proof that coverage is brute-force flooding, not coordination: redundancy nearly <b>doubles (3.68 → 7.87)</b> as agents are added while coverage climbs to 100% — <b>adding agents floods rather than divides</b>.</p>
+
+  <h2 style="font-size:1.1em">Generalization study (4 modes) <span class="tag">train → zero-shot → few-shot</span></h2>
+  <table>
+    <tr>
+      <th>mode</th>
+      <th>16×16 (train)</th>
+      <th>32×32 (train)</th>
+      <th>40×40 (zero-shot)</th>
+      <th>relay%</th>
+      <th>verdict</th>
+    </tr>
+    <tr>
+      <td><b>baseline</b> (w_conn=1.0)</td>
+      <td>91 / 76</td><td>100 / 32</td><td>100 / 22</td>
+      <td>25% → 1%</td>
+      <td>connectivity collapses with scale</td>
+    </tr>
+    <tr class="lose">
+      <td><b>adaptive</b> (Lagrangian λ→1.5)</td>
+      <td>40 / 100</td><td>10 / 100</td><td>4 / 100</td>
+      <td>94–100%</td>
+      <td>degenerate clump: everyone relays, coverage dies</td>
+    </tr>
+    <tr class="lose">
+      <td><b>fiedler</b> (exact λ₂ oracle features)</td>
+      <td>100 / 60</td><td>100 / 16</td><td>100 / 14</td>
+      <td>0–2%</td>
+      <td>null/worse: a perfect signal produced NO relays</td>
+    </tr>
+    <tr>
+      <td><b>episodes</b> (2× length)</td>
+      <td>100 / 86</td><td>98 / 71</td><td>72 / 72</td>
+      <td>67–87%</td>
+      <td>roles emerge — but only by violating fixed-100 (more time)</td>
+    </tr>
+  </table>
+  <p>The <b>adaptive</b> and <b>fiedler</b> modes are failures: the Lagrangian chases the trivial all-relay clump, and a <i>perfect</i> global-connectivity oracle (exact eigendecomposition λ₂ + each agent's own Fiedler component) produced essentially no relays and connectivity <i>worse</i> than baseline at scale — information is not the bottleneck. The <b>episodes</b> mode is the only one where roles emerge and connectivity holds, but it "works" only by spending 2× the time — emergence appears just when we cheat the clock.</p>
+
+  <h2 style="font-size:1.1em">Architecture tournament &amp; parameter sweep</h2>
+  <ul>
+    <li><b>Graph attention does not break the geometric wall.</b> At 32×32 the best variants cap at <b>~63–67% coverage / ~28% connectivity</b> (gattn-d4 63/28, gattn-l 67/19). Deeper attention <b>gattn-d6</b> just trades coverage for connectivity (<b>46–50 / 52–59</b>).</li>
+    <li><b>Regime-B sweet spot is w_conn=1.0</b> (16×16 <b>94 / 99</b>, relay 26%). Pushing <b>w_conn ≥ 2</b> Goodharts into the clump: <b>22 / 100</b> at 16×16 with <b>relay 100%</b> — full connectivity bought by abandoning coverage entirely.</li>
+  </ul>
+
+  <div class="two">
+    <figure><img src="assets/gifs/relay_A.gif" alt="Regime A relay controller" style="width:100%"><figcaption>Regime A (hard backstop) — roles emerge, but coverage is capped.</figcaption></figure>
+    <figure><img src="assets/gifs/relay_B.gif" alt="Regime B relay controller" style="width:100%"><figcaption>Regime B (soft + latency-discounted) — full coverage, connectivity collapses.</figcaption></figure>
+  </div>
+  <div class="two">
+    <figure><img src="assets/gifs/cov_32x32_n10.gif" alt="coverage-pressured swarm at 32x32" style="width:100%"><figcaption>Coverage corner @32×32 / N10 — the swarm disperses to cover.</figcaption></figure>
+    <figure><img src="assets/gifs/conn_32x32_n10.gif" alt="connectivity-pressured swarm at 32x32" style="width:100%"><figcaption>Connectivity corner @32×32 / N10 — the swarm huddles to stay linked.</figcaption></figure>
+  </div>
+
+  <div class="callout key">
+    <b>Takeaway.</b> Across every 2026-06-22 run, the swarm <b>did not coordinate</b> — there is no division of labor. Coverage was achieved either by <b>flooding</b> (redundancy rising toward ~8 as agents are added) or by <b>spending more time</b> (the episodes mode that violates fixed-100). A <b>perfect Fiedler oracle did not help</b>, so the bottleneck is not information — it is the <b>action space</b>: a 1-step move head / relay-bit gate cannot represent "claim a disjoint region." This motivates the proposed <b>"Stack C" redesign</b>: a learned goal/region selector + A* executor + hard connectivity mask + redundancy reward, finally plugging in the GCRN belief — success criterion: invert the agent-sweep curve so redundancy → 1 as agents are added, at fixed 100 steps.
+  </div>
+
+  <h2>Sibling studies — detection &amp; testbed</h2>
+  <p class="meta">Three of the author's own write-ups, transcribed here so they survive after the source documents are retired. Two are sibling papers (a degradation <i>detector</i> and the published-form <i>testbed</i>); the third adds the finer empirical detail behind the compromise-sweep headline above.</p>
+
+  <h2 style="font-size:1.1em">Early-warning detector — temporal graph embeddings <span class="tag">GWU advanced-ML report · w/ Tejaaswini Narendran · 4pp</span></h2>
+  <p>This sibling report (Mehralizadeh &amp; Narendran, George Washington University) asks whether mission degradation can be caught <b>before</b> it becomes visible as failure. The setup is a grid exploration mission with four homogeneous agents (<b>N=4</b>) on a <b>32×32</b> grid, horizon <b>T<sub>max</sub>=500</b> steps, with connectivity enforced as a hard mission constraint — formal mission failure is the first step the time-varying communication graph disconnects (proximity by Chebyshev distance). Nominal behavior is drawn from <b>four</b> policy families (structured lawn-mower sweeping, pure random walk, ε-greedy with structured drift, frontier-biased coverage) so the embedding encodes coordination structure rather than one policy's motion artifacts. Adversarial perturbation overrides a random <b>25% or 50%</b> subset of agents with uniform-random actions over random time windows.</p>
+  <ul>
+    <li><b>Pipeline.</b> Each mission trajectory becomes a temporal graph (nodes = timesteps, labeled by deviation count, connectivity indicator, and average degree). <b>Weisfeiler-Lehman</b> relabeling (H=2 iterations) builds a multiscale temporal fingerprint, <b>Graph2Vec</b> embeds each mission into ℝ<sup>16</sup>, and a <b>k-nearest-neighbor</b> classifier does the early-warning call — a deliberately simple, non-parametric classifier chosen to show the signal is already separable in the geometry, with no deep discriminative model.</li>
+    <li><b>Degradation is detectable from short prefixes.</b> The classifier is trained only on mission <b>prefixes of length 150</b> steps — well before the typical break time — yet nominal missions concentrate in a compact region of the embedding while degraded missions form a smooth manifold that diverges progressively along the primary principal component. Degradation is a continuous structural process visible in latent space <i>long before</i> explicit disconnection.</li>
+    <li><b>Broken vs. rogue agents separate.</b> Permanently failed ("broken") agents and adversarially deviating ("rogue") agents land in measurably different regions: broken agents produce a gradual loss of coordination density, while rogue agents inject high-variance topological disruption. The embedding captures not just degradation severity but its <i>mode</i>.</li>
+    <li><b>Distance encodes remaining lifetime.</b> Missions that fail early align toward the extreme-degradation region; longer-lasting missions stay near the nominal cluster — latent distance from the nominal manifold correlates with remaining mission lifetime, giving a continuous early-warning signal rather than a binary flag.</li>
+  </ul>
+  <p><b>Figure 1 (PCA space with kNN probability surface, described in prose since no asset was exported):</b> the 16-dimensional mission embeddings are projected to two principal components. Nominal-mission points (one dot per 150-step prefix) cluster tightly in one region while broken-mission points fan outward; overlaid is a smooth kNN decision surface colored by P(mission broken), shading continuously from low probability over the nominal cluster to high probability across the degraded fan. The continuity of that surface — not a sharp wall — is the figure's whole point: it shows the early-warning score is graded, so a threshold can trade off detection delay against false alarms.</p>
+
+  <h2 style="font-size:1.1em">ExoRL — the connectivity-constrained exploration testbed <span class="tag">ICML-2026-formatted · 7pp · published-form sibling of zymera_env</span></h2>
+  <p>The published-form testbed paper for the connectivity-constrained decentralized exploration environment. A swarm of <b>N</b> agents (headline runs use <b>N=4</b>) must maximize coverage of a discrete grid (32×32 in the headline) within a fixed horizon, acting from local sensing plus one-hop neighbor messages — centralized training, decentralized execution. The base reward is the incremental coverage gain cov(t+1) − cov(t).</p>
+  <ul>
+    <li><b>Shaped reward decomposition (five weighted terms + terminal bonus).</b> The per-step shaped reward is
+    <br><code>r(t) = w<sub>new</sub>·Δcov(t) − w<sub>time</sub> − w<sub>sens</sub>·ov<sub>sens</sub>(t) + w<sub>comm</sub>·ov<sub>comm</sub>(t) − w<sub>break</sub>·𝟙[λ₂(t+1) ≤ ε]</code><br>
+    a positive term for newly explored area (w<sub>new</sub>), a small per-step time cost to discourage dithering (w<sub>time</sub>), a redundant-sensing-overlap penalty (w<sub>sens</sub>), a positive shaping term rewarding non-fragile local communication structure (w<sub>comm</sub>), and a large penalty on connectivity violation with immediate termination (w<sub>break</sub>). At the horizon a terminal mission bonus <code>r<sub>T</sub> = w<sub>final</sub>·cov(T)</code> is added. The overlap terms are lightweight shaping signals (normalized sensing-footprint overlap; normalized neighbor-graph edge density / average degree) and are swappable in ablations.</li>
+    <li><b>Algebraic-connectivity breakage criterion.</b> Mission breakage is declared at the first step where the algebraic connectivity (second-smallest Laplacian eigenvalue) of the neighbor graph satisfies <b>λ₂(t) ≤ ε</b> for tolerance ε &gt; 0, and the episode terminates immediately. This permits sparse chain-like topologies while preventing fragmentation into disconnected subteams — connectivity is a hard feasibility condition, not a soft penalty in the headline.</li>
+    <li><b>Headline result.</b> The learned four-agent nominal policy produces a perimeter-first-then-inward-loops pattern and reaches <b>~89.3% coverage</b> (stable above 90% in training; Fig. 2 nominal panel at step 445 shows 89.3%). Injecting a single mild execution-time disturbance — biasing <b>one</b> agent toward the STAY action without altering the other three — drags the whole team down to <b>~68.0% coverage</b> at the end of the horizon (step 500). The biased agent becomes a coordination drag: the team spends part of its fixed budget compensating for the reduced mobility while preserving connectivity, which slows exploration and amplifies a seemingly small single-agent deviation into a large mission-level loss.</li>
+  </ul>
+
+  <h2 style="font-size:1.1em">Stealth-attacks compromise sweep — finer detail <span class="tag">16×16 · N=5 · k∈{0,1,2} · 20 seeds</span></h2>
+  <p class="meta">The headline of this sweep already appears in the adversarial section above; below are the finer numbers and the two figures, not duplicated there.</p>
+  <ul>
+    <li><b>Coverage and degradation by budget k</b> (mean over last 100 training episodes, 20 seeds): benign <b>B (k=0) 98.5 ± 2.3%</b>, <b>C₁ (k=1) 89.6 ± 3.7%</b>, <b>C₂ (k=2) 87.1 ± 7.6%</b>. Degradation ΔJ is <b>9.0 pp</b> at k=1 and <b>11.4 pp</b> at k=2, with <b>diminishing per-agent returns — 9.0 then 5.7 pp per compromised agent</b>. Brittleness (seed-to-seed s.d.) roughly doubles from C₁ to C₂ (σ ratio 2.06).</li>
+    <li><b>Statistical significance (Welch's t, Cohen's d; n=20/condition).</b> B vs C₁: ΔJ 8.98 pp, t=9.27, p&lt;10⁻³, d=2.93. B vs C₂: ΔJ 11.43 pp, t=6.42, p&lt;10⁻³, d=2.03 (both survive Bonferroni at α=0.05/3). <b>C₁ vs C₂ is NOT significant</b>: ΔJ 2.45 pp, t=1.29, <b>p≈0.21</b>, d=0.41 — the second compromise shifts the mean only modestly and shows up mostly as variance.</li>
+    <li><b>Seeds reaching the 90% mission threshold:</b> <b>19/20</b> at B, <b>11/20</b> at C₁, <b>9/20</b> at C₂ — even one compromised agent removes nearly half the seeds from the set that completes the mission within budget.</li>
+    <li><b>Visit concentration (max times any single agent revisits one cell).</b> Compromised agents hoard scans far more sharply than nominal blue: red <b>660</b> per agent at C₁ and <b>915</b> at C₂, against a nominal blue baseline of <b>210</b> — roughly 3–4×. This concentration is the mechanism by which the attacker reshapes the team's shared posterior.</li>
+    <li><b>Network sizes:</b> blue per-agent actor and the k=1 red actor are <b>20,229</b> parameters each (23→128→128→5); the central critic at N=5 is <b>31,489</b> (n·23→128→128→1); the k=2 joint-red actor is <b>23,818</b> (46→128→128→10).</li>
+  </ul>
+  <div class="two">
+    <figure><img src="assets/figures/compromise_compare_v2.png" alt="compromise coverage trajectory by budget k"><figcaption>Mean coverage trajectory ± 95% CI per setup (20 seeds); grey line marks the 90% mission threshold. Per-setup summary (seeds reaching 90%, median crossing step, mean coverage at horizon): B = 19/20, step 89, 98.5%; C₁ = 11/20, step 159, 89.6%; C₂ = 9/20, step 143, 87.1%.</figcaption></figure>
+    <figure><img src="assets/figures/bayesian_belief_powerpoint.png" alt="Bayesian-belief cityscape across compromise budgets"><figcaption>Bayesian-belief "cityscape": bar height is per-cell scan count (proxy for posterior log-evidence), common z-axis across panels. B (5b/0r): smooth dome. C₁ (4b/1r): a red tower over the hoarded cells with a ring of depression in blue's surface. C₂ (3b/2r): two red spikes at the extremities with the blue plateau collapsed between them — the damage lives in the posterior, not the per-step coverage rate.</figcaption></figure>
+  </div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

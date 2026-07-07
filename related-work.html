@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Related Work & the Gap</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .flank{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:38px 0 4px}
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk active" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Related work &amp; the gap</h1>
+  <p class="sub">Five literature investigations — <b>two PRISMA systematic reviews</b> (connectivity-role-allocation; covert misbehaviour), <b>two deep-research sweeps</b> (connectivity-constrained exploration; resilience), and a <b>code hunt</b> — across four flanks. Honest verdict: each flank is well-trodden alone; the <b>intersection</b> is the open seam.</p>
+
+  <div class="toc2">
+    <a href="#spectrum">0 · The connectivity-regime spectrum</a>
+    <a href="#flankA">A · Connectivity-aware exploration &amp; role allocation</a>
+    <a href="#flankB">B · Covert micro→macro misbehaviour</a>
+    <a href="#flankC">C · Resilience of autonomous teams</a>
+    <a href="#borrow">D · Methods worth borrowing</a>
+    <a href="#verdict">The combined gap verdict</a>
+    <a href="#validity">Threats to validity</a>
+    <a href="#corpus">Sources &amp; document corpus</a>
+    <a href="#mrs">E · What to borrow from Multi-Robot Systems</a>
+    <a href="#foundational">F · Foundational references (annotated)</a>
+  </div>
+
+  <!-- 0 SPECTRUM -->
+  <span class="flank" id="spectrum">0 · framing</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The connectivity-regime spectrum</h2>
+  <p>The field organizes connectivity-constrained exploration along a strictness spectrum — <b>None → event-based / recurrent → intermittent → continuous</b>. This is the soft↔hard axis our own work moved along: our soft degree-floor sits near the <i>recurrent</i> end; our hard guardrail is the <i>continuous</i> end. Under the strictest (continuous) regimes the field tends to retreat to centralized planning — which is exactly the room a decentralized, learned approach has.</p>
+
+  <!-- A -->
+  <span class="flank" id="flankA">A · connectivity + roles</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Connectivity-aware exploration &amp; role allocation</h2>
+  <p class="meta">PRISMA review (96 → 24 extracted; 0 met all four criteria) + a connectivity-exploration deep-research sweep + a code hunt.</p>
+  <p>The literature splits into <b>two camps that no study bridges</b>:</p>
+  <ul>
+    <li><b>Connectivity camp</b> — learned + decentralized + genuine comm-graph maintenance, but <b>homogeneous, no roles</b>: <a href="https://arxiv.org/abs/2109.08536">Li et al. 2021</a> (λ₂ / constrained-RL), <a href="https://proceedings.mlr.press/v100/lin20a.html">Lin et al. 2020</a> (hard projection), <a href="https://ieeexplore.ieee.org/document/9738445/">DRL Multitarget Coverage 2023</a> (hard action-mask — closest coverage method).</li>
+    <li><b>Roles camp</b> — learned + decentralized + role-differentiated, but <b>connectivity-blind</b>: <a href="https://arxiv.org/abs/2003.08039">ROMA</a>, <a href="https://arxiv.org/abs/2010.01523">RODE</a>, <a href="https://arxiv.org/abs/2501.02221">CORD</a>; <a href="https://arxiv.org/abs/2312.01747">Area-Search</a> (explore-vs-cover — closest threat); <a href="https://arxiv.org/abs/2402.04763">evolved swarm specialization</a>.</li>
+  </ul>
+  <p><b>Classical relay/explorer + no-consensus allocation</b> (well-established, all heuristic or centralized): de Hoog's role-based exploration, CBAX (centralized, bandwidth-aware Steiner relays), Cesare's self-sacrificing UAVs, DRBECM-ML (RSSI-hysteresis roles), MoRoCo; <b>GVGExp</b> (Voronoi "gate" partition) and <b>Cross-rank</b> (TSP spreading, position-only sharing ~100 B/s); decentralized allocation via <b>market/auction MRTA</b> (Zlot, Sheng), <b>potential fields</b> (Liu &amp; Lyons), and <b>stigmergy</b> (Andries, Kuyucu).</p>
+
+  <div class="callout key"><b>Independent validation of three of our design choices.</b>
+  <table style="margin-top:8px">
+    <tr><th>our choice</th><th>prior art that validates it</th></tr>
+    <tr><td>hysteresis role-switch (enter hi / release lo)</td><td>DRBECM-ML's two-sided RSSI hysteresis (−65 / −75 dBm)</td></tr>
+    <tr><td>hard connectivity guardrail (mask disconnecting moves)</td><td>CBAX's hard feasible-set constraint; Lin 2020 projection; <a href="https://ieeexplore.ieee.org/document/9738445/">9738445</a> hard mask</td></tr>
+    <tr><td>lightweight intent channel (share little)</td><td>Cross-rank shares positions only (~100 B/s), anti-redundancy by spatial spreading</td></tr>
+  </table></div>
+
+  <div class="callout"><b>Released code we can study.</b> <a href="https://github.com/v-spirin/MRESim">MRESim</a> (de Hoog's role-based explorer/relay simulator, Java — a baseline to beat) and <a href="https://github.com/HazemCHAABI/DRBECM">DRBECM</a> (Python/NumPy — the geometric base, not the ML version). Most others released no code. <i>Honest note:</i> the strongest <b>explicit negotiated anti-redundancy</b> claims were the ones that got <b>refuted</b> in verification — that mechanism class is weakly evidenced, which makes our intent-signalling negotiation a less-trodden path.</p></div>
+
+  <!-- B -->
+  <span class="flank" id="flankB">B · covert micro→macro</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Covert micro→macro misbehaviour</h2>
+  <p class="meta">PRISMA review (degraded by tooling → re-established by direct scan). Four clusters; the finding is which never overlap.</p>
+  <table>
+    <tr><th>cluster</th><th>representative work</th><th>stealthy</th><th>micro→macro</th><th>spatial mission</th><th>resilience</th></tr>
+    <tr><td>Covert c-MARL poisoning / backdoor</td><td><a href="https://www.sciencedirect.com/science/article/abs/pii/S0167404822003972">One4All</a>, <a href="https://arxiv.org/abs/2501.01593">BLAST</a>, <a href="https://arxiv.org/abs/2409.07775">Spatiotemporal backdoor</a>, <a href="https://arxiv.org/html/2603.20390">CAMA</a>, <a href="https://www.sciencedirect.com/science/article/abs/pii/S0893608025006276">AMI</a></td><td class="win">yes</td><td class="win">yes (1→team)</td><td class="lose">no (SMAC games)</td><td>attack-demo</td></tr>
+    <tr><td>Stealthy attacks on networked control (CPS)</td><td>stealthy FDI / zero-dynamics attacks</td><td class="win">yes (formal)</td><td>partial</td><td class="lose">no (linear consensus)</td><td>detection</td></tr>
+    <tr><td>Resilient consensus / r-robustness</td><td>W-MSR; <a href="https://www.science.org/doi/10.1126/scirobotics.abf1538">secure swarm cooperation</a></td><td class="lose">no (needs detectable)</td><td>via graph robustness</td><td>flocking</td><td class="win">yes</td></tr>
+    <tr><td>Micro→macro / cascade modelling</td><td>cascading-failure risk, encounter diffusion</td><td class="lose">no (stochastic)</td><td class="win">yes</td><td>abstract</td><td class="win">yes</td></tr>
+  </table>
+  <p><b>The active subfield:</b> single covert agent → poison the whole cooperative team is real and growing (One4All 2022; BLAST 2025 — behaves normally until a trigger, 91.6% success / 3.7% clean-variance; an OpenReview titled <i>"Single-Agent Poisoning Attacks Suffice to Ruin Multi-Agent…"</i>). <b>But all of it is on game benchmarks (SMAC), trigger-based, attack-demonstrations</b> — not spatial missions, not role/position-aware, not resilience curves.</p>
+
+  <!-- C -->
+  <span class="flank" id="flankC">C · resilience</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Resilience of autonomous teams</h2>
+  <p class="meta">Resilience deep-research sweep (automated synthesis failed on tooling → direct-read of the surfaced sources).</p>
+  <ul>
+    <li><b>Byzantine / adversarial resilience theory:</b> <b>r-robustness &amp; (r,s)-robustness</b> of graphs and the <b>W-MSR</b> algorithm (LeBlanc / Zhang / Sundaram) — resilient consensus iff the graph is (F+1,F+1)-robust; <b>resilient leader-follower</b> (Usevitch &amp; Panagou, Automatica 2019).</li>
+    <li><b>Resilient motion:</b> <b>Resilient Flocking for Mobile Robot Teams</b> (Saulnier et al., RA-L 2017) — discard the most extreme neighbours (a spatial W-MSR); robust-topology construction (Guerrero-Bonilla &amp; Kumar).</li>
+    <li><b>Failure / self-healing:</b> decentralized <b>self-repair to maintain connectivity and coverage</b>; fault-tolerant coverage.</li>
+    <li><b>Learned resilience (thin):</b> a few 2023–25 fault-tolerant / Byzantine-robust MARL preprints — for homogeneous teams, not connectivity-aware role-allocating ones.</li>
+  </ul>
+  <div class="callout warnbox"><b>Key distinction this surfaced: connectivity ≠ resilience.</b> A graph can have high algebraic connectivity (λ₂) yet <b>not</b> be r-robust — one well-placed adversary breaks consensus. So a <i>connectivity</i> objective should target λ₂, but a <i>resilience</i> objective should target <b>graph robustness r</b> (W-MSR). Crucially, all this theory assumes adversaries are <b>detectable outliers</b> (the defense discards extremes) — which is exactly what a <b>stealthy</b> agent evades, so the F-robustness guarantees go silent in the covert regime.</div>
+
+  <!-- D -->
+  <span class="flank" id="borrow">D · borrow</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Methods worth borrowing</h2>
+  <ul>
+    <li><b>λ₂ as a constraint, from the belief</b> (Li 2021 / CPO): maximize coverage <i>subject to</i> a connectivity floor — removes the weighted-sum knob that caused our clump/freeze; compute λ̂₂ from the belief instead of an oracle.</li>
+    <li><b>Hard action-mask for coverage</b> (<a href="https://ieeexplore.ieee.org/document/9738445/">9738445</a>, Lin 2020): the connectivity guardrail, validated.</li>
+    <li><b>Hierarchical role architecture</b> (<a href="https://arxiv.org/abs/2312.01747">Area-Search</a>): a high-level role-selector over role-specific controllers.</li>
+    <li><b>GAT / GNN policy backbone</b> (MARVEL, GNN-MARL): the natural substrate for intent-signalled, no-consensus coordination.</li>
+    <li><b>Expert-bootstrap</b> (behaviour cloning; our warm-start): pure from-scratch constrained RL oscillates — start from a known-good policy.</li>
+  </ul>
+
+  <!-- VERDICT -->
+  <span class="flank" id="verdict">verdict</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The combined gap verdict</h2>
+  <div class="callout gap"><b>Every flank is NARROWED, not open — so the contribution must be the conjunction, never a single leg.</b>
+  Connectivity-aware role allocation exists (homogeneous OR connectivity-blind, never both); covert single-agent poisoning of cooperative MARL exists (game benchmarks, trigger-based); resilience theory exists (assumes detectable adversaries). <b>The open seam is the intersection:</b> covert, within-bounds misbehaviour's <b>micro→macro</b> propagation in a <b>spatial</b> connectivity mission, governed by <b>role / graph-position</b>, with a <b>learned graph belief as both attack-surface and detector</b>, characterized as a <b>stealth–damage frontier</b>.</div>
+  <p><b>Do NOT claim:</b> "first connectivity-aware MARL coverage" (refuted by <a href="https://ieeexplore.ieee.org/document/9738445/">9738445</a>), "first learned role allocation for exploration" (refuted by <a href="https://arxiv.org/abs/2312.01747">2312.01747</a>), or "first covert single-agent attack on cooperative teams" (refuted by One4All / BLAST).</p>
+
+  <!-- VALIDITY -->
+  <span class="flank" id="validity">validity</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Threats to validity</h2>
+  <ul>
+    <li><b>Search coverage.</b> The reviews were arXiv-weighted; IEEE / ACM / Springer robotics venues (ICRA, IROS, RSS, CoRL, T-RO) are under-represented — a targeted robotics-venue sweep is the outstanding check before locking the claim.</li>
+    <li><b>Tooling.</b> The connectivity review completed cleanly (96→24); the covert and resilience sweeps' automated synthesis degraded (structured-output failures + an API overload) and were re-established by direct reading — treat those flanks as direct-read, not PRISMA-verified.</li>
+    <li><b>Weakest leg.</b> The relay-role's novelty vs. Area-Search's spatial roles — defend via the integration (belief-driven + connectivity-objective + stealth-frontier), not "we have roles".</li>
+  </ul>
+
+  <!-- CORPUS -->
+  <span class="flank" id="corpus">corpus</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Sources &amp; document corpus</h2>
+  <p class="meta">The full set of documents gathered across the five investigations and the local reference library. Web sources are the substantive/verified ones; quality was mixed and the verified set is what the verdict rests on.</p>
+
+  <h3>Surveyed literature (web)</h3>
+  <p><b>Flank A — connectivity &amp; roles:</b>
+    Amigoni/Banfi/Basilico connectivity-exploration survey (<a href="https://ieeexplore.ieee.org/document/8267592/">8267592</a>),
+    <a href="https://arxiv.org/abs/2109.08536">Li 2021 (λ₂/CPO)</a>,
+    <a href="https://proceedings.mlr.press/v100/lin20a.html">Lin 2020</a>,
+    <a href="https://ieeexplore.ieee.org/document/9738445/">DRL Multitarget Coverage</a>,
+    <a href="https://ieeexplore.ieee.org/document/9620554/">GVGExp</a>,
+    <a href="https://arxiv.org/pdf/1911.08626">intermittent-connectivity ILP</a>,
+    <a href="https://link.springer.com/article/10.1007/s10514-025-10234-3">Cross-rank</a>,
+    de Hoog (<a href="https://ieeexplore.ieee.org/document/5509803">5509803</a> / <a href="https://github.com/v-spirin/MRESim">MRESim</a>),
+    DRBECM-ML (WiOpt 2025 / <a href="https://github.com/HazemCHAABI/DRBECM">repo</a>),
+    <a href="https://arxiv.org/html/2508.07657v1">MoRoCo</a>;
+    role MARL — <a href="https://arxiv.org/abs/2003.08039">ROMA</a>, <a href="https://arxiv.org/abs/2010.01523">RODE</a>, <a href="https://arxiv.org/abs/2205.02561">LDSA</a>, <a href="https://arxiv.org/abs/2312.04819">ACORM</a>, <a href="https://arxiv.org/abs/2501.02221">CORD</a>, <a href="https://arxiv.org/abs/1910.07483">MAVEN</a>;
+    learned exploration — <a href="https://arxiv.org/abs/2312.01747">Area-Search</a>, <a href="https://arxiv.org/abs/2502.20217">MARVEL</a>, <a href="https://arxiv.org/abs/2301.03398">ACE</a>, <a href="https://arxiv.org/abs/2402.04763">evolved swarm</a>.</p>
+  <p><b>Flank B — covert misbehaviour:</b>
+    <a href="https://www.sciencedirect.com/science/article/abs/pii/S0167404822003972">One4All</a>,
+    <a href="https://arxiv.org/abs/2501.01593">BLAST</a>,
+    <a href="https://arxiv.org/abs/2409.07775">Spatiotemporal backdoor</a>,
+    <a href="https://www.sciencedirect.com/science/article/abs/pii/S0893608025006276">AMI</a>,
+    <a href="https://arxiv.org/html/2603.20390">CAMA</a>,
+    <a href="https://openreview.net/pdf?id=46xYl55hdc">"Single-Agent Poisoning Suffices…"</a>,
+    <a href="https://arxiv.org/pdf/2508.09275">Constrained Black-Box Attacks</a>,
+    <a href="https://arxiv.org/html/2508.08800">Selective Adversarial Fault Induction</a>.</p>
+  <p><b>Flank C — resilience:</b>
+    Sundaram et al. robust consensus / r-robustness (W-MSR),
+    Usevitch &amp; Panagou resilient leader-follower (Automatica 2019),
+    Saulnier et al. <i>Resilient Flocking</i> (RA-L 2017),
+    decentralized <a href="https://www.researchgate.net/publication/224252761_Decentralized_self-repair_to_maintain_connectivity_and_coverage_in_networked_multi-robot_systems">self-repair connectivity</a>,
+    <a href="https://www.science.org/doi/10.1126/scirobotics.abf1538">secure swarm cooperation</a> (Science Robotics),
+    <a href="https://www.researchgate.net/publication/386374504_Towards_Fault_Tolerance_in_Multi-Agent_Reinforcement_Learning">Towards Fault Tolerance in MARL</a>,
+    plus resilient-MARL preprints (<a href="https://arxiv.org/abs/2305.12872">2305.12872</a>, <a href="https://arxiv.org/abs/2111.06776">2111.06776</a>, <a href="https://arxiv.org/abs/2204.10063">2204.10063</a>).</p>
+
+  <h3>Local reference library (gathered in the workspace)</h3>
+  <p><b>Classic taxonomies</b> (<code>docs/taxonomy-refs/</code>): Dudek 1996 (multi-agent robotics taxonomy), Gerkey &amp; Matarić 2004 (MRTA taxonomy, IJRR), Verma &amp; Ranga 2021 (multi-robot coordination taxonomy, JIRS), Chung et al. 2018 (aerial swarm robotics survey, T-RO), Brambilla et al. 2013 (swarm robotics / swarm engineering), Schranz et al. 2020 (swarm robotic behaviours), Amato (Dec-POMDP survey), Oliehoek 2012 (Dec-POMDPs RL chapter). Plus the generated <b><code>marl_taxonomy/</code></b> field map (70 entries + gap/venue reports).</p>
+  <p><b>Project drafts</b> (<code>references/</code>): <i>Stealth Attacks on Swarms</i>, <i>Swarm Resiliency</i>, <i>mission family</i>, <i>advML report</i>, <i>ExoRL report</i>, <i>Formalization</i>.</p>
+
+  <div class="callout warnbox"><b>Honesty on the corpus.</b> The deep-research sweeps returned more candidate URLs than are listed here; many were graded low-quality and dropped, and the resilience/covert syntheses were re-established by direct reading after a tooling failure. This page lists the <b>substantive</b> documents; the only ones the gap <i>verdict</i> leans on are the verified/primary works in flanks A–C.</p></div>
+
+  <!-- E · MRS TECHNICAL REVIEW -->
+  <span class="flank" id="mrs">E · multi-robot systems</span>
+  <h2 style="margin-top:6px;border:0;padding:0">What to borrow from Multi-Robot Systems</h2>
+  <p class="sub">A method-level technical review for a <b>sparse, networked team of autonomous agents</b> doing area coverage under a communication constraint — built toward studying covert-misbehaviour resilience. Three areas: distributed connectivity estimation · coverage control · connectivity-constrained exploration.</p>
+
+  <p>The multi-robot-systems (MRS) field has worked these exact problems for ~20 years. This review pulls the canonical methods, defines the technical terms from them, states <b>what information each node must hold</b>, shows <b>how the classical methods fuse with learning (MARL/GNN)</b>, and lays out the <b>three connectivity "guardrail" strategies</b> (maintain · mask · grace). The novelty-conjunction verdict it lands on is <b>the same one already stated above</b> — see <a href="#verdict">the combined gap verdict</a>; this section does not repeat it, it supplies the method-level depth underneath it.</p>
+
+  <!-- ===== E.1 connectivity ===== -->
+  <h3>E.1 · Distributed algebraic-connectivity (λ₂) estimation &amp; maintenance</h3>
+  <p>How does a team where each robot sees only its one-hop neighbours keep the whole comm graph connected? The field makes "connected" quantitative through <b>λ₂</b>, the second-smallest eigenvalue of the graph Laplacian (the <b>Fiedler value</b>): it is &gt; 0 iff the graph is connected and grows as the graph gets better-knit. The hard part: λ₂ and its eigenvector are <b>global</b> properties, yet each robot only knows its own Laplacian row. The signature contribution is a family of <b>distributed power-iteration + average-consensus</b> algorithms that let every robot estimate its own component of the Fiedler vector and a local copy of λ₂ from neighbour-to-neighbour messages alone — then follow the <b>gradient of λ₂</b> to hold connectivity. Almost all of it is control-theoretic; learning enters as a replacement controller (GNN) or as a constraint/guardrail around a learned policy.</p>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">Glossary (defined from the canonical methods)</h4>
+  <table>
+    <tr><th style="width:230px">Term</th><th>Definition</th></tr>
+    <tr><td><b>Graph Laplacian <code>L = D − A</code></b></td><td>Degree matrix minus adjacency. Symmetric PSD, row-sums zero (<code>L·1=0</code>); spectrum <code>0=λ₁≤λ₂≤…</code> encodes connectivity. Each robot natively knows only its own <b>row</b> of L.</td></tr>
+    <tr><td><b>Algebraic connectivity / Fiedler value (λ₂)</b></td><td>2nd-smallest eigenvalue of L. <code>λ₂&gt;0 ⇔ graph connected</code> (Fiedler 1973); monotone as edges/weights increase — a smooth scalar surrogate for "how connected".</td></tr>
+    <tr><td><b>Fiedler vector (v₂)</b></td><td>Eigenvector for λ₂, orthogonal to <code>1</code>. Component <code>v₂ⁱ</code> says how robot <i>i</i> sits on the graph's weakest cut; the λ₂ gradient is built from edge differences <code>(v₂ⁱ−v₂ʲ)²</code>, so a robot needs only its own component + neighbours'.</td></tr>
+    <tr><td><b>Why the <i>second</i> eigenvalue</b></td><td>λ₁ is always 0 (eigenvector <code>1</code>), carrying no connectivity info. Connectivity lives in λ₂ — which requires <b>deflating</b> the trivial <code>1</code> direction so λ₂ becomes the dominant mode.</td></tr>
+    <tr><td><b>Distributed power iteration</b></td><td>Repeatedly apply a shifted/deflated operator <code>(I−αL)</code> to a vector; it converges to v₂. The product <code>L·x</code> is <b>local</b> (each node combines only neighbour values) — turning power iteration into rounds of neighbour message-passing.</td></tr>
+    <tr><td><b>Dynamic average consensus</b></td><td>The PI (proportional-integral) estimator (Freeman–Yang–Lynch 2006) that tracks the average of a <i>time-varying</i> signal from neighbour exchanges. It supplies the two global scalars — the deflation mean <code>Ave(x)</code> and normalisation <code>Ave(x²)</code> — that power iteration needs, without any node holding the whole vector.</td></tr>
+    <tr><td><b>Connectivity gradient</b></td><td><code>∂λ₂/∂pᵏ = Σⱼ −Aₖⱼ(v₂ᵏ−v₂ʲ)²(pᵏ−pʲ)/σ²</code>. <b>Local</b>: robot k needs only its own Fiedler component, its neighbours', and relative positions. Following it (or a barrier-potential of λ₂) is the connectivity-maintenance control law.</td></tr>
+  </table>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">Methods &amp; their learning stacks</h4>
+  <table>
+    <tr><th>Method</th><th>How it works</th><th>Learning stack</th></tr>
+    <tr><td><b>Decentralized deflated power-iteration + PI consensus</b> (Yang–Freeman–Lynch 2010)</td><td>Each agent integrates one scalar <code>xⁱ→v₂ⁱ</code> with three terms (deflate the <code>1</code> mode, apply −L, renormalise); reads off λ₂ via Rayleigh quotient or the normalisation gain; then moves up the λ₂ gradient. <b>The reference scheme.</b></td><td>control-theoretic (ODE + consensus + gradient; Lyapunov proof)</td></tr>
+    <tr><td><b>Power-iteration + potential-barrier controller</b> (Sabattini–Chopra–Secchi 2013)</td><td>Same estimator, wrapped by a potential <code>V(λ₂)→∞</code> as <code>λ₂→ε</code>. The barrier dominates near the threshold ⇒ provably keeps <code>λ₂&gt;ε</code> for all time even with an added bounded task controller.</td><td>control-theoretic</td></tr>
+    <tr><td><b>Fiedler-supergradient ascent</b> (de Gennaro–Jadbabaie 2006)</td><td>Estimate v₂ (distributed spectral analysis), ascend λ₂ via <code>dλ₂ = v₂ᵀ(dL)v₂</code>. Establishes λ₂-as-objective.</td><td>control-theoretic + distributed eigensolver</td></tr>
+    <tr><td><b>Nearest-neighbour connectivity potentials</b> (Zavlanos–Pappas 2007)</td><td>Potentials on existing links diverge as a link nears comm range ⇒ no current edge is ever lost. Preserves the <i>edge set</i> rather than tracking λ₂ (more conservative).</td><td>control-theoretic</td></tr>
+    <tr><td><b>Nonlinear edge-weight coordination</b> (Ji–Egerstedt 2007)</td><td>Edge weights blow up near sensing range ⇒ the weighted-Laplacian flow never disconnects, with <i>no</i> λ₂ computation. Simple, decentralized, conservative (freezes initial topology).</td><td>control-theoretic</td></tr>
+    <tr><td><b>λ₂-maximisation via SDP</b> (Kim–Mesbahi 2006)</td><td>Place agents to maximise λ₂ subject to proximity, solved as a sequence of semidefinite programs. The centralized "ground truth" the distributed gradients approximate.</td><td>optimization (SDP), centralized</td></tr>
+    <tr><td><b>Aggregation-GNN decentralized controller</b> (Tolstaya–Gama–Ribeiro 2019)</td><td>An order-K graph-filter GNN (K rounds of message-passing — structurally the same local aggregation as power iteration) <b>imitates</b> a centralized flocking controller; transfers across team sizes. But <b>no hard connectivity guarantee</b> — the authors document a <b>subgroup-escape</b> failure, motivating guardrails.</td><td>imitation (behaviour cloning) on a graph-conv GNN; K-hop message passing</td></tr>
+    <tr><td><b>RL policy with λ₂ as a constraint</b> (Li et al., ICRA 2022)</td><td>Shared decentralized policy from local range-scan + neighbour positions; λ₂(Gₜ) enters as a <b>constraint</b> (not just reward), behaviour-cloning warm-start. The now-standard pattern: <b>learned task policy + control-theoretic λ₂ as the safety layer.</b></td><td>deep MARL (PPO-style, constrained) + BC</td></tr>
+  </table>
+
+  <div class="callout key">
+  <b>What information each node must hold &amp; exchange</b> (the Yang–Freeman–Lynch scheme — directly answers "what info does each node need"):
+  <ul>
+    <li><b>Own position</b> <code>pⁱ</code> and the relative positions <code>pⁱ−pʲ</code> of its one-hop neighbours; shared design constants (comm range <code>r</code>, kernel <code>σ</code>).</li>
+    <li><b>Its Laplacian row, implicitly:</b> edge weights <code>Aᵢⱼ=exp(−‖pⁱ−pʲ‖²/2σ²)</code> to each neighbour ⇒ its degree and row entries. Never sees non-neighbours' rows. The product <code>(Lx)ⁱ=Σⱼ Aᵢⱼ(xⁱ−xʲ)</code> is computable from this row + neighbours' <code>xʲ</code>.</li>
+    <li><b>Its Fiedler-component estimate</b> <code>xⁱ</code> — a single scalar integrated toward <code>v₂ⁱ</code>. The full vector is never materialised anywhere.</li>
+    <li><b>Two PI dynamic-average-consensus estimators</b> (4 internal states): one tracks <code>Ave(x)</code> (deflation/mean), one tracks <code>Ave(x²)</code> (normalisation).</li>
+    <li><b>Its own λ₂ estimate</b> <code>λ₂ⁱ=(k₃/k₂)(1−z^{i,2})</code> (or the Rayleigh-quotient form).</li>
+    <li><b>Local gains</b> k₁,k₂,k₃ and consensus gains (identical across agents — no global knowledge needed; only an <i>upper bound</i> on n is required).</li>
+    <li><b>Exchanged per round, neighbour-to-neighbour only:</b> five scalars <code>{xⁱ, z^{i,1}, w^{i,1}, z^{i,2}, w^{i,2}}</code> (+ position for the controller). Cost is <b>O(1) per node</b>, scaling only with degree, not n.</li>
+    <li><b>Does NOT need:</b> the full Laplacian, full Fiedler vector, global topology, exact n, or any coordinator — every global quantity is reconstructed locally via consensus.</li>
+  </ul>
+  </div>
+
+  <p><b>How it fuses with learning.</b> Three layers: <b>(1) replacement</b> — a graph-conv GNN imitates a centralized controller and runs decentralized (but pure imitation lacks a guarantee → subgroup-escape, so it does <i>not</i> subsume the λ₂ machinery); <b>(2) λ₂ as a learning signal</b> — MARL puts algebraic connectivity into the objective as a reward or hard constraint; <b>(3) guardrail/shielding</b> (most robust, now-standard) — a learned policy proposes, a control-theoretic layer (distributed λ₂ estimate, edge-weight barrier, or move-masking) projects onto the connectivity-feasible set. In all hybrids the <b>spectral estimator stays control-theoretic</b>; learning replaces the <i>controller</i> or the <i>objective</i>, not the estimator.</p>
+
+  <p class="meta"><b>Gaps:</b> time-scale fragility (estimators correct only under strong separation: consensus ≫ power-iteration ≫ motion); λ₂ is global &amp; slow (one weak cut sets it, gradient near-zero almost everywhere, per-node readout singular when <code>xⁱ</code> crosses zero); <b>adversarial / Byzantine robustness essentially open</b> (estimators assume truthful neighbours — one lying agent biases the whole λ₂ estimate; resilient distributed Fiedler estimation is unsolved, and W-MSR/r-robustness protect consensus <i>values</i>, not spectral estimates); connectivity is necessary but not the right objective (λ₂-max over-clusters), and the learning side is thin on guarantees.</p>
+
+  <div class="callout warnbox"><b>→ For us.</b> The big one is the adversarial gap — that's our headline RQ. Two of our levers attack it: the learned GCRN belief is <i>dual-use</i> (attack surface <i>and</i> a within-bounds anomaly detector), and we measure resilience as a stealth-damage frontier rather than a one-shot attack. Practically, treat a <b>distributed/learned connectivity estimate as a policy feature</b>, but remember a key in-house finding: <b>λ₂ is not deployable under partial single-step info</b> — the implementable hard form is a <b>local degree/component check</b>, and the deployable belief is our learned size-invariant estimator, not an online eigensolver.</div>
+
+  <!-- ===== E.2 coverage ===== -->
+  <h3>E.2 · Coverage control — and how it fuses with learning</h3>
+  <p>Coverage control deploys mobile sensors so every point is well-sensed by its nearest robot, with more capacity where it matters. The canonical formulation (Cortés–Martínez–Karatas–Bullo 2004) is <b>locational optimization</b>: minimise <code>H(P)=Σᵢ ∫_{Vᵢ} f(‖q−pᵢ‖)·φ(q) dq</code>. The solution partitions the region into <b>Voronoi cells</b>, shows the optimum is a <b>centroidal Voronoi tessellation</b> (each robot at its importance-weighted centroid), and reaches it by <b>Lloyd's algorithm</b> (move toward your cell centroid). Decentralized over the Delaunay graph. Its limitation — φ assumed known, controller myopic (uses only its own cell, never shares) — is exactly what learning attacks.</p>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">Glossary</h4>
+  <table>
+    <tr><th style="width:230px">Term</th><th>Definition</th></tr>
+    <tr><td><b>Voronoi cell <code>Vᵢ</code></b></td><td>All points closer to <code>pᵢ</code> than any other robot. Robot <i>i</i> is responsible for its cell; only Delaunay (boundary-sharing) neighbours matter.</td></tr>
+    <tr><td><b>Lloyd's algorithm</b></td><td>Iterate: compute Voronoi cells → move each site to its density-weighted centroid → repeat. As feedback: <code>uᵢ=−k(pᵢ−Cᵢ)</code> — gradient descent on the locational cost.</td></tr>
+    <tr><td><b>Locational cost <code>H(P)</code></b></td><td>Total importance-weighted sensing error (commonly <code>f(x)=x²</code>); the objective coverage minimises.</td></tr>
+    <tr><td><b>Centroidal Voronoi tessellation (CVT)</b></td><td>Every site = centroid of its own cell. CVTs are exactly the critical points of H.</td></tr>
+    <tr><td><b>Generalized mass / centroid</b></td><td><code>Mᵢ=∫_{Vᵢ}φ</code>, <code>Cᵢ=(1/Mᵢ)∫_{Vᵢ} q·φ dq</code>. Gradient: <code>∂H/∂pᵢ=2Mᵢ(pᵢ−Cᵢ)</code>.</td></tr>
+    <tr><td><b>Density / importance <code>φ</code></b></td><td>Where sensing matters. Known a-priori classically; <b>estimated from data</b> in adaptive/learned versions.</td></tr>
+    <tr><td><b>Weighted / power Voronoi</b></td><td>Per-robot weights <code>wᵢ</code> make capable robots claim larger cells (heterogeneous teams); weights can be learned online.</td></tr>
+    <tr><td><b>CTDE-by-imitation</b></td><td>A centralized <i>clairvoyant</i> CVT expert (full state + true φ) generates optimal Lloyd actions; a decentralized GNN is trained by MSE to reproduce them from local obs + messages, then deployed decentrally.</td></tr>
+  </table>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">Methods (classical → learned)</h4>
+  <table>
+    <tr><th>Method</th><th>How it works</th><th>Learning stack</th></tr>
+    <tr><td><b>Voronoi/Lloyd coverage</b> (Cortés–Bullo 2004)</td><td>Compute cell → weighted centroid → <code>uᵢ=−k(pᵢ−Cᵢ)</code>. Exact gradient descent on H; LaSalle convergence to a CVT. Assumes φ known.</td><td>control-theoretic</td></tr>
+    <tr><td><b>Decentralized adaptive coverage</b> (Schwager–Rus–Slotine 2009)</td><td><b>Learns φ online:</b> <code>φ=K(q)ᵀa</code> with unknown weights a; each robot updates â from its own measurements + a consensus term; moves to its â-centroid. Lyapunov proof of coverage + (under persistent excitation) parameter consensus.</td><td>online adaptive control + parameter consensus (no deep nets)</td></tr>
+    <tr><td><b>Adaptive weighted-Voronoi</b> (Pierson–Schwager 2017)</td><td>Heterogeneous teams: multiplicatively-weighted Voronoi; each robot <b>learns its performance weight</b> online from local signal + neighbours.</td><td>online adaptive control (weight adaptation)</td></tr>
+    <tr><td><b>Spatial-GNN coverage</b> (Tolstaya et al. 2021)</td><td>Environment → spatial graph; a size-equivariant GNN maps each robot's neighbourhood to a move, imitating a centralized expert. Generalises to maps/teams far larger than the expert can solve.</td><td>spatial GNN + imitation</td></tr>
+    <tr><td><b>GNN decentralized controller</b> (Gosrich–Kumar 2022)</td><td>Multi-hop message passing lets each robot fuse <i>non-local</i> info before deciding velocity → <b>beats non-communicating Lloyd</b>, scales/transfers to larger teams.</td><td>GNN (multi-hop) + imitation</td></tr>
+    <tr><td><b>LPAC</b> (Agarwal–Kumar–Ribeiro 2024) <span class="tag">SOTA, open-source</span></td><td>Per robot: <b>CNN</b> perception of a 32×32 local density map → <b>GNN</b> (K=3 hops) communication → <b>MLP</b> velocity. Imitates a clairvoyant CVT expert on 100k state-action pairs. <b>Beats decentralized- and centralized-CVT by ≥20%</b>, transfers zero-shot to larger maps/teams, robust to position noise.</td><td>CNN + K-hop GNN + MLP, end-to-end imitation (PyTorch-Geometric)</td></tr>
+    <tr><td><b>Constrained-learning coverage</b> (Agarwal et al. 2024)</td><td>LPAC architecture trained with <b>primal-dual / Lagrangian</b> optimization so the policy satisfies extra constraints (e.g. connectivity) rather than collapsing them into one scalar.</td><td>GNN + constrained (primal-dual) learning</td></tr>
+    <tr><td><b>MARL coverage + dynamic density</b></td><td>RL (actor-critic) with coverage-cost reward; targets spawn a dynamic density that attracts agents, coupled to CVT — handles moving/unknown φ the static-φ controller can't.</td><td>MARL (actor-critic) + CVT prior</td></tr>
+  </table>
+
+  <div class="callout key">
+  <b>How coverage fuses with learning — four increasingly aggressive layers:</b>
+  <ol>
+    <li><b>Learn the density, keep the controller</b> (Schwager): φ modelled as linear-in-unknown-weights, estimated online + shared by consensus; motion law stays "move to weighted centroid" — a provable controller wrapped around an online estimator (the cleanest fusion).</li>
+    <li><b>Learn relative capability</b> (Pierson): per-robot performance weights learned inside a weighted-Voronoi partition; geometry kept, parameters adapted.</li>
+    <li><b>Learn the controller itself</b> (Kumar/Ribeiro): the analytic Lloyd rule is <b>myopic</b> (own cell only, no sharing) ⇒ provably suboptimal under limited range. GNNs with multi-hop message passing fuse non-local info and beat it; LPAC is the mature CNN+GNN+MLP pipeline. <b>The recurring recipe is CTDE-by-imitation:</b> classical theory supplies both the <i>cost</i> and the cheap clairvoyant <i>expert</i>, and a decentralized GNN is supervised to reproduce it.</li>
+    <li><b>Learn under constraints / by reward:</b> primal-dual constrained learning to respect connectivity; or MARL reward-shaping for time-varying φ.</li>
+  </ol>
+  Across all four, the <b>centroidal-Voronoi objective stays the backbone</b> (the cost, the expert, or the geometric prior); learning supplies what the theory assumes away — the density, the heterogeneity, and the non-local coordination.
+  </div>
+
+  <p><b>What each node holds:</b> own position + Voronoi/Delaunay-neighbour positions (to compute its cell); the density φ over its cell (known classically; a learned estimate â shared by consensus in adaptive coverage); mass <code>Mᵢ</code> and centroid <code>Cᵢ</code> — the move-toward target, computed locally; heterogeneous: a learned performance/trust weight <code>wᵢ</code>, exchanged with neighbours; GNN/LPAC: a local ego-centric density map (e.g. 32×32 + boundary + neighbour-position channels), a fixed-size learned message exchanged at each of K hops, and in-range neighbours' relative positions.</p>
+
+  <p class="meta"><b>Gaps:</b> only <b>local</b> optimality (Lloyd → a local CVT, init-dependent); known-/static-density assumption (adaptive needs persistent excitation, which conflicts with staying spread on high-φ areas); learned controllers are <b>bottlenecked by their clairvoyant expert</b> (inherit its local-optimality ceiling; need centralized true-state at train time); assume cooperative honest robots — <b>corrupted neighbour features / dropped links unaddressed</b> (the GNN message layer is a single point of failure); connectivity treated only recently, as a <b>soft</b> constraint — coupling coverage with a hard connectivity guarantee remains under-developed.</p>
+
+  <div class="callout warnbox"><b>→ For us.</b> LPAC is the architecture to study closely: CNN-local-map + K-hop GNN + MLP, trained by imitation of a cheap analytic expert, gives <b>size-invariant transfer</b> — exactly the "scale-free local rule → emergent collective" property the swarm claim requires. But its blind spots are <i>our</i> contributions: it has <b>no relay role</b> (coverage over-clusters), treats connectivity as a soft constraint, and assumes honest neighbours. Our additions — emergent relay role, hard-ish connectivity, and the covert-resilience layer — sit precisely in LPAC's gaps.</div>
+
+  <!-- ===== E.3 exploration ===== -->
+  <h3>E.3 · Exploration / coverage under a connectivity constraint — the three guardrails</h3>
+  <p>The core tension is intrinsic: exploration rewards spreading apart; comms have limited range, so dispersing eventually <b>breaks the network and strands discoveries</b>. The field's central design choice is the <b>connectivity guardrail</b> — the rule for which dispersed configurations are allowed and how/when the network must reform. The literature organises cleanly around three behaviours:</p>
+
+  <table>
+    <tr><th style="width:160px">Guardrail</th><th>How it works</th><th>Representative works</th></tr>
+    <tr><td><b>(A) Maintain</b><br>continuous connectivity</td><td>The graph stays a <b>single component at all times</b>. Realised as an attractive potential on the Laplacian (links = springs) or a controller keeping <code>λ₂&gt;0</code>; any exploration command is blended with a connectivity-restoring term so robots are reeled back <i>before</i> a link breaks. Hard, always-on guarantee — but conservative: robots can never venture beyond the network's reach.</td><td>Hsieh–Cowley–Kumar 2008; Zavlanos–Pappas 2007; Zavlanos–Egerstedt–Pappas 2011; Sabattini et al. 2013</td></tr>
+    <tr><td><b>(B) Mask</b><br>hard-constrain moves</td><td>Operates on <b>individual decisions</b>: check each candidate move; if it would disconnect the graph, <b>forbid it and project to the nearest admissible move</b>. In continuous control a <b>CBF-QP</b> renders the connected set forward-invariant; in discrete/distributed settings a local motion-constraint projection (even under delay). Less conservative than a global potential (free inside the connected set), and <b>the natural form inside a learned policy</b> (mask disconnecting actions).</td><td>Schuresko–Cortés 2009; Capelli–Sabattini 2020 (CBF); <i>our RedWithinBlue hard guardrail (beats soft degree-floor by ~20 pts)</i></td></tr>
+    <tr><td><b>(C) Grace</b><br>budget + incentivise reconnection</td><td>The team is <b>deliberately allowed to split</b> to explore far, then brought back by <b>rendezvous</b>. Guarantee is <i>temporal</i>: reconnect every T steps (<b>periodic</b>), whenever info must be reported (<b>recurrent</b>), or in the union-over-a-window sense (<b>intermittent</b>). Reconnection is driven by an explicit schedule (job-shop/MILP, event-triggered) <i>or</i> by an incentive (reconnect when the value of sharing exceeds the value of more solo exploration). Buys the most exploration speed, bounds the <b>age-of-information</b> of discoveries, at the price of latency.</td><td>Hollinger–Singh 2010/12 (periodic, seminal); Banfi et al. 2018 (recurrent); Kantaros–Zavlanos 2017 (intermittent + LTL); job-shop rendezvous 2024; Jensen–Gini 2013 (sentry/explorer); <b>learned:</b> IR2, IROS 2024</td></tr>
+  </table>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">Glossary</h4>
+  <table>
+    <tr><th style="width:230px">Term</th><th>Definition</th></tr>
+    <tr><td><b>Continuous connectivity</b></td><td>Graph connected at <i>every</i> instant; no splitting move ever allowed (guarantee pointwise in time).</td></tr>
+    <tr><td><b>Recurrent connectivity</b></td><td>May disconnect arbitrarily long, but must periodically re-establish — typically to teammates <i>and</i> a base — each time there's something to report (<b>event-driven</b>).</td></tr>
+    <tr><td><b>Intermittent connectivity</b></td><td>Required only in the <i>union</i> sense over a sliding window, infinitely often; the instantaneous graph may be split; info flows through a sequence of pairwise meetings.</td></tr>
+    <tr><td><b>Periodic connectivity</b></td><td>Special case: regain full connectivity every fixed interval T (Hollinger–Singh) — a tunable knob between spreading and coupling.</td></tr>
+    <tr><td><b>Rendezvous</b></td><td>A coordinated meeting to exchange maps. <b>Explicit/scheduled</b> (planned point+time via MILP/job-shop) or <b>implicit/emergent</b> (converge when sharing-value &gt; solo-exploration-value).</td></tr>
+    <tr><td><b>Connectivity budget</b></td><td>Bound on how much / how long / how far the team may be disconnected (the period T, max disconnection duration, droppable hops). Grace <i>spends</i> this budget to buy speed.</td></tr>
+    <tr><td><b>Age-of-Information (AoI)</b></td><td>Delay between observing info and it reaching its consumer (teammate/base). Under intermittent connectivity it's non-zero, bounded by the reconnection schedule; minimising it is the implicit objective rendezvous timing trades against exploration gain.</td></tr>
+    <tr><td><b>Relay/backbone vs frontier/explorer</b></td><td>Division of labour: relays hold positions stitching the network; explorers push into the unknown. Roles can be static, rule-switched (Jensen–Gini), tied to comm-tree depth (A³), or — the open goal — <b>emergent from learning</b>.</td></tr>
+  </table>
+
+  <p><b>What each node holds:</b> own pose/cell + local occupancy belief (free/occupied/unknown) accumulated since the last sync; its in-range neighbour set (local adjacency row) + link qualities — raw material for any connectivity check; a <b>local estimate of a global connectivity quantity</b> (giant-component membership, a degree count, or a distributed λ₂ estimate); frontier/utility info, and (for Grace) a <b>"map-surplus" belief</b> — how much more it knows than neighbours — which sets the value of reconnecting; teammates' last-known positions/headings (to anticipate disconnection and navigate to rendezvous); for scheduled/intermittent, the rendezvous commitment (where/when) + a timer/budget (AoI of its discoveries); for role-based, its current role + the info to decide a switch (comm-tree depth; whether holding position keeps the backbone intact).</p>
+
+  <p><b>How learning enters.</b> <b>(1) Learning replaces the planner, guardrail stays hand-engineered</b> — a MARL/GNN policy chooses moves, connectivity enforced by an external mask/CBF/schedule (safest, most common). <b>(2) Learning absorbs Grace</b> — instead of an explicit schedule, the policy learns the long-horizon disconnect-vs-reconnect trade-off, so rendezvous becomes <b>implicit/emergent</b> (<b>IR2</b>, IROS 2024: SAC + attention + a map-surplus feature + curriculum — the frontier of replacing schedules with learned timing). <b>(3) Learning is meant to grow the role structure</b> — but the few instances (A³ network) still tie roles to a hand-defined comm-tree-depth rule, so differentiation is only <b>semi-emergent</b>. The natural substrate throughout is a GNN over the comm graph (size-invariant transfer) — and a <b>learned per-agent graph-belief</b> is the key under-used enabler.</p>
+
+  <p class="meta"><b>Gaps (the deep one):</b> learned connectivity-constrained exploration is thin, and almost always pairs a learned explorer with a <b>hand-designed</b> guarantee — a policy that <i>internalises</i> the constraint and still gives a formal guarantee is largely missing; <b>Grace-by-learning is nearly a one-paper field</b> (IR2); <b>emergent explorer/relay roles under the constraint are essentially unrealized</b> (every split is hand-assigned, rule-switched, or keyed to comm-tree depth); per-agent belief/graph substrates are under-used as the carrier of the constraint; realistic comm models (latency, loss, bandwidth, AoI) mostly absent from learned work, and <b>adversarial/stealth robustness of a learned connectivity guardrail is unaddressed</b>.</p>
+
+  <div class="callout warnbox"><b>→ For us.</b> Three of these gaps are <i>literally our open questions</i>, and we already have results in them: <b>(C/learned)</b> our Regime-B (soft + latency-discounted delivery) is exactly a learned-Grace formulation; <b>(emergent roles)</b> our crisp finding — roles emerge <i>only</i> when the constraint is soft enough that relaying pays; under a hard backstop the relay role is redundant and vanishes; <b>(belief substrate)</b> we built the GCRN size-invariant belief that no surveyed method has. The thing to adopt from here is the <b>Grace vocabulary itself</b> — periodic/recurrent/intermittent + age-of-information — because at scale (where one component is geometrically infeasible) this is the only honest regime, and <b>AoI is precisely our covert-attack channel</b> (a relay that silently drifts inflates AoI without tripping a degree-floor).</div>
+
+  <!-- ===== E.4 cross-cutting seams ===== -->
+  <h3>E.4 · Where classical stops and learning starts (the seams)</h3>
+  <p>All three areas independently flag the same holes; the same four cross-cutting gaps surfaced here as in the flank-A–C reviews above, validated against in-house results. The five seams where classical MRS theory hands off to learning:</p>
+  <ol>
+    <li><b>Global-info / time-scale seam.</b> Distributed λ₂ needs strong time-scale separation and recovers a <i>global</i> quantity over many rounds. It fails for fast motion / sparse links and — for us — under partial single-step info: the deployable hard constraint is a <b>local degree/component check</b>, the deployable belief a <b>learned size-invariant estimator</b>, not an online eigensolver.</li>
+    <li><b>Myopia seam.</b> Lloyd/CVT is exact but uses only its own cell and over-clusters → provably suboptimal under limited range. Learned multi-hop GNNs (LPAC) propagate the non-local info the myopic rule can't.</li>
+    <li><b>Known-model seam.</b> Classical assumes φ known/static, links symmetric, neighbours truthful. Learning starts where the model is unknown/time-varying/heterogeneous — for us, the global topology and teammate positions after disconnection (estimated by the belief).</li>
+    <li><b>Hard-discrete-composition seam (most central).</b> Control theory gives hard guarantees for a single smooth objective (CBF-QP, edge-barriers, move-projection) but stops at (a) emergent multi-role division of labour, (b) the non-myopic Grace trade-off, (c) composing a flexible policy with the guarantee beyond ad-hoc penalties. Our results pin it: the hard mask is the right <i>safety</i> layer but makes the relay role redundant ⇒ control theory supplies the <b>invariant</b>, learning supplies the <b>non-myopic policy + emergent roles + reconnection timing + the belief</b>.</li>
+    <li><b>Cooperative-truthful seam (our RQ).</b> Every classical guarantee — including W-MSR — assumes neighbours are truthful or detectable outliers. Learning + our resilience study becomes necessary the moment the adversary is <b>covert</b> (within-bounds, corrupting the estimate, exploiting graph-position) — where classical robustness goes silent and the dual-use learned belief is the only instrument.</li>
+  </ol>
+  <p class="meta">The MRS review's own novelty verdict (the full conjunction is novel; each axis alone is not — learned+decentralized free, λ₂-aware control exists but role-less, learned role differentiation exists but connectivity-blind, covert single-agent poisoning is an active subfield, LPAC transfer is unconstrained/role-less, learned implicit rendezvous ≈ one paper) is identical to <a href="#verdict">the combined gap verdict above</a> and is not repeated here. Compiled from a 4-agent verified literature workflow (<code>mrs-litreview</code>); arXiv-weighted — a robotics-venue (ICRA/IROS/RSS/CoRL/T-RO) sweep is still owed before locking paper claims.</p>
+
+  <h4 class="meta" style="text-transform:uppercase;letter-spacing:.5px;margin-top:18px">References — MRS technical review</h4>
+  <p class="meta"><b>Connectivity estimation &amp; maintenance:</b>
+    Yang, Freeman, Gordon, Lynch, Srinivasa, Sukthankar (2010), <i>Automatica</i> 46(2);
+    Sabattini, Chopra, Secchi (2013), <i>IJRR</i> 32(12);
+    de Gennaro, Jadbabaie (2006), <i>IEEE CDC</i>;
+    Zavlanos, Pappas (2007), <i>IEEE T-RO</i> 23(4);
+    Kim, Mesbahi (2006), <i>IEEE TAC</i> 51(1);
+    Ji, Egerstedt (2007), <i>IEEE T-RO</i> 23(4);
+    Kempe, McSherry (2008), <i>JCSS</i> 74(1);
+    Tolstaya, Gama, Paulos, Pappas, Kumar, Ribeiro (2019), <i>CoRL</i>;
+    Li, Jie, Kong, Cheng (2022), <i>IEEE ICRA</i> (<a href="https://arxiv.org/abs/2109.08536">arXiv:2109.08536</a>).</p>
+  <p class="meta"><b>Coverage control:</b>
+    Cortés, Martínez, Karatas, Bullo (2004), <i>IEEE T-RA</i> 20(2);
+    Bullo, Cortés, Martínez (2009), <i>Distributed Control of Robotic Networks</i>, Princeton;
+    Schwager, Rus, Slotine (2009), <i>IJRR</i> 28(3);
+    Pierson, Figueiredo, Pimenta, Schwager (2017), <i>IJRR</i> 36(3);
+    Du, Faber, Gunzburger (1999), <i>SIAM Review</i> 41(4) / Lloyd (1982);
+    Tolstaya, Paulos, Kumar, Ribeiro (2021), <i>IROS</i> (<a href="https://arxiv.org/abs/2011.01119">arXiv:2011.01119</a>);
+    Gosrich, Mayya, Li, Paulos, Yim, Ribeiro, Kumar (2022), <i>ICRA</i> (<a href="https://arxiv.org/abs/2109.15278">arXiv:2109.15278</a>);
+    Agarwal, Muthukrishnan, Gosrich, Kumar, Ribeiro (2024), LPAC (<a href="https://arxiv.org/abs/2401.04855">arXiv:2401.04855</a>; open-source CoverageControl);
+    Agarwal, Kumar, Ribeiro et al. (2024), constrained coverage (<a href="https://arxiv.org/abs/2409.11311">arXiv:2409.11311</a>).</p>
+  <p class="meta"><b>Connectivity-constrained exploration:</b>
+    Hsieh, Cowley, Kumar, Taylor (2008), <i>JFR</i> 25(1-2);
+    Zavlanos, Egerstedt, Pappas (2011), <i>Proc. IEEE</i> 99(9);
+    Schuresko, Cortés (2009), <i>JINT</i> 56(1-2);
+    Capelli, Sabattini (2020), <i>ICRA</i> (<a href="https://arxiv.org/abs/2003.10178">arXiv:2003.10178</a>);
+    Hollinger, Singh (2012), <i>IEEE T-RO</i> 28(4) (ICRA 2010);
+    Banfi, Quattrini Li, Rekleitis, Amigoni, Caro (2018), <i>Auton. Robots</i> 42(4);
+    Kantaros, Zavlanos (2017), <i>IEEE TAC</i> 62(7);
+    Amigoni, Banfi, Basilico (2019), <i>IEEE Intell. Syst.</i>;
+    Jensen, Gini (2013), <i>IJCAI</i>;
+    Ribeiro da Silva, Chaimowicz, Silva, Hsieh (2024) (<a href="https://arxiv.org/abs/2309.13494">arXiv:2309.13494</a>);
+    Tan, Ma, Liang, Chng, Cao, Sartoretti (2024), IR2, <i>IROS</i> (<a href="https://arxiv.org/abs/2409.04730">arXiv:2409.04730</a>);
+    Zeng et al. (2025), A³ Network (<a href="https://arxiv.org/abs/2509.18526">arXiv:2509.18526</a>).</p>
+
+  <!-- F · FOUNDATIONAL REFERENCES -->
+  <span class="flank" id="foundational">F · foundational references</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Foundational references (annotated)</h2>
+  <p class="sub">An annotated bibliography of the field's standing taxonomies and formal-model anchors, organised by the four axes a swarm/multi-agent mission can be classified along. Each entry: full citation · thesis · why it matters here.</p>
+  <p class="meta">These were the local reference library used to position the project's mission families against the dominant axes in the literature. <b>Note:</b> the PDFs themselves have been retired from the workspace — each is retrievable from its publisher via the DOI / venue below.</p>
+
+  <h3>BEHAVIOR axis — swarm behavior taxonomies (the de facto standard to cite)</h3>
+  <ul>
+    <li><b>Brambilla, Ferrante, Birattari, Dorigo (2013).</b> <i>Swarm robotics: a review from the swarm engineering perspective.</i> Swarm Intelligence 7(1):1–41. DOI 10.1007/s11721-012-0075-2. — <b>Thesis:</b> presents two taxonomies, one for design/analysis <i>methods</i> and one for <i>collective behaviors</i>. <b>Why it matters:</b> the most-cited swarm-robotics taxonomy (&gt;1700 citations) — the canonical anchor for any behavior-type classification.</li>
+    <li><b>Schranz, Umlauft, Sende, Elmenreich (2020).</b> <i>Swarm Robotic Behaviors and Current Applications.</i> Frontiers in Robotics and AI 7:36. DOI 10.3389/frobt.2020.00036. — <b>Thesis:</b> extends Brambilla into four top-level buckets — Spatial Organization, Navigation, Decision Making, Miscellaneous — adding collective localization, collective perception, synchronization, self-healing, self-reproduction. <b>Why it matters:</b> the finest-grained behavior map; our mission families map onto its sub-behaviors (information-gathering → collective exploration/perception/localization).</li>
+  </ul>
+
+  <h3>SYSTEM / TASK-ALLOCATION axis — different axes (capabilities, allocation, coordination)</h3>
+  <ul>
+    <li><b>Dudek, Jenkin, Milios, Wilkes (1996).</b> <i>A taxonomy for multi-agent robotics.</i> Autonomous Robots 3(4):375–397. — <b>Thesis:</b> classifies multi-agent <i>systems</i> by collective size, communication range, communication topology, bandwidth, reconfigurability, processing ability, composition. <b>Why it matters:</b> the system-design (not mission) taxonomy — the vocabulary for the communication-constraint dimensions our work lives in.</li>
+    <li><b>Gerkey, Matarić (2004).</b> <i>A formal analysis and taxonomy of task allocation in multi-robot systems.</i> IJRR 23(9):939–954. DOI 10.1177/0278364904045564. — <b>Thesis:</b> the standard MRTA axes — single-task vs multi-task robots (ST/MT), single-robot vs multi-robot tasks (SR/MR), instantaneous vs time-extended assignment (IA/TA). <b>Why it matters:</b> the reference framing for role/task allocation — the lens our relay-vs-frontier division is positioned against.</li>
+    <li><b>Verma, Ranga (2021).</b> <i>Multi-Robot Coordination Analysis, Taxonomy, Challenges and Future Scope.</i> Journal of Intelligent and Robotic Systems 102:10. DOI 10.1007/s10846-021-01378-2. — <b>Thesis:</b> a 6-dimension coordination taxonomy — communication, planning, control architecture, scalability, decision-making, application domain. <b>Why it matters:</b> the most recent coordination taxonomy; situates the decentralized/no-consensus coordination axis our design occupies.</li>
+  </ul>
+
+  <h3>FORMAL-MODEL axis — Dec-POMDP family (decentralized partial observability)</h3>
+  <ul>
+    <li><b>Oliehoek (2012).</b> <i>Decentralized POMDPs.</i> In Wiering &amp; van Otterlo (eds.), Reinforcement Learning: State-of-the-Art, Springer. — <b>Thesis:</b> lays out the Dec-POMDP subclass hierarchy (MMDP, Dec-MDP, Dec-POMDP, ND-POMDP, TI-Dec-MDP, OC-Dec-MDP). <b>Why it matters:</b> the formal model our setting <i>is</i> — decentralized, partially observable — and the chapter that names the tractable subclasses.</li>
+    <li><b>Amato, Chowdhary, Geramifard, Ure, Kochenderfer.</b> <i>Decentralized Control of Partially Observable Markov Decision Processes.</i> Survey. — <b>Thesis:</b> covers Dec-POMDP model assumptions, complexity (<b>NEXP-complete</b>), and solution methods, with a subclass complexity table. <b>Why it matters:</b> the complexity anchor — establishes <i>why</i> exact decentralized planning is intractable and learning/approximation is required.</li>
+  </ul>
+
+  <h3>DOMAIN anchor — aerial swarm robotics</h3>
+  <ul>
+    <li><b>Chung, Paranjape, Dames, Shen, Kumar (2018).</b> <i>A Survey on Aerial Swarm Robotics.</i> IEEE Transactions on Robotics 34(4):837–855. — <b>Thesis:</b> domain survey covering the graph-Laplacian / consensus machinery for coordinated aerial motion. <b>Why it matters:</b> the domain-specific anchor for the hybrid (sensing + comms + coordinated motion) category — ties the consensus/Laplacian formalism of §E.1 to a concrete swarm domain.</li>
+  </ul>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

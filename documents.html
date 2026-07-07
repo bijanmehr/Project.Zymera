@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Documents</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .doc{border-left:3px solid var(--line);padding:4px 0 4px 14px;margin:10px 0}
+  .doc b{font-size:14.5px} .doc code{font-size:12px} .doc p{margin:3px 0 0;font-size:13.3px;color:#445}
+  .doc .ext{font-size:11px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:6px}
+  .grp{font-size:12.5px;text-transform:uppercase;letter-spacing:.8px;color:#fff;background:var(--accent-d);display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:30px 0 6px}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk active" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Documents</h1>
+  <p class="sub">An index of where each part of the project now lives. The original markdown corpus has been folded into the pages of this site; the source binaries (PDFs, LaTeX, the taxonomy YAML tree) are preserved as downloads below.</p>
+
+  <div class="callout key"><b>How to read this page.</b> Section&nbsp;1 points each major topic to its in-site page — that is where the narrative, figures, and digests now live. Section&nbsp;2 lists the original source files (papers, LaTeX, the auto-generated field-map tree) kept for download under <code>assets/sources/</code>. Section&nbsp;3 notes the code repositories that are not bundled here.</p></div>
+
+  <span class="grp">1 · On this site</span>
+  <p class="sub" style="margin-bottom:2px">Each topic below has been written up as a page. Follow the link for the full treatment.</p>
+
+  <div class="doc"><b><a href="field-map.html">Field Map</a></b><p>The MARL / agentic-AI field map (2019–2026): the catalog of entries and surveys organised by interaction mode, the cooperative-vs-collaborative axis, and the candidate-gap analysis that positions this work. Auto-generated from the taxonomy YAML (downloadable in Section&nbsp;2).</p></div>
+  <div class="doc"><b><a href="theory.html">Theory &amp; Formalism</a></b><p>The formal model: the Networked Dec-POMDP / POSG tuple with a dynamic comm graph, the CTDE state split, the attack-channel and stealth/intervention/detectability parameters. Mirrors <code>formalism.tex</code> (downloadable in Section&nbsp;2).</p></div>
+  <div class="doc"><b><a href="missions.html">Mission Taxonomy</a></b><p>The Sense / Organize / Act mission taxonomy: the ternary-simplex placement of deployments and hardware anchors (Kilobot, CADRE, OFFSET, Starling), and why coupling mechanism determines the attack surface. Built from the standalone mission-taxonomy LaTeX (downloadable in Section&nbsp;2).</p></div>
+  <div class="doc"><b><a href="related-work.html">Literature, MRS Borrow &amp; the Gap</a></b><p>The related-work review: prior swarm/MARL taxonomies, the multi-robot canon worth borrowing (connectivity estimation, coverage control, connectivity-constrained exploration), and the conjunction of axes that remains novel.</p></div>
+  <div class="doc"><b><a href="findings.html">Results &amp; Findings</a></b><p>The quantitative results from RedWithinBlue: the cooperative coverage ladder, the n=60 adversarial-validation sweep (the action-stream channel is statistically silent; damage scales with <i>how many</i> agents are compromised; the quietest "stay" attacker is most damaging; co-evolution is a defender-side fragility).</p></div>
+  <div class="doc"><b><a href="architecture.html">Architecture</a></b><p>The JAX/Flax pipeline: the PureJaxRL single-JIT train loop, the CTDE actor / central-critic design, the warm-start weight-transfer ladder, and the environment / comm-graph API.</p></div>
+  <div class="doc"><b><a href="emergence.html">Emergence</a></b><p>The emergent-behaviour story: explorer/relay role differentiation, symmetry-breaking, the connectivity guardrail, and the graph-belief swarm design (Compass / SLAM / Emergence).</p></div>
+  <div class="doc"><b><a href="journey.html">Journey</a></b><p>The research narrative: how the question evolved from single-agent coverage to covert-misbehavior resilience, the negative results (TD(0) collapse, statistically silent belief corruption), and the decisions taken and abandoned.</p></div>
+  <div class="doc"><b><a href="paper.html">Paper</a></b><p>The NeurIPS-style write-up "Stealth Attacks on Swarms": threat model, methods, and the ~45-figure results section.</p></div>
+
+  <span class="grp">2 · Downloadable sources (preserved)</span>
+  <p class="sub" style="margin-bottom:2px">The original source files, preserved verbatim under <code>assets/sources/</code>. These are the binaries the pages above were built from.</p>
+
+  <div class="doc"><b><a href="assets/sources/formalism.pdf">formalism.pdf</a></b><span class="ext">PDF</span><p>The standalone formal model — the compiled formalism document (Networked Dec-POMDP, attack channels, stealth parameters).</p></div>
+  <div class="doc"><b><a href="assets/sources/formalism.tex">formalism.tex</a></b><span class="ext">LaTeX</span><p>LaTeX source for the formalism document above.</p></div>
+  <div class="doc"><b><a href="assets/sources/Swarm_resiliency_v1.3.pdf">Swarm_resiliency_v1.3.pdf</a></b><span class="ext">PDF</span><p>The swarm-resiliency write-up (v1.3) — early framing of covert-misbehavior propagation and macro mission failure.</p></div>
+  <div class="doc"><b><a href="assets/sources/mission_family.pdf">mission_family.pdf</a></b><span class="ext">PDF</span><p>The mission-family reference: the deployment landscape behind the mission taxonomy.</p></div>
+  <div class="doc"><b><a href="assets/sources/Stealth%20Attacks%20on%20Swarms.pdf">Stealth Attacks on Swarms.pdf</a></b><span class="ext">PDF</span><p>The compiled "Stealth Attacks on Swarms" paper PDF (see <a href="paper.html">Paper</a> for the in-site version).</p></div>
+  <div class="doc"><b><a href="assets/sources/StealthAttacksOnSwarms_overleaf.zip">StealthAttacksOnSwarms_overleaf.zip</a></b><span class="ext">ZIP</span><p>The full Overleaf project archive for the paper — LaTeX sources, sections, figures, and bibliography.</p></div>
+  <div class="doc"><b><a href="assets/sources/advML_report.pdf">advML_report.pdf</a></b><span class="ext">PDF</span><p>The adversarial-ML report — background survey of attacks and defenses informing the threat model.</p></div>
+  <div class="doc"><b><a href="assets/sources/ExoRL_report.pdf">ExoRL_report.pdf</a></b><span class="ext">PDF</span><p>The ExoRL report — exploratory reinforcement-learning notes feeding the early method choices.</p></div>
+  <div class="doc"><b><a href="assets/sources/Formalization.docx">Formalization.docx</a></b><span class="ext">DOCX</span><p>The earlier Word-format formalization draft that preceded <code>formalism.tex</code>.</p></div>
+  <div class="doc"><b><a href="assets/sources/mission-taxonomy/main.pdf">mission-taxonomy/main.pdf</a></b><span class="ext">PDF</span><p>The compiled standalone mission-taxonomy document, including the ternary-simplex figure (see <a href="missions.html">Missions</a> for the in-site version).</p></div>
+  <div class="doc"><b><a href="assets/sources/mission-taxonomy/main.tex">mission-taxonomy/main.tex</a></b><span class="ext">LaTeX</span><p>LaTeX source for the mission-taxonomy document above (its <code>missions.bib</code> and <code>Images/</code> live alongside it in the same folder).</p></div>
+  <div class="doc"><b><a href="assets/sources/marl_taxonomy/README.md">marl_taxonomy/ (YAML source tree)</a></b><span class="ext">Folder</span><p>The auto-generation source for the <a href="field-map.html">Field Map</a>: the generated <code>README.md</code> plus the <code>data/</code> entry/survey YAML, <code>schema/</code> pydantic models, and build <code>Makefile</code>. Browse the folder from the linked README.</p></div>
+
+  <span class="grp">3 · Code repositories (not bundled)</span>
+  <div class="callout warnbox"><b>Code lives in its own repositories.</b> The full code-and-docs corpora for <code>RedWithinBlue/</code> (the JAX MARL experiments engine), <code>zymera_env/</code> (the swarm-explore engine), and <code>zymera_lab/</code> (the consolidated simulator + lab) are maintained in their own git repositories and are <i>not</i> bundled into this static site. The narrative, architecture, and results drawn from them are written up in the pages linked in Section&nbsp;1.</div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a> · in-site index + preserved source downloads</div>
+</div>
+</body>
+</html>

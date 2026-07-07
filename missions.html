@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Missions</title><link rel="stylesheet" href="assets/style.css">
+<style>
+  /* page-local patterns, matching the site's restrained academic palette */
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0}
+  .flank{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:38px 0 4px}
+
+  /* family entry cards — one colour-keyed block per family */
+  .fam{border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:12px;
+    background:var(--card);padding:18px 20px;margin:16px 0}
+  .fam.sense{border-left-color:#3b6ea5}
+  .fam.org{border-left-color:#2f8f57}
+  .fam.act{border-left-color:#c98a2b}
+  .fam h3{margin:0 0 4px}
+  .fam.sense h3{color:#2c5a8c}
+  .fam.org h3{color:#256e43}
+  .fam.act h3{color:#a86c14}
+  .fam .roman{font-style:italic;color:var(--mut);font-size:13px;font-weight:600;margin-right:6px}
+  .fam .deliver{font-size:13.6px;margin:2px 0 8px}
+  .fam figure{margin:10px 0 0}
+  .fam figure img{max-height:230px;object-fit:contain}
+
+  /* ternary simplex (CSS triangle + barycentric-placed dots) */
+  .simplex-wrap{margin:18px 0;text-align:center}
+  .simplex{position:relative;width:440px;max-width:100%;height:400px;margin:0 auto}
+  .simplex .tri{position:absolute;inset:0;width:100%;height:100%}
+  .simplex .corner{position:absolute;font-weight:800;font-size:14px}
+  .simplex .corner small{display:block;font-style:italic;font-weight:500;font-size:10.5px;color:var(--mut)}
+  .simplex .c-sense{top:-2px;left:50%;transform:translateX(-50%);text-align:center;color:#2c5a8c}
+  .simplex .c-org{bottom:-4px;left:0;text-align:left;color:#256e43}
+  .simplex .c-act{bottom:-4px;right:0;text-align:right;color:#a86c14}
+  .simplex .dot{position:absolute;width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);
+    border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+  .simplex .lab{position:absolute;font-size:11.5px;transform:translateY(-50%);white-space:nowrap}
+  .d-sense{background:#3b6ea5}.l-sense{color:#2c5a8c}
+  .d-org{background:#2f8f57}.l-org{color:#256e43}
+  .d-act{background:#c98a2b}.l-act{color:#a86c14}
+  .d-comp{background:#7d3a8c}.l-comp{color:#6a2f78;font-weight:700}
+  .legend{font-size:12px;color:var(--mut);margin-top:8px}
+  .legend span{display:inline-block;margin:0 8px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+  /* references list */
+  ol.refs{font-size:12.8px;color:#33414d;padding-left:26px}
+  ol.refs li{margin:5px 0}
+  ol.refs .t{font-style:italic}
+</style>
+</head><body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk active" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+<div class="wrap">
+  <h1>Missions: a Sense / Organize / Act taxonomy</h1>
+  <p class="sub">A <b>mission</b> is a team-level objective of a multi-agent system whose agents act on local information and coordinate through peer and environment interactions, from which system-level progress and constraint satisfaction emerge. Missions group by their <b>dominant deliverable</b> into three functional families — <b>Sense</b>, <b>Organize</b>, <b>Act</b>. The cut is embodiment-agnostic: it applies across aerial and ground robot swarms, underwater vehicle teams, planetary surface rovers, autonomous satellite formations, and teams of reasoning agents — whether they couple mechanically, communicatively, or by observation alone.</p>
+
+  <div class="toc2">
+    <a href="#families">The three families</a>
+    <a href="#anchors">Hardware anchors</a>
+    <a href="#simplex">The ternary simplex</a>
+    <a href="#composites">Composites &amp; strata</a>
+    <a href="#scope">Scope — the adversarial stratum</a>
+    <a href="#reconcile">Reconciling with the coupling taxonomy</a>
+    <a href="#refs">References</a>
+  </div>
+
+  <!-- ===================== FAMILIES ===================== -->
+  <span class="flank" id="families">the three families</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Three families, grouped by deliverable</h2>
+  <p>The taxonomy classifies the <i>deliverable</i> — what the team is fundamentally producing — not the platform, the sensors, or the coupling modality. Each family draws on its own established line of work.</p>
+
+  <div class="fam sense">
+    <h3><span class="roman">(I)</span> Information Gathering — Sense</h3>
+    <p class="deliver"><b>Build and maintain a shared picture.</b> The team's deliverable is shared knowledge of an environment, system, or set of targets; progress is team-level uncertainty reduction.</p>
+    <p><i>Canonical example — shared exploration:</i> a team reduces uncertainty over an unknown region within a time budget; global progress depends on how local observations propagate through inter-agent interaction. The family rests on active perception and its later extensions to distributed and multi-robot sensing.</p>
+    <figure>
+      <img src="assets/figures/missions/sense.png" alt="Drones with sensing footprints reducing uncertainty over a contour map">
+      <figcaption><b>(I) Sense</b> — shared exploration: agents reducing uncertainty via overlapping sensing footprints over an unknown region.</figcaption>
+    </figure>
+  </div>
+
+  <div class="fam org">
+    <h3><span class="roman">(II)</span> Collective Organization — Organize</h3>
+    <p class="deliver"><b>Form and hold structure &amp; connectivity.</b> The team's deliverable is its own relational state: a target configuration — communication topology, spatial geometry, value agreement, or spatial distribution — produced and sustained as conditions change.</p>
+    <p><i>Canonical examples:</i> holding a relay backbone, maintaining a formation, reaching consensus on a value, covering an area. The family rests on graph-theoretic cooperative control, treating consensus, formation, and connectivity as properties of the interaction graph between agents.</p>
+    <figure>
+      <img src="assets/figures/missions/organize.png" alt="Terrain with a maintained communication graph across heterogeneous agents">
+      <figcaption><b>(II) Organize</b> — formation and consensus over a maintained interaction graph across heterogeneous agents.</figcaption>
+    </figure>
+  </div>
+
+  <div class="fam act">
+    <h3><span class="roman">(III)</span> Action and Intervention — Act</h3>
+    <p class="deliver"><b>Effect change on the world.</b> The team's deliverable is an effect on the world or on a downstream system, produced through coordinated action and a division of work across agents — coupled by shared constraints: capacity, energy, conflicts in shared workspace or shared state, and safety.</p>
+    <p><i>Canonical example — precision agriculture:</i> spraying or seeding allocated across a large area within strict resource and safety limits. The family comes out of multi-robot task allocation and the swarm-robotics demonstrations built on it.</p>
+    <figure>
+      <img src="assets/figures/missions/act.png" alt="SAGA precision-agriculture swarm allocating tasks across a field">
+      <figcaption><b>(III) Act</b> — the SAGA precision-agriculture swarm allocating patrol, mapping, and weed-removal tasks across a field.</figcaption>
+    </figure>
+  </div>
+
+  <!-- ===================== HARDWARE ANCHORS ===================== -->
+  <span class="flank" id="anchors">hardware anchors</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Hardware anchors</h2>
+  <p>Real program-scale deployments set the agenda. Four representative systems, shown as photographs, anchor the families to flown and fielded hardware.</p>
+  <div class="two">
+    <figure>
+      <img src="assets/figures/missions/kilobot.jpg" alt="Kilobot thousand-robot swarm">
+      <figcaption><b>Kilobot</b> — programmable self-assembly in a thousand-robot swarm (Organize-dominant).</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/figures/missions/cadre.jpg" alt="NASA CADRE lunar rover team">
+      <figcaption><b>NASA CADRE</b> — Cooperative Autonomous Distributed Robotic Exploration, a lunar rover team (Organize over Sense).</figcaption>
+    </figure>
+  </div>
+  <div class="two">
+    <figure>
+      <img src="assets/figures/missions/offset.jpg" alt="DARPA OFFSET aerial-ground tactical swarm">
+      <figcaption><b>DARPA OFFSET</b> — OFFensive Swarm-Enabled Tactics, an aerial-ground tactical swarm (composite, blending Sense and Act).</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/figures/missions/starling.png" alt="NASA Starling satellite formation mission">
+      <figcaption><b>NASA Starling</b> — a satellite formation mission running observation, formation, and an in-space MANET together (composite).</figcaption>
+    </figure>
+  </div>
+
+  <!-- ===================== TERNARY SIMPLEX ===================== -->
+  <span class="flank" id="simplex">the simplex</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The ternary simplex</h2>
+  <p>Sense / Organize / Act are the three corners of a barycentric (ternary) simplex with coordinates <code>(s, o, a)</code>, <code>s + o + a = 1</code>. A pure-corner mission lives at a vertex; <b>real deployments rarely sit at a single corner</b>. Most are <b>composites — points in the interior of the simplex</b>. We place a handful of widely-cited systems by their dominant deliverable; colour encodes the dominant family (blue Sense, green Organize, orange Act, purple composite).</p>
+
+  <div class="simplex-wrap">
+    <div class="simplex">
+      <!-- triangle: Sense at top, Organize at bottom-left, Act at bottom-right -->
+      <svg class="tri" viewBox="0 0 100 92" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <!-- gridlines every 0.25 -->
+        <g stroke="#e4e8ec" stroke-width="0.4">
+          <!-- s = const (horizontal-ish lines) -->
+          <line x1="37.5" y1="22.5" x2="62.5" y2="22.5"/>
+          <line x1="25"   y1="45"   x2="75"   y2="45"/>
+          <line x1="12.5" y1="67.5" x2="87.5" y2="67.5"/>
+          <!-- o = const -->
+          <line x1="12.5" y1="67.5" x2="56.25" y2="11.25"/>
+          <line x1="25"   y1="45"   x2="68.75" y2="11.25"/>
+          <line x1="37.5" y1="22.5" x2="81.25" y2="11.25"/>
+          <!-- a = const -->
+          <line x1="87.5" y1="67.5" x2="43.75" y2="11.25"/>
+          <line x1="75"   y1="45"   x2="31.25" y2="11.25"/>
+          <line x1="62.5" y1="22.5" x2="18.75" y2="11.25"/>
+        </g>
+        <!-- triangle outline -->
+        <polygon points="50,0 0,90 100,90" fill="none" stroke="#1a2027" stroke-width="1.1"/>
+      </svg>
+
+      <!-- corner labels -->
+      <div class="corner c-sense">Sense<small>(I) Information Gathering</small></div>
+      <div class="corner c-org"><small style="margin-bottom:1px">Organize</small>(II) Collective Organization</div>
+      <div class="corner c-act">Act<small>(III) Action and Intervention</small></div>
+
+      <!-- dots placed by barycentric (s,o,a); cartesian = (50 - 50o + 50a, 90 - 90s) within the SVG box, mapped to % -->
+      <!-- DARPA SubT (0.40,0.30,0.30): x=50, y=54 -->
+      <span class="dot d-sense" style="left:50%;top:54%"></span>
+      <span class="lab l-sense" style="left:53%;top:54%">DARPA SubT</span>
+
+      <!-- NASA Starling (0.60,0.25,0.15): x=45, y=36 — composite -->
+      <span class="dot d-comp" style="left:45%;top:36%"></span>
+      <span class="lab l-comp" style="left:48%;top:36%">NASA Starling</span>
+
+      <!-- NASA CADRE (0.25,0.70,0.05): x=17.5, y=67.5 — composite -->
+      <span class="dot d-comp" style="left:17.5%;top:67.5%"></span>
+      <span class="lab l-comp" style="left:20.5%;top:62%">NASA CADRE</span>
+
+      <!-- Kilobot (0.10,0.80,0.10): x=15, y=81 -->
+      <span class="dot d-org" style="left:15%;top:81%"></span>
+      <span class="lab l-org" style="left:18%;top:81%">Kilobot</span>
+
+      <!-- TERMES (0.25,0.20,0.55): x=67.5, y=67.5 -->
+      <span class="dot d-act" style="left:67.5%;top:67.5%"></span>
+      <span class="lab l-act" style="left:55%;top:62%">TERMES</span>
+
+      <!-- SAGA (0.10,0.10,0.80): x=85, y=81 -->
+      <span class="dot d-act" style="left:85%;top:81%"></span>
+      <span class="lab l-act" style="left:70%;top:81%">SAGA</span>
+    </div>
+    <div class="legend">
+      <span><i class="d-sense" style="background:#3b6ea5"></i>Sense</span>
+      <span><i class="d-org" style="background:#2f8f57"></i>Organize</span>
+      <span><i class="d-act" style="background:#c98a2b"></i>Act</span>
+      <span><i class="d-comp" style="background:#7d3a8c"></i>composite (interior)</span>
+    </div>
+  </div>
+
+  <p>Reading the interior: <b>Kilobot</b> sits close to the Organize corner for programmable self-assembly; <b>SAGA</b> sits close to the Act corner for allocated agricultural intervention; <b>TERMES</b> sits inboard of SAGA, with an additional Organize share carried by its stigmergic construction rules; <b>DARPA SubT</b> sits near the simplex centroid — a Sense-led mission that nonetheless demands a mesh-maintenance Organize layer and active mobility. Two composites sit firmly inside the simplex: <b>NASA CADRE</b>, just above Kilobot, where autonomous formation driving and a mesh among four lunar rovers (Organize) produce a cooperative subsurface radar map (Sense); and <b>NASA Starling</b>, near the Sense corner, which runs cooperative observation over formation maintenance and an in-space MANET together.</p>
+
+  <p class="meta">Approximate deliverable weights <code>(s / o / a)</code> for the photographed anchors: Kilobot <code>(10 / 75 / 15)</code>, NASA CADRE <code>(35 / 60 / 5)</code>, DARPA OFFSET <code>(45 / 20 / 35)</code>, NASA Starling <code>(45 / 45 / 10)</code>.</p>
+
+  <!-- ===================== COMPOSITES & STRATA ===================== -->
+  <span class="flank" id="composites">composites &amp; strata</span>
+  <h2 style="margin-top:6px;border:0;padding:0">No fourth family — composites are interior points</h2>
+  <p>Sense / Organize / Act are the three canonical families <i>at the deliverable level</i>. We deliberately <b>do not introduce a fourth</b>. Most deployments are <b>composites</b> — interior points of the simplex — and many can be read as <b>special cases</b> of one family inheriting structure from another:</p>
+  <ul>
+    <li><b>Cooperative manipulation</b> is <i>Act</i> with a tight <i>Organize</i> substrate (a held formation around the load).</li>
+    <li><b>Cooperative SLAM</b> is <i>Sense</i> with an <i>Organize</i> substrate (a maintained communication graph that lets local maps fuse).</li>
+    <li><b>Precision agriculture</b> is <i>Act</i> with a <i>Sense</i> substrate (the spray map drives the actuation plan).</li>
+  </ul>
+
+  <div class="callout key"><b>The research interest is the coupling, not the mix.</b> What matters about a composite is not that it blends families but <i>how the families couple</i>: the communication graph determines when sensing is usable, the formation determines what actuation is reachable, and a failure in one deliverable propagates into the others. <b>NASA Starling and its 1.5 extension</b> are a clean example — cooperative observation, formation maintenance, and an in-space MANET running together, with the MANET topology gating when sensing data can be used and manoeuvre budgets reshaping both.</div>
+
+  <p>Properties such as <b>adversarial robustness, fault tolerance, and real-time guarantees</b> are likewise not separate families but <b>strata across I–III</b>: any of the three families can be required to deliver under attack, faults, or deadlines. <b>The taxonomy classifies the deliverable; the deployment specifies which strata it must hold up under.</b> We treat the three families as a scaffold rather than a fixed classification — missions that don't fit cleanly push the families to evolve, not the other way around.</p>
+
+  <!-- ===================== SCOPE ===================== -->
+  <span class="flank" id="scope">scope</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Scope — the adversarial stratum</h2>
+  <div class="callout danger"><b>Our contributions address the adversarial stratum across all three families</b> — nominally cooperative Sense, Organize, and Act missions in which one or more <b>internal agents pursue misaligned objectives</b>. Composite deployments such as Starling are the practical target.</div>
+  <p>This is the bridge to the project's governing research question: how <b>covert, within-bounds micro-level misbehaviour</b> propagates to macro-level mission failure, and how resilient the mission is. The mission taxonomy supplies the substrate; the adversarial stratum is the cross-cutting layer our work operates in. See the <a href="related-work.html">Literature</a> page for the gap analysis and the <a href="theory.html">Theory</a> page for the resiliency formalism.</p>
+
+  <!-- ===================== RECONCILE ===================== -->
+  <span class="flank" id="reconcile">one reconciled view</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Reconciling with the coupling taxonomy</h2>
+  <p>An earlier draft (the <i>Swarm-Resiliency</i> work) organized missions by their <b>coupling modality</b> rather than their deliverable — what binds the agents together. The two cuts are not competitors: the deliverable a team produces and the coupling that produces it line up almost one-to-one. We present them here as <b>one reconciled view</b>: each deliverable family is delivered through a characteristic coupling, with a fourth coupling category (constraint-and-resource) attaching to the Act family's shared limits.</p>
+
+  <table>
+    <tr><th>Deliverable family (this taxonomy)</th><th>Coupling category (Swarm-Resiliency)</th><th>What binds the agents</th></tr>
+    <tr><td><b style="color:#2c5a8c">Sense</b> — build/maintain a shared picture</td><td><b>A · Information-coupled</b></td><td>Agents share observations; the deliverable is reduced joint uncertainty.</td></tr>
+    <tr><td><b style="color:#256e43">Organize</b> — form/hold structure &amp; connectivity</td><td><b>B · Topology-coupled</b></td><td>Agents are bound by the interaction graph / formation they must hold.</td></tr>
+    <tr><td><b style="color:#2c5a8c">Sense</b> (composite substrate) — fused estimate</td><td><b>C · Fusion-coupled</b></td><td>Local estimates are merged into a shared belief; one bad input corrupts the fusion.</td></tr>
+    <tr><td><b style="color:#a86c14">Act</b> — effect change on the world</td><td><b>D · Constraint-and-resource-coupled</b></td><td>Agents share capacity, energy, workspace, and safety limits while dividing work.</td></tr>
+  </table>
+
+  <div class="callout"><b>The mapping.</b> <b>Sense ~ A</b> (information-coupled), <b>Organize ~ B</b> (topology-coupled), <b>Fusion-coupled C</b> is the coupling glue of Sense composites — the mechanism by which a maintained graph (B) lets local maps fuse into a shared picture (A) — and <b>Act ~ D</b> (constraint-and-resource-coupled). The coupling taxonomy is, in effect, the <i>mechanism</i> view of the same three deliverable families, with C naming the seam where Sense and Organize meet in composites. This is exactly why the adversarial stratum is interesting: each coupling is also an attack surface — shared observations (A) can be poisoned, the topology (B) can be cut, fusion (C) can be biased, and shared constraints (D) can be exhausted.</div>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <span class="flank" id="refs">references</span>
+  <h2 style="margin-top:6px;border:0;padding:0">References</h2>
+  <ol class="refs">
+    <li>R. Bajcsy. <span class="t">Active Perception.</span> Proceedings of the IEEE, 76(8):966–1005, 1988.</li>
+    <li>B. J. Julian, M. Angermann, M. Schwager, D. Rus. <span class="t">Distributed Robotic Sensor Networks: An Information-Theoretic Approach.</span> The International Journal of Robotics Research, 31(10):1134–1154, 2012.</li>
+    <li>B. Charrow, V. Kumar, N. Michael. <span class="t">Approximate Representations for Multi-Robot Control Policies that Maximize Mutual Information.</span> Robotics: Science and Systems (RSS), 2014.</li>
+    <li>P. Schmuck, M. Chli. <span class="t">CCM-SLAM: Robust and Efficient Centralized Collaborative Monocular SLAM for Robotic Teams.</span> Journal of Field Robotics, 36(4):763–781, 2019.</li>
+    <li>DARPA. <span class="t">Subterranean (SubT) Challenge.</span> <a href="https://www.darpa.mil/program/darpa-subterranean-challenge">darpa.mil</a>, 2018. Accessed 2026.</li>
+    <li>M. Mesbahi, M. Egerstedt. <span class="t">Graph Theoretic Methods in Multiagent Networks.</span> Princeton University Press, 2010.</li>
+    <li>M. M. Zavlanos, M. B. Egerstedt, G. J. Pappas. <span class="t">Graph-Theoretic Connectivity Control of Mobile Robot Networks.</span> Proceedings of the IEEE, 99(9):1525–1540, 2011.</li>
+    <li>R. Olfati-Saber, J. A. Fax, R. M. Murray. <span class="t">Consensus and Cooperation in Networked Multi-Agent Systems.</span> Proceedings of the IEEE, 95(1):215–233, 2007.</li>
+    <li>M. Rubenstein, A. Cornejo, R. Nagpal. <span class="t">Programmable Self-Assembly in a Thousand-Robot Swarm.</span> Science, 345(6198):795–799, 2014.</li>
+    <li>NASA JPL. <span class="t">CADRE — Cooperative Autonomous Distributed Robotic Exploration.</span> <a href="https://www.jpl.nasa.gov/missions/cadre/">jpl.nasa.gov</a>, 2024. Accessed 2026.</li>
+    <li>B. P. Gerkey, M. J. Matarić. <span class="t">A Formal Analysis and Taxonomy of Task Allocation in Multi-Robot Systems.</span> The International Journal of Robotics Research, 23(9):939–954, 2004.</li>
+    <li>J. Werfel, K. Petersen, R. Nagpal. <span class="t">Designing Collective Behavior in a Termite-Inspired Robot Construction Team.</span> Science, 343(6172):754–758, 2014.</li>
+    <li>E. Tuci, M. H. M. Alkilabi, O. Akanyeti. <span class="t">Cooperative Object Transport in Multi-Robot Systems: A Review of the State-of-the-Art.</span> Frontiers in Robotics and AI, 5, 2018.</li>
+    <li>Institute of Cognitive Sciences and Technologies, CNR. <span class="t">SAGA — Swarm Robotics for Agricultural Applications.</span> <a href="http://laral.istc.cnr.it/saga/">laral.istc.cnr.it/saga</a>, 2016. Accessed 2026.</li>
+    <li>NASA. <span class="t">Starling Mission.</span> <a href="https://www.nasa.gov/mission/starling/">nasa.gov</a>, 2023. Accessed 2026.</li>
+    <li>DARPA. <span class="t">OFFensive Swarm-Enabled Tactics (OFFSET).</span> <a href="https://www.darpa.mil/research/programs/offensive-swarm-enabled-tactics">darpa.mil</a>, 2017. Accessed 2026.</li>
+  </ol>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body></html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Covert micro-to-macro misbehaviour and mission resilience in cooperative swarms — Zymera</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .paper{max-width:780px;margin:0 auto;font-size:15.5px;line-height:1.7}
+  .paper h1{font-size:27px;line-height:1.22;border:0;margin:28px 0 8px;font-weight:800;letter-spacing:-.01em}
+  .paper .authors{font-size:15px;color:var(--ink);margin:6px 0 2px}
+  .paper .affil{font-size:13px;color:var(--mut);margin:0 0 18px}
+  .paper .lead{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;font-weight:700}
+  .abstract{background:#fff;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:16px 22px;margin:18px 0 26px;font-size:15px}
+  .paper h2{font-size:19px;margin-top:36px;border-top:0;padding-top:0;color:#11233a}
+  .paper h3{font-size:15.5px;margin-top:22px;color:#26405c}
+  .paper p{margin:12px 0;text-align:justify}
+  .paper sup a{color:var(--accent);font-weight:700;text-decoration:none;font-size:.78em}
+  figure.f{margin:24px 0;text-align:center}
+  figure.f img{max-width:100%;border:1px solid var(--line);border-radius:8px;background:#fff}
+  figure.f figcaption{font-size:13px;color:#445;text-align:left;margin-top:8px;line-height:1.55}
+  figure.f figcaption b{color:var(--ink)}
+  .refs{font-size:12.8px;color:#445;line-height:1.5;counter-reset:r}
+  .refs li{margin:5px 0}
+  table.p{font-size:13px}
+  .methods{background:#f7f9fb;border:1px solid var(--line);border-radius:10px;padding:4px 22px 18px;margin-top:30px}
+  .keyres{background:#e9f7ee;border:1px solid #a6e0bb;border-radius:9px;padding:11px 16px;font-size:14px;margin:16px 0}
+  .callout{background:#fbf7f0;border:1px solid #e6d8bf;border-left:4px solid #c98a1f;border-radius:0 10px 10px 0;padding:6px 22px 16px;margin:30px 0;font-size:14px}
+  .callout h2{margin-top:18px;color:#7a4f08;border:0}
+  .callout h3{color:#8a5a0c}
+  table.tm{border-collapse:collapse;width:100%;font-size:13px;margin:12px 0}
+  table.tm th,table.tm td{border:1px solid #e6d8bf;padding:6px 9px;text-align:left;vertical-align:top}
+  table.tm th{background:#f4ead5;font-weight:700;color:#5f3d05}
+  table.tm td code{background:#f4ead5;border-radius:3px;padding:0 3px;font-size:12.5px}
+  .callout ol{margin:8px 0 0;padding-left:20px}
+  .callout ol li{margin:6px 0}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk active" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap"><div class="paper">
+
+  <p class="lead">Article · working draft</p>
+  <h1>Covert micro-to-macro misbehaviour and mission resilience in cooperative exploration swarms</h1>
+  <p class="authors">Bijan Mehr</p>
+  <p class="affil">Zymera / RedWithinBlue research program · active work in progress, 2026</p>
+
+  <div class="abstract">
+    <b>Abstract.</b> Cooperative multi-agent systems coordinate through a shared belief that is also the surface a compromised member can exploit. We ask how <i>covert</i>, within-bounds misbehaviour by a single agent propagates from the micro level (one agent's local decisions) to the macro level (mission outcome), and how resilient the mission is. We pair a mission-centered formalism — a Dec-POMDP with a time-varying interaction graph, equipped with stealth and break budgets, a propagation model, and four resiliency metrics — with an experimental engine for decentralized connectivity-aware coverage. Three findings stand out. First, the strong attack channel is <b>withholding</b> a contribution to the shared belief, not corrupting it (active belief-corruption is ≤1 percentage point of damage); consequently mission damage scales with <i>how many</i> agents are compromised rather than the per-step attack rate, and the <b>quietest agent is the most damaging</b>. Second, <b>co-evolution is a defender-side fragility</b>: a naïve defender out-defends a co-evolved one by ~7 points. Third, the team's own <b>posterior supplies a resilience signal</b> that aggregate-coverage monitoring misses. Along the way we build a <b>size-invariant graph belief</b> that trains at one scale and transfers to another, and show that global connectivity at scale is geometrically — not algorithmically — bounded. We position the work as a threat-model and resiliency study, not the design of a specific attack.
+  </div>
+
+  <h2>Introduction</h2>
+  <p>Swarms of autonomous agents that must cover or monitor an unknown environment cannot rely on a central coordinator: they sense locally, act locally, and stitch a shared picture together over a range-limited communication graph. That shared picture — the team's belief — is what makes cooperation possible. It is also a vulnerability. A single member that has been compromised does not need to attack anyone physically; it can simply mislead, or fail to contribute to, the belief the rest of the team depends on. The damage is emergent: a small, local, hard-to-detect deviation aggregates, through the interaction graph, into a macro-level mission failure.</p>
+  <p>This micro-to-macro pathway, under <i>covert</i> deviation, is the question we study. It sits in a gap between three mature literatures that do not currently meet<sup><a href="#r1">1</a>,<a href="#r2">2</a></sup>: connectivity-aware control and role allocation (which assume benign, often homogeneous teams), covert poisoning of cooperative reinforcement learning (which lives on abstract game benchmarks, not spatial missions), and resilient consensus theory (whose r-robustness guarantees assume adversaries are <i>detectable outliers</i> — precisely what a stealthy agent evades). We make the question precise with a formalism, instantiate it in an open testbed, and report what covert misbehaviour actually does.</p>
+
+  <h2>Results</h2>
+
+  <h3>A decentralized connectivity-aware coverage engine</h3>
+  <p>The substrate is a swarm that drives every cell of a grid to "covered" while keeping its communication graph connected over a fixed range. Each agent runs three modules (Fig. 1): a deterministic <b>compass</b> that steers toward uncertain frontier cells; an evolution-strategies <b>role-switcher</b> that decides, from graph-criticality features, whether to act as a network-holding <i>relay</i> or an exploring <i>frontier</i> agent; and a learned <b>graph belief</b> that estimates the whole communication graph from partial, gossiped information. Coverage is essentially solved — a learned frontier-attention policy reaches 97.7% and generalises across grid sizes — but a pure coverage optimiser disperses the swarm, collapsing connectivity to 32%<sup><a href="#r3">3</a></sup>. Resolving that tension is the work.</p>
+  <figure class="f"><img src="assets/figures/three-stack.gif" style="width:62%" alt="three-stack policy">
+    <figcaption><b>Fig. 1 | The cooperative coverage swarm.</b> Amber agents hold the communication network (relay role); blue agents push exploration (frontier role). The role split is learned by evolution strategies, not scripted, and is conditioned on each agent's graph-criticality.</figcaption></figure>
+  <p>Two control principles recur. Connectivity is best enforced <i>locally and as a hard constraint</i>: masking any move that would sever an agent's last communication link guarantees integrity and beats a soft connectivity penalty by ~20 points of coverage, whereas a global algebraic-connectivity leash, which agents cannot compute from local information, underperforms a local degree floor. And reward must use a <i>threshold, not a maximiser</i>: a connectivity bonus is maximised by a useless huddle, so capping the rewarded component size removes the clump incentive.</p>
+
+  <h3>A size-invariant graph belief that transfers across scale</h3>
+  <p>Estimating the global graph from local gossip is a dynamic, distributed inference problem, not a one-shot classification. A feed-forward snapshot estimator reaches 88% adjacency accuracy at the training scale but collapses to chance out of distribution. Re-casting it as a recurrent message-passing network — a per-node gated recurrent unit over the communication graph with a bilinear decoder, trained by privileged distillation against the true graph — and constraining it to be size-invariant (shared weights, mean aggregation, communication-range-relative features) makes a single trained belief portable. It reaches 95.9% at 16×16 with four agents and, with no retraining, 72.5 ± 1.2% at 32×32 with ten agents (chance 45.9%); a single fine-tuning map at the new scale lifts it to 80%, within ~1 point of the full-data ceiling.</p>
+  <div class="keyres">The role-switcher's behaviour transfers too: it relays graph cut-vertices 94% of the time versus 3% for redundant agents at the training scale, and still 78% versus 8% at the larger scale — structure-aware specialisation that an actor-critic could not learn (its shared team advantage makes roles structure-blind) but evolution strategies, conditioned on per-agent features, does.</div>
+
+  <h3>Connectivity at scale is geometrically bounded</h3>
+  <p>Driving the role-switcher with the belief at the larger scale repeatedly failed, in instructive ways: the optimiser collapses either to an all-relay huddle, to a flat-fitness freeze, or to suppressing relaying altogether, and a zero-shot local switcher (60% coverage / 36% connectivity) remained the best operating point. The reason is not the policy. At ten agents, communication-range five, on a 32-wide world, the swarm <i>must</i> fragment to cover the area; holding the local bridges an agent can see cannot rejoin components that have drifted apart, and the exploration compass — with no connectivity awareness — is responsible for 97% of all link breaks (Fig. 2). Global single-component connectivity is bounded by geometry, not by the controller. This negative result reframed the project: the failure modes are themselves benign micro-to-macro amplifications, a preview of what a deliberate covert agent would exploit.</p>
+  <figure class="f"><img src="assets/figures/swarm32.gif" style="width:54%" alt="swarm fragmenting at scale">
+    <figcaption><b>Fig. 2 | The geometric wall.</b> At 32×32 with ten agents the swarm fragments to cover the area; no relay policy keeps it a single connected component while also covering, because exploration breaks links faster than relays can bridge.</figcaption></figure>
+
+  <h3>What covert misbehaviour actually does</h3>
+  <p>We instantiate the adversary as a centralised controller of <i>k</i> of <i>n</i> agents in a two-player zero-sum partially-observed game, and run a compromise sweep on a 16×16, five-agent fixture<sup><a href="#r4">4</a></sup>. A single compromised agent already pushes the team below the 90% coverage threshold (the misbehaviour-budget knee is at one agent); two inflate variance more than the mean. The mechanism is the surprising part:</p>
+  <ul>
+    <li><b>Withholding, not corrupting.</b> Actively injecting a false belief is worth ≤1 point of damage; the real cost is the team excluding a flagged member's scans and re-covering ground — a delay channel, not a destruction channel.</li>
+    <li><b>Damage scales with <i>k</i>, not the attack rate ρ.</b> Mission damage is ~10× more sensitive to the number of compromised agents (+5.3 points each) than to per-step attack rate, whose effect is flat-to-defender-favourable. Two closed-form damage models — additive and concentration — were both falsified on a held-out cell (z > 4).</li>
+    <li><b>The quietest attacker is the most damaging.</b> A do-nothing "stay" adversary (+14.8 points) beats a trained one (+13.6), because a co-evolved defender routes around the trained adversary's predictable behaviour.</li>
+    <li><b>Co-evolution is a defender-side fragility.</b> A naïve defender out-defends a co-evolved one against the same adversary by ~7 points (z = 7.18) — the co-evolved defender overfits its training adversary.</li>
+    <li><b>The connectivity guardrail is dual-use.</b> Damage is non-monotone in the disconnect-grace budget, with an attacker-optimal sweet spot; removing the hard guardrail entirely can <i>help</i> the defender, because the constraint had also been limiting the defender's own motion.</li>
+  </ul>
+  <div class="keyres">Because damage manifests jointly across coverage, completion time, and the team's posterior — and no single aggregate captures it — <b>aggregate-coverage monitoring misses the threat, while the team's own posterior is a resilience signal</b> computable from its own scans. This is the defender's lever.</div>
+
+  <h2>Discussion</h2>
+  <p>The covert regime is exactly where the standard defences fall silent. Resilient-consensus theory tolerates adversaries by discarding the most extreme neighbour values; a stealthy agent, by construction, stays within nominal bounds and is never an outlier. Our results suggest the productive defender response is not outlier rejection but <i>model-based anomaly detection on the shared belief itself</i>: an agent whose behaviour diverges from what the team's belief predicts is suspect even when it looks locally normal. The same belief is thus dual-use — the attacker's surface and the detector — and the natural object of study is a <b>stealth–damage frontier</b>: the maximum macro damage achievable per unit of detectability budget, with resilience defined as pushing that frontier down.</p>
+  <p>Two cautions generalise beyond this domain. Co-evolutionary training, the obvious way to "harden" a defender, produced a defender that was <i>more</i> fragile to an off-distribution adversary than a naïve one — a concrete instance of robustness-overfitting in adversarial co-training. And the strongest covert move was inaction, which no rate-based detector flags. Honest limitations: connectivity claims at scale are zero-shot/few-shot transfer under a CPU-only budget; the literature positioning rests partly on direct reading after a tooling failure; and the relay-role's novelty is defensible only as a conjunction (spatial mission + role/position + learned belief + stealth-frontier), not as any single ingredient.</p>
+
+  <div class="methods">
+  <h2>Methods</h2>
+  <h3>Formalism</h3>
+  <p>The mission, not the agent, is the unit of analysis. A team of <i>n</i> agents acts under a Dec-POMDP with shared reward, augmented by a time-varying interaction graph <i>G(t)</i> whose edges carry messages; each agent <i>i</i> chooses <i>a<sub>t</sub><sup>i</sup></i> from its local history. Mission state carries a health indicator Φ(s,t) ∈ [0,1] and a viability kernel (states admitting ≥(1−δ) safe completion); success, degradation, and failure are trajectory-level properties. A threat is a deviation profile: a compromised set <i>C</i> of size <i>k</i>, an activation pattern, a replacement policy, an amplitude budget (a total-variation bound on the deviation), a <b>stealth budget</b> (a KL bound for local undetectability — the formal meaning of "covert"), and an intervention/break budget. Propagation is captured by a one-step influence (the total-variation shift a deviation induces on a neighbour's input). Resilience is reported through four metrics parameterised by threat intensity: <b>robustness</b> (worst-case performance ratio), <b>brittleness</b> (sharpness of collapse at the frontier), <b>elasticity</b> (graceful-degradation rate), and <b>recovery</b> (post-degradation value and time). A worked instantiation — phantom-coverage injection on a shared-exploration mission — shows a local lie propagating through frontier sharing into mission-level coverage loss.</p>
+  <h3>Architecture &amp; learning</h3>
+  <p><i>Compass</i> (deterministic): score = uncertainty − crowding, distance-discounted, with anti-overlap and a soft connectivity bias. <i>Role-switcher</i>: a small multilayer perceptron over seven graph-criticality features (degree, budget-overspend, detachment, 2-hop cut-vertex, component fraction, local-unexplored density, coverage progress) producing P(relay), wrapped in a hysteresis switcher and trained by OpenAI-ES with a mission-safety fitness (coverage + connectivity − degree-budget violations); a stochastic-relay objective is used during training to keep the fitness landscape non-flat. Actor-critic was tried and discarded — its shared team advantage yields structure-blind roles. <i>Graph belief</i>: a graph-convolutional recurrent network (per-node GRU + mean-aggregated message passing + bilinear adjacency decoder), size-invariant by shared weights, mean aggregation, communication-range-relative offsets and capped raw degree; trained by privileged distillation (true adjacency as a per-step target) via backprop-through-time with weight decay, gradient clipping, early stopping and five-fold cross-validation.</p>
+  <h3>Evaluation</h3>
+  <p>Policies are evaluated by sampling π at ε = 0, never by argmax: argmax destroys the spawn-time symmetry-breaking the policy relies on and inflates catastrophic-failure rate from 0% to ~46%. The adversarial study uses a centralised red controller trained by coevolutionary evolution strategies (population 8, 20 generations), with a pre-registered learning-detection rubric (Mann–Whitney + early-vs-late trend + non-degenerate action distribution) and negative controls. Code: <a href="https://github.com/bijanmehr/Zymera_env">github.com/bijanmehr/Zymera_env</a>.</p>
+  </div>
+
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="r1">Systematic review, connectivity-aware role allocation: two non-overlapping camps (connectivity-but-homogeneous vs. roles-but-connectivity-blind). See <a href="related-work.html">Gap</a>.</li>
+    <li id="r2">Covert poisoning of cooperative MARL is an active subfield on game benchmarks: One4All (2022), BLAST (2025), and related backdoor attacks; resilient-consensus / r-robustness (W-MSR) assumes detectable adversaries. See <a href="related-work.html">Gap</a>.</li>
+    <li id="r3">Frontier-attention coverage policy: 97.7% coverage, size-agnostic, connectivity 32%. See <a href="findings.html">Findings</a> and <a href="journey.html">Journey</a>.</li>
+    <li id="r4"><i>Stealth Attacks on Swarms</i> — two-player zero-sum POSG, the compromise sweep and adversarial-model validation (RedWithinBlue). See <a href="findings.html">Findings</a> and <a href="documents.html">Docs</a>.</li>
+  </ol>
+
+  <div class="callout">
+  <h2>Threat model</h2>
+  <p>The adversarial study (<i>Stealth Attacks on Swarms: Adversary Modeling from a Zero-Sum Game Perspective</i>) frames the problem as a <b>two-player zero-sum partially-observable stochastic game</b> on the cooperative Dec-POMDP / POSG tuple <i>G = ⟨I, S, {A<sub>i</sub>}, {O<sub>i</sub>}, P, O, R, γ, ρ<sup>0</sup>⟩</i>. <b>Team blue</b> (the <i>n</i> nominal agents) is <b>decentralised</b>: each agent <i>i</i> picks <i>a<sub>i,t</sub> ∼ π<sub>i</sub>(τ<sub>i,t</sub>, m̄<sub>i,t</sub>)</i> from only its own local history and the messages it receives — there is no central controller with the joint state or observation. <b>Team red</b> is <b>centralised</b>: it coordinates interventions across its compromised agents and over time toward a single objective (mission degradation), even without knowing the full state or the communication graph. The game is <i>imbalanced</i> — blue holds all <i>n</i> agents, red influences at most <i>k</i> &lt; <i>n</i> — and zero-sum: <i>J<sub>red</sub>(π, φ) = −J(π, φ)</i>. The communication channel itself is not tampered with; honest agents receive whatever is broadcast, but compromised agents may emit plausible messages and actions that steer the swarm toward poor outcomes.</p>
+
+  <h3>The four stealth budgets</h3>
+  <p>A team-red strategy φ ∈ Φ<sub>k</sub> selects an unknown compromised set <i>C ⊆ I</i> and replaces the behaviour of those agents, subject to four explicit budgets:</p>
+  <table class="tm">
+    <thead><tr><th>Budget</th><th>Symbol</th><th>What it bounds</th></tr></thead>
+    <tbody>
+      <tr><td>Compromise size</td><td><code>k</code></td><td>How many agents red controls: <i>|C| ≤ k &lt; n</i>.</td></tr>
+      <tr><td>Per-step distortion</td><td><code>&epsilon;</code></td><td>How noticeable each deviation is: <i>d(π̃<sub>i</sub>, π<sub>i</sub>) ≤ ε</i> per step (a norm/KL/detector-score bound — the formal meaning of "covert").</td></tr>
+      <tr><td>Intervention window / cadence</td><td><code>T<sub>int</sub></code></td><td>How often red is allowed to act: <i>&Sigma;<sub>t</sub> 𝟙[π̃<sub>i</sub> ≠ π<sub>i</sub>] ≤ T<sub>int</sub></i>.</td></tr>
+      <tr><td>Attack aggressiveness / rate</td><td><code>&alpha;</code></td><td>Allowable detectability level, e.g. <i>ℙ(detected | φ) ≤ α</i>, trading damage against exposure.</td></tr>
+    </tbody>
+  </table>
+  <p>Blue solves <i>π<sup>⋆</sup> ∈ arg max<sub>π</sub> min<sub>φ∈Φ<sub>k</sub></sub> J(π, φ)</i> (worst-case-robust mission return); red solves the complement. The footprint quantity of interest is the mission damage <i>ΔJ(k) = J(π; clean) − min<sub>φ∈Φ<sub>k</sub></sub> J(π, φ)</i>, and especially <b><i>k<sup>⋆</sup>(θ) = min{ k : ΔJ(k) ≥ θ }</i></b> — the smallest number of compromised agents at which mission failure crosses a degradation threshold θ. (In the 16×16 / five-agent fixture this knee sits at a single agent.)</p>
+
+  <h3>Research questions</h3>
+  <ol>
+    <li><b>Minimum red-team footprint.</b> What is the smallest compromise size <i>k<sup>⋆</sup>(θ)</i> needed to force <i>ΔJ(k) ≥ θ</i>, and how does it scale with swarm size <i>n</i> and communication connectivity?</li>
+    <li><b>Stealthy worst-case attacks.</b> Under distortion budget ε, intervention budget <i>T<sub>int</sub></i>, and detectability level α, what is the achievable trade-off between mission degradation and stealth — the Pareto frontier between <i>ΔJ</i> and detection probability / delay?</li>
+    <li><b>Which attack surfaces dominate.</b> When red can influence at most <i>k</i> agents, which intervention channel — messages vs. observations vs. actions — yields the largest worst-case degradation under the same budgets, and how does this depend on the attacker's knowledge of policies or the communication graph?</li>
+  </ol>
+  </div>
+
+  <p class="meta" style="margin-top:24px">This article is the front matter of a deeper site: the <a href="related-work.html">Gap</a> analysis, the <a href="architecture.html">Architecture</a>, the full <a href="findings.html">Findings</a>, the <a href="emergence.html">Emergence</a> catalogue, the decision <a href="journey.html">Journey</a>, and the document <a href="documents.html">corpus</a> are the supplementary material. Active, evolving research — figures and numbers will change.</p>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div></div>
+</body>
+</html>

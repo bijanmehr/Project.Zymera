@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Emergence (Wanted & Unwanted)</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk active" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Emergence — wanted &amp; unwanted</h1>
+  <p class="sub">The honest core. The system produced both the cooperation we wanted and a series of degenerate or surprising behaviors that were as informative as the successes.</p>
+
+  <h2>Wanted emergence</h2>
+  <ul>
+    <li><b>Decentralization wins.</b> Independent learners match CTDE and beat the joint policy; IPPO spontaneously forms a stretched relay chain to ferry coverage information.</li>
+    <li><b>Selective, structure-aware relaying</b> emerged from ES — relaying cut-vertices 94% vs redundant agents 3% — the very thing actor-critic could <i>not</i> learn (its shared advantage made roles structure-blind). And it <b>transferred</b> to a 2.5× larger team (78% on cut-vertices) with no retraining.</li>
+    <li><b>Belief accumulation.</b> The graph belief's accuracy rises over the episode at both scales — it genuinely integrates neighbor information through time, the thing the snapshot net could not do.</li>
+    <li><b>Symmetry-breaking.</b> The policy uses stochastic tie-breaks for "who goes left / who goes right" — the mechanism behind coordinated dispersal (and fragile to evaluation protocol, below).</li>
+  </ul>
+  <figure><img src="assets/figures/evolved.gif" alt="evolved specialized behavior" style="width:55%"><figcaption>Evolved specialization — distinct roles emerging from a gradient-free search.</figcaption></figure>
+
+  <h2>Unwanted / weird emergence (failure modes)</h2>
+
+  <div class="callout danger"><b>The clump.</b> Trained with a fitness that rewarded connectivity + cohesion, ES collapsed to the degenerate optimum: <b>relay 100%, coverage 2%, connectivity 100%</b> — everyone huddles forever, trivially "connected," covering nothing. Fix: reshape the fitness (coverage primary, connectivity bonus, relay-fraction penalty); never reward huddling.</div>
+
+  <div class="callout danger"><b>The ES freeze.</b> With the relay decision behind a hard hysteresis threshold, if no agent's P(relay) sits near the threshold on the training maps, no perturbation flips a decision → a <b>flat fitness landscape</b> → fitness frozen for all generations, zero learning. Fix: stochastic relay during training (Bernoulli(P)) so P drives expected behavior smoothly; verified the landscape became non-flat (fitness std 0.0 → 0.062) before committing the run.</div>
+
+  <div class="callout danger"><b>The geometric wall.</b> At 32×32 / 10 agents / comm-range 5, <b>relaying cannot buy global connectivity</b> — holding <i>local</i> bridges can't re-join components that have drifted apart. A coverage-aware optimizer therefore <i>correctly</i> suppresses relay, and connectivity reverts toward the compass baseline. The ceiling is structural, not a policy failure — confirmed from both directions (the role-switcher transfers yet connectivity still fails; re-training drops relay).</div>
+
+  <div class="callout danger"><b>Stuck-relay.</b> A relay whose target is "HOLD position" is a fixed point — agents never switched back to frontier. Fix: relay → move toward the herd centroid + hysteresis release. Resolved (switching is now ~50/50 both directions).</div>
+
+  <div class="callout danger"><b>Snapshot-estimator OOD collapse.</b> The feedforward snapshot estimator (88% @16) collapsed to <i>trivial</i> at 32×32: trained at N=4, its bilinear head could not even reproduce the <i>visible</i> graph at N=10. Diagnosis (now central to the architecture): graph estimation is a dynamic message-passing process — a snapshot classifier is the wrong model class. Fix: the recurrent belief.</div>
+
+  <div class="callout danger"><b>Argmax collapses symmetry-breaking.</b> Greedy/argmax evaluation destroys the stochastic left/right tie-breaks — catastrophic-failure rate jumps from 0% to ~46%. Mandated fix: always evaluate with stochastic-π (ε = 0). (An early "greedy" report of 87/83/95 fell to 79/60/88 under honest stochastic eval — the protocol oversold results.)</div>
+
+  <div class="callout danger"><b>Degree-budget mis-calibration at scale.</b> The mission-safety budget that works at N=4 (keep ≥ 1 of 3) becomes infeasible at N=10 (keep ≥ 7 → ~45% safety violations). At N=10 it had to relax to "don't fully detach" — a much weaker guarantee, still violated 5–9% of steps because the geometry forces detachment.</div>
+
+  <div class="callout warnbox"><b>Training-process notes.</b> TD(0) critic targets diverged (self-referential with the non-stationary global-seen mask) → switched to Monte-Carlo returns. The best config overfit on 4 training maps (68% held-out connectivity) → needed 14 maps to generalize. Belief transfer <i>peaks</i> mid-training then drifts as it overfits N=4 → early-stop on a held-out scale.</div>
+
+  <div class="callout danger"><b>No division of labor (the flooding result).</b> The 2026-06-22 fixed-100-step diagnostic shows <b>no controller divides the map</b>: the redundancy floor is <b>&ge; 2.2 everywhere</b>, rising to ~6–8 at scale. The agent sweep @32×32 is the proof — redundancy climbs <b>3.68 → 7.87</b> from N6 → N18 while coverage climbs <b>60% → 100%</b>. Adding agents <i>floods</i> the map rather than dividing it; the 100% coverage is brute force, not coordination.</div>
+
+  <div class="callout danger"><b>Information is not the bottleneck (the Fiedler-oracle null).</b> Feeding a <i>perfect</i> global-connectivity signal (exact eigendecomposition λ₂ + each agent's own Fiedler component) into the role gate produced <b>no relays (0–2%)</b> and connectivity <i>worse</i> than baseline at scale (<b>16% @32×32, 14% @40×40</b>). The swarm cannot <i>act</i> on connectivity information it already has — the limit is the action space, not perception.</div>
+
+  <div class="callout danger"><b>Adaptive-λ walks straight into the clump (again).</b> A Lagrangian on connectivity ran λ up to <b>~1.5</b> and converged on the degenerate all-relay optimum: <b>relay 94–100%, connectivity 100% trivially, coverage 4–40%</b>. The constraint solver rediscovered the huddle.</div>
+
+  <div class="callout danger"><b>Emergence only when we cheat the clock.</b> The only run where roles emerged <i>and</i> connectivity held (<b>relay 67–87%, conn 68–88%</b>) was the "episodes" mode with <b>2× episode length</b> — which violates the fixed-100-step protocol. Give the swarm more time and emergence reappears; hold time fixed and it vanishes. The apparent emergence was a time budget, not coordination.</div>
+
+  <div class="callout key"><b>Why the failure modes matter for the research question.</b> Several are themselves <i>benign</i> micro→macro amplifications — one stuck agent fragments the team; one mis-calibrated budget collapses the role distribution. They preview exactly what a <i>deliberately covert</i> agent would exploit, and the load-bearing positions they exploit (cut-vertices, relays) are precisely the amplification map the research question predicts.</div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

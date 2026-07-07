@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Inspirations</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .sscurve{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+  .tagfit{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .fit{background:#e6f5ec;color:#1f7a44;border:1px solid #b6e2c6}
+  .meta-only{background:#fdf3e3;color:#b9770e;border:1px solid #f0d9ad}
+  .tried{background:#fdeaea;color:#c0392b;border:1px solid #f3c2bd}
+  .lawbox{background:#eef4ff;border:1px solid #bcd6ff;border-radius:12px;padding:6px 20px;margin:16px 0}
+</style>
+</head>
+<body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk active" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Inspirations — physics &amp; biology for the redesign</h1>
+  <p class="sub">Cross-disciplinary mechanisms we're drawing on to break the two open walls — getting the team to <b>divide the map</b> (coordination / redundancy) and to <b>stay linked at scale</b> (the connectivity wall). Candidate ideas feeding the proposed <a href="architecture.html">Stack&nbsp;C</a> redesign — not results.</p>
+
+  <div class="callout key">
+    <b>The reframe that filters everything below: this is a small TEAM, not a swarm.</b> At <b>N ≈ 4–16</b> agents, large-N self-organization (ant colonies, starling murmurations, soap-foam coarsening, percolation in the thermodynamic limit) is a <i>statistical</i> effect that doesn't exist at our scale — at best a metaphor. And two obvious "swarm" fixes — a fixed <b>50/50</b> relay/explorer split and <b>role rotation</b> — were <span class="tagfit tried">tried · ruled out</span>. So the inspirations here are filtered for <b>small-N, role-differentiated, position-determined</b> mechanisms.
+  </div>
+
+  <!-- ============ ROPE ============ -->
+  <h2>1 · The elastic-rope comms model</h2>
+  <p>Replace our current link model — a <b>binary, memoryless cutoff</b> at comm-range (link at d=4.9, gone at d=5.1, no warning, no state) — with an <b>elastic rope</b> between agents that builds tension as they separate and snaps under enough strain. It maps cleanly onto a material's <b>stress–strain curve</b>:</p>
+  <table class="sscurve">
+    <tr><th>Rope physics</th><th>Comms meaning</th><th>Per-edge variable</th></tr>
+    <tr><td><b>Elastic</b> (stretches, springs back)</td><td>full link — within nominal range, healthy comms</td><td>tension <code>τ = k·max(0, d−d_rest)</code></td></tr>
+    <tr><td><b>Yield / plastic</b> (deforms, accrues strain)</td><td><b>degraded</b> link in a stretch band — alive but lower bandwidth, <b>rising staleness</b></td><td>strain <code>∫(τ−τ_yield)⁺ dt</code></td></tr>
+    <tr><td><b>Fracture</b> (snaps)</td><td>link lost</td><td>break when <code>d &gt; r_break</code> <i>or</i> strain <code>&gt; budget</code></td></tr>
+  </table>
+  <p><b>What it buys (the genuinely new parts):</b></p>
+  <ul>
+    <li><b>The elastic band = free temporary over-range = grace / intermittent connectivity.</b> Agents can briefly leave contact to cover ground as long as the rope doesn't break — so they spread to the <i>elastic limit</i>, not the range limit. This is the main untried lever for the connectivity wall.</li>
+    <li><b>Strain-then-snap = Age-of-Information with a budget</b> — and a covert-attack surface: a compromised agent can manipulate tension without ever snapping a rope (free-ride by staying central, or <i>fatigue</i> a critical link to near-breaking). Tension is <b>local and oracle-free</b> (unlike the Fiedler value), so it's deployable.</li>
+    <li><b>Per-edge state</b> <code>(tension, strain, health)</code> = relational edge features for the graph belief.</li>
+  </ul>
+  <div class="callout danger">
+    <b>Don't misread the rope.</b> The <i>restoring-force</i> reading (a spring that pulls everyone back together) is just the <b>soft tether we already tried</b> — it loses to the hard guardrail and, at the limit, gives the <b>clump</b>. Tension must be a <b>constraint</b> (don't exceed the break budget), <b>not a reward term</b> (a "minimize tension" objective Goodharts into the huddle, as adaptive-λ did). Ropes <b>attach on contact</b>, not as a complete mesh. And the rope is a <i>connectivity/comms</i> idea — it does <b>not</b> fix coverage division.
+  </div>
+
+  <!-- ============ PHYSICS ============ -->
+  <h2>2 · Physics — useful as theory, not as large-N dynamics</h2>
+  <p>Physics helps two ways: <b>mechanism metaphors</b> (how an agent acts) and <b>theory</b> (what's achievable). For us the theory is the bigger prize — it can turn one of our "failures" into a finding. But most large-N physics is statistical, so it's <i>descriptive</i> at our scale, not a control law:</p>
+  <table>
+    <tr><th>Inspiration</th><th>What it gives us</th><th>Scale fit</th></tr>
+    <tr><td><b>Percolation / random geometric graphs</b></td><td>The connectivity wall <i>is</i> a phase transition: below a critical density the giant component shatters. Reframes "we couldn't stay connected at 32²" as <b>"physics says one rigid component is improbable here → use grace,"</b> not a policy bug.</td><td><span class="tagfit meta-only">large-N · descriptive</span></td></tr>
+    <tr><td><b>Soap foam / surface tension (Plateau) → Voronoi/CVT</b></td><td>Bubbles tile space into disjoint cells = a spatial <b>partition</b> = the physical face of CVT/LPAC = anti-redundancy.</td><td><span class="tagfit fit">CVT target fits small-N</span></td></tr>
+    <tr><td><b>Reaction–diffusion (Turing) / stigmergy</b></td><td>Local inhibition → even spacing. A decaying "I claimed here" field = decentralized anti-redundancy (and the decay is AoI again).</td><td><span class="tagfit meta-only">pattern is large-N</span></td></tr>
+    <tr><td><b>Self-organized criticality (sandpiles)</b></td><td>A team at the edge of connectivity shows <b>avalanches of all sizes</b> from tiny perturbations — the <b>micro→macro amplification thesis</b> in physics; predicts attack leverage peaks at criticality.</td><td><span class="tagfit meta-only">conceptual</span></td></tr>
+    <tr><td><b>Spider web / tensegrity / granular force-chains</b></td><td>Pre-stressed, damage-tolerant networks = <b>r-robustness</b> (redundant load paths &gt; mere λ₂-connectivity); force-chains = which agents are <b>load-bearing</b> = the amplification map.</td><td><span class="tagfit fit">fits small-N</span></td></tr>
+  </table>
+  <div class="callout">
+    <b>The pattern:</b> <b>constraint-</b> and <b>field-</b>based physics helps us; <b>force-</b>based physics (charges, springs-as-attraction, boids) is just soft potential fields — which we've shown lose to hard constraints and deadlock in local minima. Highest-value pulls: <b>percolation</b> as the theory of the wall, and <b>self-organized criticality</b> as the theory of attack leverage.
+  </div>
+
+  <!-- ============ NATURE ============ -->
+  <h2>3 · Nature at the right scale — small-group cooperative hunting</h2>
+  <p>Small predator groups (3–12) solve role division the way we need to — and it's the <b>opposite</b> of a 50/50 rotating split:</p>
+  <ul>
+    <li><b>Lions</b> hunt in groups of <b>3–7 split into "wings" and "centers"</b>: wings circle out and drive the prey; the center (the heaviest, most experienced individual) waits in ambush. <a href="https://biomemedia.org/the-importance-of-group-hunting-how-do-animals-like-lions-wolves-and-dolphins-use-teamwork-to-increase-their-hunting-success/">[overview]</a></li>
+    <li><b>Dolphins</b> (Cedar Key): <b>one "driver"</b> herds fish against a <b>"barrier"</b> line of the others — 1-to-many. <a href="https://en.wikipedia.org/wiki/Pack_hunter">[pack hunting]</a></li>
+    <li><b>Wolves:</b> role by <b>individual attribute</b> — light fast females herd; heavy males take down.</li>
+  </ul>
+  <div class="lawbox">
+  <p style="margin:10px 0"><b>Three lessons, all against what we tried:</b></p>
+  <ol style="margin:0 0 8px">
+    <li><b>Ratio is asymmetric and emergent</b>, never a fixed 50/50 (several wings, one center; one driver, many barriers).</li>
+    <li><b>Roles are stable within a task, not rotated</b> — the center stays the center. (Fairness is handled across many hunts by reciprocity, not mid-task rotation.)</li>
+    <li><b>Role = a function of position</b> — wing vs. center is set by <i>where you are</i> relative to the prey and the team, not by a quota or a clock.</li>
+  </ol>
+  </div>
+
+  <!-- ============ SMALL-N TOOLKIT ============ -->
+  <h2>4 · The small-N toolkit that actually fits</h2>
+  <p>Three rigorous, citable tools that are native to <i>few</i> agents (and that we have <b>not</b> tried):</p>
+  <ul>
+    <li><b>Rigidity &amp; persistence theory</b> — the rope made formal. "Rigidity plays the role of connectivity when only distance (range) measurements are available." A graph can be <i>connected but floppy</i>; <b>rigidity</b> means the team's shape is recoverable from inter-agent distances, it has a <b>rigidity eigenvalue</b> (richer than the Fiedler value), and it's maintainable <b>decentrally from range only</b> while the topology changes freely. It tells you <b>which links are load-bearing → who must relay</b>, and degrades gracefully. <a href="https://www.roboticsproceedings.org/rss08/p60.pdf">[Zelazo et al., RSS]</a> <a href="https://journals.sagepub.com/doi/10.1177/0278364914546173">[IJRR]</a> <a href="https://arxiv.org/pdf/0710.2659">[persistence]</a></li>
+    <li><b>Shapley value / marginal contribution</b> — the army-ant cost–benefit rule, formalized: value each agent by its average marginal contribution. Picks relays (highest marginal connectivity contribution) <b>and</b> gives a credit-assignment signal for training; tractable at small N (exponential in N — fine at ≤16, hopeless at 1000, another reason swarm methods don't fit). <a href="https://arxiv.org/pdf/2105.15013">[SHAQ: Shapley-value MARL]</a> <a href="https://www.researchgate.net/publication/365692608_Multi-robot_task_allocation_clustering_based_on_game_theory">[Shapley MRTA]</a></li>
+    <li><b>Communication-constrained multi-robot exploration</b> — the directly-relevant subfield (search the small-team framing, not "swarm"). Its standard structure is exactly <b>explorer / relay / relay-dispatcher</b> roles — and they're <b>asymmetric</b>, never an even split. <a href="https://re.public.polimi.it/retrieve/handle/11311/1046659/265235/ismultirobot.pdf">[Amigoni/Banfi/Basilico survey]</a> <a href="https://arxiv.org/html/2309.15975v1">[MOCHA]</a> <a href="https://arxiv.org/pdf/2601.00163">[SLEI3D 2026]</a></li>
+  </ul>
+
+  <!-- ============ SYNTHESIS ============ -->
+  <h2>5 · The synthesis — the relay/explorer "role law"</h2>
+  <p>Physics, biology, and small-team robotics converge on the <b>same control law</b>, and it is the opposite of a symmetric rotating split:</p>
+  <div class="callout key">
+    <ul style="margin:6px 0">
+      <li><b>Role = f(structural position)</b> — relay vs. explorer is <i>determined</i> by whether you're load-bearing in the graph right now (rigidity / Shapley-on-connectivity), the way a lion's role is set by position — not a quota, not a turn.</li>
+      <li><b>Ratio emerges asymmetric</b> — often few relays / many explorers (or the reverse near a chokepoint). Forcing 50/50 imposed a symmetry the geometry rarely wants.</li>
+      <li><b>Pick relays by marginal contribution (Shapley), not by clock</b> — which doubles as the training credit signal.</li>
+      <li><b>Maintain <i>rigidity</i>, not just connectivity</b> — the right structural target for a distance-constrained (roped) small team, deployable from range alone.</li>
+    </ul>
+  </div>
+  <p><b>Honest caveat:</b> this gives the <i>who-holds-the-net</i> law — it does <b>not</b> by itself fix coverage <b>division</b> (the redundancy / flooding problem). That still needs the <b>goal/region action head</b> (so an agent can actually <i>go hold the bridge</i> its structural position assigns it) plus a partition target (foam/Voronoi/CVT). Rigidity + Shapley give the <b>role law</b>; the action-representation change gives the <b>ability to execute it</b>. See <a href="architecture.html">Architecture → Stack&nbsp;C</a>.</p>
+
+  <!-- ============ RULED OUT ============ -->
+  <h2>6 · Already tried / ruled out</h2>
+  <p>So we don't re-litigate — these are closed unless reopened with the stated reason addressed:</p>
+  <table>
+    <tr><th>Approach</th><th>Verdict</th></tr>
+    <tr><td>Fixed <b>50/50</b> relay/explorer ratio</td><td class="lose">imposes a symmetry nature avoids; ratio should emerge from position/need</td></tr>
+    <tr><td><b>Role rotation</b> / turn-taking</td><td class="lose">fights the natural stable-complementary-role structure within a task</td></tr>
+    <tr><td><b>Soft tether / cohesion forces</b> (potential fields, boids)</td><td class="lose">lost to the hard guardrail by ~20 pts; deadlocks in local minima</td></tr>
+    <tr><td><b>Adaptive-λ</b> (Lagrangian on connectivity)</td><td class="lose">degenerates into the all-relay clump (λ→1.5, coverage dies)</td></tr>
+    <tr><td><b>Fiedler oracle</b> as a feature</td><td class="lose">null — a perfect global signal didn't help; the limit is the action space</td></tr>
+    <tr><td>Per-step <b>1-step move head</b></td><td class="lose">the action-representation bottleneck; can't represent "claim a region"</td></tr>
+  </table>
+
+  <div class="callout">
+    <b>Status.</b> These are candidate inspirations, grounded in the cited literature, feeding the <a href="architecture.html">Stack&nbsp;C</a> redesign (proposed, not yet approved). They attack the <a href="findings.html">measured</a> walls and the <a href="emergence.html">failure modes</a>, and the rope/AoI &amp; force-chain ideas double as the covert-attack surface for the <a href="paper.html">resilience</a> question. Our prior literature sweeps were arXiv-weighted, so the rigidity, Shapley-MARL, and cooperative-biology threads still owe a targeted robotics-/biology-venue review before any paper claim.
+  </div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body>
+</html>

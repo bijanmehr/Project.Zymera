@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Theory / Formalism</title><link rel="stylesheet" href="assets/style.css">
+<style>
+  /* page-local patterns */
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0}
+  .flank{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:40px 0 4px}
+  /* boxed definition */
+  .def{background:#eef3fb;border:1px solid #bcd0ff;border-left:4px solid var(--accent-d);
+    border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .def .dt{font-weight:800;color:var(--accent-d);font-size:13px;text-transform:none;display:block;margin-bottom:5px}
+  .def .eqn{display:block;background:#fff;border:1px solid var(--line);border-radius:6px;
+    padding:9px 13px;margin:9px 0 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:13px;overflow-x:auto;color:#13243a}
+  /* assumption / hypothesis box */
+  .ass{background:#fff7e6;border:1px solid #ffd8a8;border-radius:8px;padding:11px 15px;margin:12px 0;font-size:13.6px}
+  .ass b{color:var(--warn)}
+  /* standalone equation (outside def) */
+  .eq{display:block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--mut);
+    border-radius:6px;padding:9px 13px;margin:12px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:13px;overflow-x:auto;color:#13243a}
+  .eq.key{border-left-color:var(--accent-d);background:#f6f9ff}
+  /* three-layer stack */
+  .stack{display:grid;gap:8px;margin:16px 0}
+  .stack .lyr{border-radius:10px;padding:13px 16px;border:1px solid}
+  .stack .macro{background:#fbecec;border-color:#e8b4b4}
+  .stack .bridge{background:#f1ecf8;border-color:#cdb8e6}
+  .stack .micro{background:#e9f1fb;border-color:#b7cdec}
+  .stack h4{margin:0 0 3px;font-size:14px}
+  .stack .macro h4{color:#a03232}.stack .bridge h4{color:#6a3aa0}.stack .micro h4{color:#2860a0}
+  .stack p{margin:0;font-size:13px;color:#3a4652}
+  .stack .conn{text-align:center;color:var(--mut);font-size:18px;line-height:.7}
+  /* definition mini-index cards */
+  .defgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:14px 0}
+  .defgrid div{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px}
+  .defgrid b{display:block;font-size:12.5px;color:var(--accent-d)}
+  .defgrid span{font-size:12px;color:var(--mut)}
+  .sym{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.6px;background:#eef1f4;padding:1px 5px;border-radius:4px}
+</style></head><body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk active" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Theory / Formalism</h1>
+  <p class="sub"><b>Mission-Centered Resiliency for Teams of Autonomous Agents</b> — a formal foundation for studying how teams of autonomous agents stay (or fail to stay) on-mission under decentralized control, partial observability, and adversarial pressure. The framework is built around the <b>mission</b> as the unit of analysis, not the individual agent.</p>
+
+  <div class="callout key" style="margin-top:14px">
+    This page consolidates the project's formal foundation from three increasingly mature versions of the same framework, transcribed faithfully so the site itself carries the math:
+    <ul style="margin:8px 0 4px">
+      <li><b><code>formalism.tex</code></b> — the full <i>Mission-Centered Resiliency</i> document (three layers, the Dec-POMDP backbone, ~20 boxed definitions, the stealth/break budgets, propagation, viability, the resiliency metrics, hypotheses H1–H3, and focused research questions RQ1–RQ6).</li>
+      <li><b>Swarm Resiliency draft (v1.3)</b> — the problem statement: the Dec-POMDP tuple, the neighbor-aggregation interface, the effect-based stealthy-misbehavior threat model <span class="sym">D = (C, α, ε, Δ)</span>, and assumptions A1–A5.</li>
+      <li><b>the early <i>Formalization</i></b> — the original backbone: the four interactional regimes and the nominal / off-nominal + health / viability / resilience / recovery vocabulary.</li>
+    </ul>
+    Download links are at the <a href="#downloads">bottom of the page</a>. See also <a href="architecture.html">Architecture</a> (the engineering of the same swarm) and <a href="findings.html">Findings</a> (the empirical evidence).
+  </div>
+
+  <div class="toc2">
+    <a href="#premise">1 · Premise &amp; interactional regimes</a>
+    <a href="#three">2 · The three-layer architecture</a>
+    <a href="#micro">3 · Micro level</a>
+    <a href="#macro">4 · Macro level (Dec-POMDP)</a>
+    <a href="#bridge">5 · The interaction bridge</a>
+    <a href="#nominal">6 · Nominal vs. off-nominal</a>
+    <a href="#objectives">7 · Mission objectives (definitions)</a>
+    <a href="#threat">8 · Deviation, stealth &amp; threat model</a>
+    <a href="#propagation">9 · Propagation</a>
+    <a href="#break">10 · Adversarial game &amp; break budget</a>
+    <a href="#hyp">11 · Amplification hypotheses H1–H3</a>
+    <a href="#metrics">12 · Resiliency metrics</a>
+    <a href="#example">13 · Worked example: shared exploration</a>
+    <a href="#rq">14 · Focused research questions RQ1–RQ6</a>
+    <a href="#downloads">Source documents</a>
+  </div>
+
+  <!-- 1 PREMISE -->
+  <span class="flank" id="premise">1 · framing</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Foundational premise &amp; interactional regimes</h2>
+  <p>Some missions exceed the operational capacity of any single actor: high-stakes, time-constrained, executed in dynamic environments under partial information, evolving constraints, and little tolerance for delay, error, or failure. The challenge is <b>sustained mission execution under conditions that progressively erode performance and stability</b>. The mission is the primary unit of analysis — agents, structure, autonomy, and interaction matter only through their effect on mission feasibility, progress, degradation, and recovery.</p>
+  <p>Once the mission is primary, the next question is the <b>structure of interaction</b> through which execution unfolds. The presence of multiple agents is not, by itself, decisive; what matters is the structure of inter-agent relations in a decentralized setting where no persistent central authority governs execution. Mission-level behavior emerges from those relations — the <b>interactional space</b>. Different regimes produce different mechanics of execution:</p>
+
+  <table>
+    <tr><th>Regime</th><th>Coupling</th><th>Execution character</th></tr>
+    <tr><td><b>Independent</b></td><td>Weak</td><td>Limited strategic dependence; progress only weakly conditioned by others.</td></tr>
+    <tr><td><b>Aligned&ndash;separable</b></td><td>Moderate</td><td>Positively aligned effort, substantially separable contributions (loosely &ldquo;collaborative&rdquo;).</td></tr>
+    <tr><td><b>Joint</b></td><td>Strong</td><td>Jointly constituted execution; progress, risk, and consequence are shared (loosely &ldquo;cooperative&rdquo;).</td></tr>
+    <tr><td><b>Competitive</b></td><td>Adversarial</td><td>Rivalry, contest, or adversarial interference within the same mission space.</td></tr>
+  </table>
+  <p class="meta">The labels <i>collaboration</i> / <i>cooperation</i> are treated as loose cues; the regimes are defined through their interactional properties (objective alignment, action coupling, separability of effort, shared progress/risk/consequence). This four-regime vocabulary is the original backbone from the early <i>Formalization</i>; it survives into the mature document as the framing of the interaction structure.</p>
+
+  <p>Missions are grouped not by hardware or domain but by the <b>dominant coupling mechanism</b> tying agents together. The taxonomy exposes the structure through which local behavior becomes mission-level effect — and through which local disruption becomes mission-level loss:</p>
+  <div class="defgrid">
+    <div><b>Distributed information gathering</b><span>Uncertainty reduction — exploration, mapping, search, monitoring.</span></div>
+    <div><b>Self-organized ad-hoc connectivity</b><span>Maintenance of reachability — relay, rendezvous, formation support. The interaction graph is part of the mission state.</span></div>
+    <div><b>Fusion-coupled</b><span>Distributed estimation &amp; fusion under neighborhood constraints — tracking, environmental fields, maps.</span></div>
+    <div><b>Actuation &amp; intervention</b><span>Coordinated physical effect — manipulation, logistics, area treatment.</span></div>
+    <div><b>Hybrid</b><span>Multiple coupling modes coexist (e.g. NASA Starling: sensing + networking + reconfiguration at once).</span></div>
+  </div>
+
+  <!-- 2 THREE LAYERS -->
+  <span class="flank" id="three">2 · architecture</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The three-layer architecture</h2>
+  <p>The formalism develops in three layers, with a <b>Dec-POMDP backbone at the center</b> and graph-theoretic, control-theoretic, game-theoretic, and learning-based views entering as complementary extensions. The modeling problem is fundamentally <b>micro&ndash;macro</b>: missions succeed or fail at the macro level, while execution unfolds at the micro level through local decisions and constrained interaction. A useful model must keep both and make the relation between them explicit.</p>
+
+  <div class="stack">
+    <div class="lyr macro"><h4>Macro level — the latent mission process</h4><p>Mission state <span class="sym">s&#8348; &isin; S</span>, trajectory <span class="sym">&tau;</span>, health <span class="sym">&Phi;</span>, viability kernel <span class="sym">Viab&#948;</span>, reward <span class="sym">R</span>. Mission-level claims are made over how execution unfolds through <i>time</i>.</p></div>
+    <div class="conn">&#8645; <span style="font-size:11px">joint action <span class="sym">a&#8348;</span> &uarr; / observations <span class="sym">o&#8348;</span> &darr;</span></div>
+    <div class="lyr bridge"><h4>Interaction bridge — where local becomes collective</h4><p>Time-varying graph <span class="sym">G&#8348; = (I, E&#8348;)</span>, messages <span class="sym">m&#8348;<sup>j&rarr;i</sup></span>, aggregation <span class="sym">Agg&#7522;</span>, propagation <span class="sym">&#8496;&#8348;<sup>i&rarr;j</sup></span>. The formal location of coordination, dependence, propagation, and structural fragility.</p></div>
+    <div class="conn">&#8645; <span style="font-size:11px">local actions compose &uarr; / comm. shapes inputs &darr;</span></div>
+    <div class="lyr micro"><h4>Micro level — local decision-making</h4><p>Observation <span class="sym">o&#8348;<sup>i</sup></span>, auxiliary input <span class="sym">q&#8348;<sup>i</sup></span>, local input <span class="sym">x&#8348;<sup>i</sup></span>, history <span class="sym">h&#8348;<sup>i</sup></span>, policy <span class="sym">&pi;&#7522;(&middot;|h&#8348;<sup>i</sup>)</span>, action <span class="sym">a&#8348;<sup>i</sup></span>. The level at which decentralized execution is realized.</p></div>
+  </div>
+  <p class="meta">Interaction affects the mission <b>twice</b>: first by shaping what enters each local history through communication, second by shaping how local decisions compose into the next global state. A local message, dropped link, delayed summary, or corrupted signal can therefore matter far beyond the agent at which it first appears.</p>
+
+  <!-- 3 MICRO -->
+  <span class="flank" id="micro">3 · micro</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Micro-level formalism</h2>
+  <p>Execution is local: at each step, agent <span class="sym">i</span> acts not from the full mission state but from what is locally available. Let the agent set be <span class="sym">I = {1, &hellip;, n}</span> over horizon <span class="sym">t &isin; {0, &hellip;, H&minus;1}</span>. Agent <span class="sym">i</span> has observation space <span class="sym">&Omega;&#7522;</span> and action space <span class="sym">A&#7522;</span>; at time <span class="sym">t</span> it receives a direct observation <span class="sym">o&#8348;<sup>i</sup> &isin; &Omega;&#7522;</span> and an auxiliary input <span class="sym">q&#8348;<sup>i</sup> &isin; Q&#7522;</span>. The auxiliary input is deliberately broad — it may carry neighbor communication, role, trust, belief summaries, uncertainty, or health.</p>
+  <div class="eq key">x&#8348;<sup>i</sup> = (o&#8348;<sup>i</sup>, q&#8348;<sup>i</sup>) &nbsp; &mdash; full local input</div>
+  <p>Because execution is decentralized, the agent chooses from its locally available history, not the current input alone:</p>
+  <div class="eq">h&#8348;<sup>i</sup> = (x&#8320;<sup>i</sup>, a&#8320;<sup>i</sup>, x&#8321;<sup>i</sup>, a&#8321;<sup>i</sup>, &hellip;, a&#8348;&#8331;&#8321;<sup>i</sup>, x&#8348;<sup>i</sup>)</div>
+  <div class="eq key">a&#8348;<sup>i</sup> &sim; &pi;&#7522;(&middot; | h&#8348;<sup>i</sup>) &nbsp; &mdash; the core micro-level decision rule</div>
+  <p class="meta">Any quantity that later matters for execution must enter through <span class="sym">q&#8348;<sup>i</sup></span>, become part of <span class="sym">x&#8348;<sup>i</sup></span>, and influence action through <span class="sym">h&#8348;<sup>i</sup></span> and <span class="sym">&pi;&#7522;</span>. The policy may be hand-designed, model-based, learned, recurrent, stochastic, or role-conditioned. History-based local decision-making does <i>not</i> conflict with a first-order Markov assumption at the <i>system</i> level — the global dynamics can be Markovian while no single agent sees the full global state.</p>
+
+  <!-- 4 MACRO -->
+  <span class="flank" id="macro">4 · macro</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Macro-level formalism — the Dec-POMDP backbone</h2>
+  <p>The latent mission process that local actions jointly induce is modeled as a finite-horizon cooperative <b>Decentralized Partially Observable Markov Decision Process</b> — the right starting point because the mission is sequential, partially observed, decentralized, and team-level by construction. The mission model is the tuple:</p>
+  <div class="eq key">P = &langle; I, S, {A<sup>i</sup>}<sub>i&isin;I</sub>, {&Omega;<sup>i</sup>}<sub>i&isin;I</sub>, T, O, R, &rho;&#8320;, H &rangle;</div>
+  <table>
+    <tr><th>Object</th><th>Meaning</th></tr>
+    <tr><td><span class="sym">I = {1,&hellip;,n}</span></td><td>Set of <span class="sym">n</span> autonomous agents; each selects its action from locally available information.</td></tr>
+    <tr><td><span class="sym">S</span></td><td>Mission-state space — the true mission condition <span class="sym">s&#8348;</span> (variables governing evolution and scoring). Latent in the information sense: no agent directly accesses the full <span class="sym">s&#8348;</span>.</td></tr>
+    <tr><td><span class="sym">A<sup>i</sup></span></td><td>Action space of agent <span class="sym">i</span>; joint action <span class="sym">a&#8348; = (a&#8348;<sup>1</sup>,&hellip;,a&#8348;<sup>n</sup>)</span>.</td></tr>
+    <tr><td><span class="sym">&Omega;<sup>i</sup></span></td><td>Local observation space of agent <span class="sym">i</span>.</td></tr>
+    <tr><td><span class="sym">T</span></td><td>Transition kernel <span class="sym">s&#8348;&#8330;&#8321; &sim; T(&middot; | s&#8348;, a&#8348;)</span> — how the mission state evolves under the joint action.</td></tr>
+    <tr><td><span class="sym">O</span></td><td>Observation model <span class="sym">o&#8348; &sim; O(&middot; | s&#8348;)</span> — how the latent state generates local observations.</td></tr>
+    <tr><td><span class="sym">R</span></td><td>Shared team reward <span class="sym">R(s&#8348;, a&#8348;)</span> — scores mission progress / utility as a team-level quantity.</td></tr>
+    <tr><td><span class="sym">&rho;&#8320;</span></td><td>Initial-state distribution <span class="sym">s&#8320; &sim; &rho;&#8320;</span> (fixed starts are a point mass).</td></tr>
+    <tr><td><span class="sym">H</span></td><td>Finite mission horizon (time budget in decision steps).</td></tr>
+  </table>
+  <p>The joint policy <span class="sym">&pi; = (&pi;&#8321;,&hellip;,&pi;&#8345;)</span> induces the <b>mission trajectory</b> — the main macro-level object, since mission-level claims are made over how execution unfolds through time:</p>
+  <div class="eq">&tau; = (s&#8320;, o&#8320;, a&#8320;, s&#8321;, o&#8321;, a&#8321;, &hellip;, s<sub>H</sub>)</div>
+  <div class="eq key">J(&pi;) = E [ &Sigma;<sub>t=0</sub><sup>H&minus;1</sup> R(s&#8348;, a&#8348;) ] &nbsp; &mdash; the cooperative objective</div>
+  <p class="meta">The return <span class="sym">J(&pi;)</span> is a standard mission-level abstraction, but it is <b>insufficient on its own</b>: a mission may accumulate reward while its structural capacity to continue erodes. Degradation, viability, and failure are built on top of this backbone once the interaction and micro&ndash;macro mapping are explicit.</p>
+
+  <!-- 5 BRIDGE -->
+  <span class="flank" id="bridge">5 · bridge</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The interaction bridge</h2>
+  <p>The bridge between micro and macro is the <b>interaction layer</b>: communication, message passing, neighborhood structure, role-dependent influence, and propagation. Decentralized coordination is not produced by local policy alone — it is produced by local policy acting through a structured pattern of inter-agent communication and dependence. The structure is a <b>time-varying directed interaction graph</b>:</p>
+  <div class="eq">G&#8348; = (I, E&#8348;) &nbsp;&middot;&nbsp; N&#7522;(t) = { j &isin; I : (j,i) &isin; E&#8348; } &nbsp; (in-neighbors of i)</div>
+  <p>If agent <span class="sym">j</span> sends a signal to <span class="sym">i</span>, write it <span class="sym">m&#8348;<sup>j&rarr;i</sup></span>. The communication input to <span class="sym">i</span> is the aggregation of received neighbor signals:</p>
+  <div class="eq">c&#8348;<sup>i</sup> = Agg&#7522;( { m&#8348;<sup>j&rarr;i</sup> : j &isin; N&#7522;(t) } )</div>
+  <p class="meta">The operator <span class="sym">Agg&#7522;</span> is left abstract on purpose — averaging, consensus, message fusion, belief update, map merging, or trust-weighted filtering. This is the communication component inside the auxiliary input: simplest case <span class="sym">q&#8348;<sup>i</sup> = c&#8348;<sup>i</sup></span>; richer settings <span class="sym">q&#8348;<sup>i</sup> = (c&#8348;<sup>i</sup>, r&#8348;<sup>i</sup>, u&#8348;<sup>i</sup>, &hellip;)</span> with role/mode <span class="sym">r&#8348;<sup>i</sup></span> and a local uncertainty/trust/health variable <span class="sym">u&#8348;<sup>i</sup></span>. The <b>trust-by-default</b> assumption enters exactly here: under nominal operation agents treat neighbor signals as valid decision inputs, discounting them only after clear inconsistency.</p>
+
+  <h3>Working assumptions</h3>
+  <p>The framework is developed under explicit assumptions — realistic starting conditions, not universal claims. The mature document carries eight; the Swarm-Resiliency draft states the load-bearing first five (A1&ndash;A5):</p>
+  <div class="defgrid">
+    <div><b>A1 — Local agency at execution</b><span>Each agent selects actions from its own information state; a central node may log/score/supervise offline but holds no real-time decision authority.</span></div>
+    <div><b>A2 — Partial observability</b><span>No agent has full access to the mission state; observations are local, incomplete, possibly noisy, delayed, or occluded.</span></div>
+    <div><b>A3 — Topology-constrained interaction</b><span>Agents interact through limited, possibly time-varying channels; influence depends on who is connected to whom, not on broadcast.</span></div>
+    <div><b>A4 — Mission-level objective</b><span>The objective is over the joint trajectory, not a sum of node-level goals; success/degradation/failure are assessed at the mission level.</span></div>
+    <div><b>A5 — Isolation &amp; agent loss admissible</b><span>Agents may become isolated, degraded, or unavailable; isolation changes redundancy, reachability, feasibility — its effect depends on role, timing, structure.</span></div>
+    <div><b>A6 — Trust-by-default</b><span>Under nominal execution, neighbor information is treated as usable unless clear evidence suggests otherwise.</span></div>
+    <div><b>A7 — Disturbance &amp; misbehavior possible</b><span>Execution may include noise, faults, misbehavior, or adversarial influence; the question is when local deviation stays local vs. propagates.</span></div>
+    <div><b>A8 — Adversarial influence is stealth-constrained</b><span>Adversarial effects are assumed locally plausible rather than overt — influence that can persist without immediate rejection.</span></div>
+  </div>
+
+  <!-- 6 NOMINAL -->
+  <span class="flank" id="nominal">6 · regimes</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Nominal vs. off-nominal execution</h2>
+  <p><b>Nominal execution</b> is execution within the expected operating regime: the joint trajectory stays inside an admissible region where sensing, communication, and local decision-making behave within design assumptions. It may include noise and variation, but not in a form that changes the basic logic of execution — geometrically, motion within an expected operating region, near a constrained manifold of admissible mission dynamics.</p>
+  <p><b>Off-nominal execution</b> begins when the trajectory departs that regime. The cause is intentionally cause-agnostic — disturbance, fault, isolation, anomaly, misbehavior, or adversarial influence. It marks a <b>regime shift</b>, not yet a verdict on success or failure: information quality shifts, interaction patterns weaken or distort, redundancy erodes, or local decisions no longer compose as expected.</p>
+  <p>Within that shift, four trajectory-level concepts orient everything downstream — <b>health</b> tracks the broader condition of execution; <b>viability</b> asks whether successful completion is still achievable; <b>degradation</b> marks weakening of health; <b>failure</b> begins when viability is lost. Distinct from these are four <i>response</i> concepts:</p>
+  <table>
+    <tr><th>Concept</th><th>Description</th></tr>
+    <tr><td><b>Robustness</b></td><td>Ability to remain effective under disturbance without major reconfiguration.</td></tr>
+    <tr><td><b>Resilience</b></td><td>Ability to absorb disruption and preserve or restore acceptable mission behavior.</td></tr>
+    <tr><td><b>Recovery</b></td><td>The return of mission health or viability after degradation.</td></tr>
+    <tr><td><b>Healing</b></td><td>Repair/restoration/reconfiguration of damaged components, links, policies, or subsystems — may <i>enable</i> recovery but does not guarantee it.</td></tr>
+  </table>
+  <p class="meta">A mission can recover without full healing, and a system can heal locally without full mission recovery. This nominal / off-nominal + health / viability / resilience / recovery vocabulary originates in the early <i>Formalization</i> and is made precise by the definitions and metrics below.</p>
+
+  <!-- 7 OBJECTIVES -->
+  <span class="flank" id="objectives">7 · definitions</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Mission objectives — the core definitions</h2>
+  <p>Because the cooperative return alone cannot detect eroding structural capacity, the framework adds formal objects capturing the <b>conditions for continued execution</b>: the constraint set, mission health, the viability kernel, and trajectory-level predicates for success, degradation, and failure.</p>
+
+  <div class="def"><span class="dt">Definition — Mission Constraint Set</span>
+  The set of mission states from which completion remains physically and informationally feasible, encoding hard constraints (minimum connectivity, surviving agents, time budget, safety) as state-dependent inequalities. The <b>goal set</b> <span class="sym">K<sub>goal</sub> &sube; K</span> collects the terminal conditions for completion.
+  <span class="eqn">K = { s &isin; S : g&#11388;(s) &le; 0, &nbsp; j = 1,&hellip;,J }</span>
+  <span class="meta">e.g. for a connectivity mission, <span class="sym">g<sub>conn</sub>(s) = &minus;&lambda;&#8322;(L(G&#8348;))</span> keeps the algebraic connectivity (Fiedler value) of the graph Laplacian strictly positive.</span></div>
+
+  <div class="def"><span class="dt">Definition — Mission Health Function</span>
+  A weighted combination of normalized health indicators — a <b>diagnostic, not a reward</b>: one can have <span class="sym">R &gt; 0</span> (reward earned) while <span class="sym">&Phi;</span> declines (capacity to keep earning it eroding).
+  <span class="eqn">&Phi;(s&#8348;, t) = &Sigma;<sub>d=1</sub><sup>D</sup> w<sub>d</sub> &phi;<sub>d</sub>(s&#8348;, t), &nbsp; w<sub>d</sub> &gt; 0, &nbsp; &Sigma; w<sub>d</sub> = 1</span>
+  <span class="meta">Canonical indicators: connectivity <span class="sym">&lambda;&#8322;(L(G&#8348;))/&lambda;&#8322;<sup>max</sup></span>; information quality <span class="sym">1 &minus; H(s&#8348;|o&#8320;&#8338;&#8348;)/H<sub>max</sub></span>; task progress <span class="sym">P(s&#8348;)/P*</span>; capacity (fraction of agents operational / roles filled / channels active). Weights are mission-family-dependent.</span></div>
+
+  <div class="def"><span class="dt">Definition — Stochastic Viability Kernel</span>
+  The set of states from which <i>some</i> joint policy keeps the trajectory inside the constraint set with probability at least <span class="sym">1&minus;&delta;</span> for all remaining time — viability theory adapted to the discrete-time stochastic Dec-POMDP setting (a backward recursion analogous to Hamilton&ndash;Jacobi reachability).
+  <span class="eqn">Viab&#948;(K, t) = { s&#8348; &isin; K : &exist; &pi; s.t. Pr( s&#964; &isin; K &forall; &tau; &isin; {t,&hellip;,H} | s&#8348;, &pi; ) &ge; 1&minus;&delta; }</span></div>
+
+  <div class="def"><span class="dt">Definition — Mission Viability</span>
+  The mission is <b>viable</b> at time <span class="sym">t</span> if and only if <span class="sym">s&#8348; &isin; Viab&#948;(K, t)</span>.</div>
+
+  <div class="def"><span class="dt">Definition — Mission Success</span>
+  A trajectory achieves success under <b>sustained constraint satisfaction and goal attainment</b> — &ldquo;always safe&rdquo; <span class="sym">&and;</span> &ldquo;goal reached&rdquo;.
+  <span class="eqn">Success(&tau;) &hArr; [ &forall; t, s&#8348; &isin; K ] &and; [ s<sub>H</sub> &isin; K<sub>goal</sub> ] &nbsp;&nbsp; (in LTL: &#9633;(s&isin;K) &and; &#9671;(s&isin;K<sub>goal</sub>))</span></div>
+
+  <div class="def"><span class="dt">Definition — Mission Failure</span>
+  Failure at <span class="sym">t*</span> occurs when the state has left the constraint set <i>and</i> viability is lost — an <b>absorbing</b> condition (once viability is lost, failure is irreversible).
+  <span class="eqn">Failure(&tau;, t*) &hArr; s<sub>t*</sub> &notin; K &nbsp;&and;&nbsp; s<sub>t*</sub> &notin; Viab&#948;(K, t*)</span></div>
+
+  <div class="def"><span class="dt">Definition — Mission Degradation</span>
+  A trajectory is degraded on <span class="sym">[t&#8321;,t&#8322;]</span> if viability is maintained but health has dropped below the nominal baseline — &ldquo;still viable&rdquo; <span class="sym">&and;</span> &ldquo;health loss&rdquo;.
+  <span class="eqn">Degraded(&tau;, t&#8321;, t&#8322;) &hArr; [ &forall; t, s&#8348; &isin; Viab&#948;(K,t) ] &and; [ &exist; t, &Phi;(s&#8348;,t) &lt; &Phi;<sup>nom</sup>(t) &minus; &epsilon; ]</span></div>
+
+  <!-- 8 THREAT -->
+  <span class="flank" id="threat">8 · threat</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Deviation, stealth &amp; the threat model</h2>
+  <p>The deviation model is <b>cause-agnostic</b> — it captures any bounded departure from nominal behavior. The Swarm-Resiliency draft frames this as an <b>effect-based</b> threat model: rather than model the exploit path, model its mission-relevant outcome, namely that a subset of agents no longer follows the nominal decentralized decision rule. A disturbance instance is the tuple <span class="sym">D = (C, &alpha;, &epsilon;, &Delta;)</span>.</p>
+
+  <div class="def"><span class="dt">Definition — Compromised Set &amp; Activation</span>
+  Let <span class="sym">C &sube; I</span> be the compromised agents, <span class="sym">k = |C|</span>. A binary activation variable <span class="sym">&beta;&#8348;<sup>i</sup> &isin; {0,1}</span> (with <span class="sym">&beta;&#8348;<sup>i</sup>=0 &forall; i&notin;C</span>); the <b>activation pattern</b> <span class="sym">&Delta; = {&beta;&#8348;<sup>i</sup>}</span> over the horizon specifies <i>when</i> each compromised agent deviates.</div>
+
+  <div class="def"><span class="dt">Definition — Perturbed / Effective Policy</span>
+  When activated, a compromised agent runs a perturbed policy <span class="sym">&pi;&#771;&#7522;</span> in place of the nominal <span class="sym">&pi;&#7522;</span>:
+  <span class="eqn">&pi;&#770;&#7522;(&middot;|h&#8348;<sup>i</sup>) = (1&minus;&beta;&#8348;<sup>i</sup>) &pi;&#7522;(&middot;|h&#8348;<sup>i</sup>) + &beta;&#8348;<sup>i</sup> &pi;&#771;&#7522;(&middot;|h&#8348;<sup>i</sup>)</span></div>
+
+  <div class="def"><span class="dt">Definition — Amplitude Bound</span>
+  Deviation amplitude is bounded by total-variation distance whenever active. <span class="sym">&alpha;=0</span>: identical to nominal; <span class="sym">&alpha;=1</span>: arbitrary.
+  <span class="eqn">d<sub>TV</sub>( &pi;&#771;&#7522;(&middot;|h&#8348;<sup>i</sup>), &pi;&#7522;(&middot;|h&#8348;<sup>i</sup>) ) &le; &alpha; &nbsp; (when &beta;&#8348;<sup>i</sup>=1)</span></div>
+
+  <div class="def"><span class="dt">Definition — Deviation Profile</span>
+  The tuple specifying which agents are compromised, when they activate, what they do instead, and how far they can deviate.
+  <span class="eqn">D = ( C, &Delta;, &pi;&#771;<sub>C</sub>, &alpha; )</span></div>
+
+  <div class="def"><span class="dt">Definition — Local Stealth Constraint (the formal meaning of &ldquo;covert&rdquo;)</span>
+  An attack is stealthy if it is indistinguishable from normal operation given the observations available to local monitors — and in the decentralized setting the monitors <i>are</i> the neighboring agents. Agent <span class="sym">i</span>'s deviation is <span class="sym">&epsilon;<sub>s</sub></span>-stealthy to neighbor <span class="sym">j</span> if the KL divergence between the nominal and perturbed message distributions is bounded:
+  <span class="eqn">D<sub>KL</sub>( P<sup>nom</sup>(m&#8348;<sup>i&rarr;j</sup>) &#8741; P<sup>pert</sup>(m&#8348;<sup>i&rarr;j</sup>) ) &le; &epsilon;<sub>s</sub></span>
+  <span class="meta"><span class="sym">&epsilon;<sub>s</sub>=0</span>: perfectly undetectable; <span class="sym">&epsilon;<sub>s</sub>&rarr;&infin;</span>: the constraint becomes vacuous. This is a <b>local, per-edge</b> condition — a deviation can be stealthy to every individual neighbor yet have detectable <i>mission-level</i> consequences. By Neyman&ndash;Pearson, <span class="sym">&epsilon;<sub>s</sub></span> bounds the Type-II error exponent of a neighbor's likelihood-ratio test.</span></div>
+
+  <p>The framework also bounds <b>intervention frequency</b> — the total activated steps across all compromised agents is capped by an intervention budget <span class="sym">T<sub>int</sub></span>: <span class="sym">&Sigma;<sub>i&isin;C</sub> &Sigma;<sub>t</sub> &beta;&#8348;<sup>i</sup> &le; T<sub>int</sub></span>. Together these define the <b>feasible strategy set</b> <span class="sym">&Phi;<sub>k</sub>(&alpha;, &epsilon;<sub>s</sub>, T<sub>int</sub>)</span> of deviation profiles with <span class="sym">|C|&le;k</span> satisfying amplitude, stealth, and intervention bounds.</p>
+
+  <h3>Threat-model taxonomy: natural faults vs. adversarial attacks</h3>
+  <table>
+    <tr><th>Dimension</th><th>Natural faults</th><th>Adversarial attacks</th></tr>
+    <tr><td>Agent selection <span class="sym">C</span></td><td>Random (i.i.d. failure prob. <span class="sym">p<sub>f</sub></span>)</td><td>Chosen to maximize damage</td></tr>
+    <tr><td>Activation <span class="sym">&Delta;</span></td><td>Persistent or random-onset</td><td>Strategically timed</td></tr>
+    <tr><td>Perturbed policy <span class="sym">&pi;&#771;&#7522;</span></td><td>Unstructured (crash, stuck, random)</td><td>Optimized against the rest of the team</td></tr>
+    <tr><td>Amplitude <span class="sym">&alpha;</span></td><td>Uncontrolled</td><td>As large as stealth permits</td></tr>
+    <tr><td>Stealth intent</td><td>None</td><td>Essential; attacks must persist</td></tr>
+    <tr><td>Coordination</td><td>Independent</td><td>Centralized adversary across <span class="sym">C</span></td></tr>
+  </table>
+  <p class="meta"><b>f-local / f-total models</b> (from Byzantine consensus): <i>f-total</i> caps the whole network at <span class="sym">|C|&le;f</span>; <i>f-local</i> caps any agent's neighbors at <span class="sym">|C&cap;N&#7522;(t)|&le;f</span>. Resilient consensus under f-local faults requires <span class="sym">(2f+1)</span>-robustness of the graph — connecting interaction-layer structure directly to the threats the mission can withstand. Three <b>attack surfaces</b> exist: message corruption (KL on the message distribution), observation tampering (within the sensor-noise envelope), and action perturbation (TV on the action distribution).</p>
+
+  <!-- 9 PROPAGATION -->
+  <span class="flank" id="propagation">9 · propagation</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Propagation — how local deviation becomes mission-level effect</h2>
+  <p>A purely local deviation need not stay local. Once it enters the interaction graph it alters neighbors' inputs, shifts downstream decisions, changes the future joint action, and modifies later mission states and observations.</p>
+
+  <div class="def"><span class="dt">Definition — One-Step Influence</span>
+  The TV shift on agent <span class="sym">j</span>'s input at <span class="sym">t+1</span> caused by agent <span class="sym">i</span>'s deviation at <span class="sym">t</span> (with <span class="sym">i</span> deviating and all others nominal):
+  <span class="eqn">&#8496;&#8348;<sup>i&rarr;j</sup> = d<sub>TV</sub>( P(x<sub>t+1</sub><sup>j</sup> | &pi;), P(x<sub>t+1</sub><sup>j</sup> | &pi;&#770;) )</span></div>
+
+  <p>For agents not directly connected, influence propagates over multi-hop paths in the <b>time-expanded interaction graph</b>. The <span class="sym">&ell;</span>-step influence is bounded by the sum over directed length-<span class="sym">&ell;</span> paths of the product of edge-level influences:</p>
+  <div class="eq">&#8496;<sub>t:t+&ell;</sub><sup>i&rarr;j</sup> &le; &Sigma;<sub>p &isin; Paths(i,j,&ell;)</sub> &prod;<sub>(u,v) &isin; p</sub> &#8496;<sub>t<sub>e</sub></sub><sup>u&rarr;v</sup></div>
+  <p class="meta">This upper bound follows from the data-processing inequality and the triangle inequality for total variation. It is a strict generalization of <b>consensus error propagation</b>: in linear consensus <span class="sym">x<sub>t+1</sub>=W&#8348;x&#8348;+&eta;&#8348;</span>, a perturbation at node <span class="sym">i</span> reaches node <span class="sym">j</span> at <span class="sym">t+&ell;</span> as <span class="sym">[W<sub>t+&ell;&minus;1</sub>&hellip;W<sub>t+1</sub>]<sub>ji</sub></span> times the perturbation — the linear, deterministic special case of the general influence chain.</p>
+
+  <div class="def"><span class="dt">Definition — Mission-Level Impact</span>
+  The shift in the whole trajectory distribution induced by a deviation profile:
+  <span class="eqn">&#8464;(D) = d<sub>TV</sub>( P(&tau; | &pi;), P(&tau; | &pi;&#770;) )</span></div>
+
+  <!-- 10 BREAK BUDGET -->
+  <span class="flank" id="break">10 · the game</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The adversarial game &amp; the break budget</h2>
+  <p>Under an adversarial threat model the contest is a two-player zero-sum <b>partially observable stochastic game (POSG)</b>: blue (the swarm) plays a defensive joint policy to maximize mission return; red (a centralized adversary on <span class="sym">k</span> of <span class="sym">n</span> agents) selects a deviation profile from the feasible set to minimize it.</p>
+  <div class="eq key">Blue: &pi;* &isin; argmax<sub>&pi;</sub> min<sub>D&isin;&Phi;<sub>k</sub></sub> J(&pi;, D) &nbsp;&middot;&nbsp; Red: D* &isin; argmin<sub>D&isin;&Phi;<sub>k</sub></sub> J(&pi;, D)</div>
+  <p>The <b>return gap</b> quantifies degradation under worst-case attack at resource level <span class="sym">k</span>: <span class="sym">&Delta;J(k) = J(&pi;; clean) &minus; min<sub>D&isin;&Phi;<sub>k</sub></sub> J(&pi;, D)</span>.</p>
+
+  <div class="def"><span class="dt">Definition — Break Budget</span>
+  The minimum-resource deviation profile that <i>causes mission failure</i> (subject to the stealth constraints):
+  <span class="eqn">D* = argmin<sub>D</sub> cost(D) &nbsp; s.t. &nbsp; Pr( Failure(&tau;) | &pi;&#770; ) &ge; 1 &minus; &delta;<sub>fail</sub></span>
+  <span class="meta">Cost can be cardinality <span class="sym">|C|</span>, amplitude <span class="sym">&alpha;</span>, duration <span class="sym">&Sigma;&beta;&#8348;<sup>i</sup></span>, or a combined product. The <b>minimum compromise size</b> for a target loss <span class="sym">&theta;</span> is <span class="sym">k*(&theta;) = min{ k : &Delta;J(k) &ge; &theta; }</span>. A large break budget &rArr; structurally hard to break; a small one &rArr; a few agents with small deviations cause failure. How <span class="sym">k*</span> scales with swarm size <span class="sym">n</span> and connectivity is a central empirical question.</span></div>
+
+  <h3>The stealth&ndash;degradation trade-off (the stealth&ndash;damage frontier)</h3>
+  <p>The stealth constraint forces a <b>Pareto frontier</b> between mission degradation and detectability. A maximally damaging attack (<span class="sym">&epsilon;<sub>s</sub>&rarr;&infin;</span>) is trivially detected; a perfectly stealthy attack (<span class="sym">&epsilon;<sub>s</sub>=0</span>) may produce little degradation. Between them lies the achievable frontier — and its shape is mission-family-dependent (information-coupled missions may expose a steep frontier where small stealth budgets yield large damage; connectivity-coupled missions may flatten it).</p>
+  <div class="callout warnbox"><b>The gap between local stealth and global consequence is the heart of the problem.</b> A deviation can satisfy the per-edge KL budget against every neighbor while still shifting the whole trajectory distribution — because no single agent sees the global effect. Aggregate monitoring misses the threat; the team's own posterior supplies the resilience signal. This is the formal version of what the empirical work calls the <a href="findings.html">stealth&ndash;damage frontier</a>.</div>
+
+  <!-- 11 HYPOTHESES -->
+  <span class="flank" id="hyp">11 · hypotheses</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Hypotheses on adversarial amplification (H1&ndash;H3)</h2>
+  <p>The zero-sum framing plus the propagation formalism motivate three structural hypotheses that distinguish adversarial pressure from random faults.</p>
+  <div class="ass"><b>H1 — Amplified effects through communication.</b> Small compromise sets can have amplified mission-level effects when they target the information flow that drives coordination. Under learned communication, messages act as shared belief features or intent signals; corrupting a few agents propagates through aggregation and downstream decision rules, producing minority-to-majority influence and disproportionate return loss. Amplification is strongest when compromised agents occupy <b>influential positions</b> (bottlenecks, highly relied-upon senders).</div>
+  <div class="ass"><b>H2 — Robustness gap: random vs. adaptive.</b> The same &ldquo;amount&rdquo; of corruption is far more damaging placed <i>strategically</i>. Random noise/dropouts spread their effect across agents and time; an adaptive attacker spends its limited budget only when and where the swarm is most sensitive — near decision boundaries, during critical coordination, on high-influence senders — producing substantially larger return loss under the <i>same</i> budgets <span class="sym">(k, &epsilon;<sub>s</sub>, T<sub>int</sub>)</span> while staying stealthy by acting sparsely.</div>
+  <div class="ass"><b>H3 — Attack-surface dominance.</b> Not all intervention channels are equally damaging. When red can influence at most <span class="sym">k</span> agents, some surfaces — messages vs. observations vs. actions — produce larger worst-case degradation under the same stealth budgets. Which surface dominates depends on the mission family and the attacker's information (knowledge of policies or the communication graph).</div>
+
+  <!-- 12 METRICS -->
+  <span class="flank" id="metrics">12 · metrics</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Resiliency metrics</h2>
+  <p>The formal objects above enable a precise, trajectory-based, threat-parameterized vocabulary for resiliency, aligned with the resilience-engineering distinctions of robustness, brittleness, elasticity, and recovery.</p>
+
+  <div class="def"><span class="dt">Definition — Mission Robustness</span>
+  Worst-case performance ratio over admissible deviation profiles with <span class="sym">|C|&le;k</span> and amplitude <span class="sym">&le;&alpha;</span>. Near 1: robust; near 0: fragile.
+  <span class="eqn">R<sub>rob</sub>(&pi;, &#120123;<sub>&alpha;,k</sub>) = inf<sub>D&isin;&#120123;<sub>&alpha;,k</sub></sub> J(&pi;&#770;) / J(&pi;)</span>
+  <span class="meta">The <b>robustness margin</b> <span class="sym">&alpha;*</span> is the largest amplitude for which performance stays above <span class="sym">1&minus;&epsilon;<sub>tol</sub></span> of nominal.</span></div>
+
+  <div class="def"><span class="dt">Definition — Performance Response Function</span>
+  Maps each point in threat space <span class="sym">(k, &alpha;, &Delta;)</span> to the worst-case mission return under that level of adversarial pressure.
+  <span class="eqn">&Gamma;(k, &alpha;, &Delta;) = inf<sub>D : |C|=k, amp=&alpha;, pattern=&Delta;</sub> J(&pi;&#770;)</span></div>
+
+  <div class="def"><span class="dt">Definition — Brittleness Frontier</span>
+  The level set in <span class="sym">(k, &alpha;, &Delta;)</span>-space where the mission transitions from degradation to failure — the boundary of the region where the mission stays viable.
+  <span class="eqn">&#8497; = &part;{ (k, &alpha;, &Delta;) : Pr( s&#8348; &isin; Viab&#948;(K,t) &forall; t ) &ge; 1 &minus; &delta;<sub>crit</sub> }</span></div>
+
+  <div class="def"><span class="dt">Definition — Brittleness Index</span>
+  How sharply performance collapses near the frontier — the gradient magnitude of the response function along <span class="sym">&#8497;</span>. Large &rArr; a <b>cliff</b> (a small resource increase past the frontier causes a large drop); small &rArr; smooth degradation.
+  <span class="eqn">B<sub>brit</sub> = sup<sub>(k,&alpha;)&isin;&#8497;</sub> &#8741; &nabla;<sub>(k,&alpha;)</sub> &Gamma;(k, &alpha;, &Delta;) &#8741;</span></div>
+
+  <div class="def"><span class="dt">Definition — Elasticity</span>
+  The average rate of performance loss per unit deviation amplitude, integrated up to the robustness margin — how <i>gracefully</i> performance degrades before the frontier. Near-zero magnitude + high brittleness = <b>cliff-like</b>; steady negative = <b>slope-like</b>.
+  <span class="eqn">E<sub>elas</sub>(&pi;) = (1/&alpha;*) &int;<sub>0</sub><sup>&alpha;*</sup> (&part;&Gamma;/&part;&alpha;)|<sub>k,&Delta;</sub> d&alpha;</span></div>
+
+  <div class="def"><span class="dt">Definition — Recovery Value, Ratio &amp; Time</span>
+  After a deviation that subsequently ceases at degraded state <span class="sym">s<sub>t<sub>d</sub></sub></span>:
+  <span class="eqn">V<sub>rec</sub>(s<sub>t<sub>d</sub></sub>, &pi;) = E<sub>&pi;</sub>[ &Sigma;<sub>t=t<sub>d</sub></sub><sup>H&minus;1</sup> R(s&#8348;, a&#8348;) | s<sub>t<sub>d</sub></sub> ]</span>
+  <span class="eqn">&rho;<sub>rec</sub> = V<sub>rec</sub>(s<sub>t<sub>d</sub></sub>, &pi;) / V<sub>nom</sub>(t<sub>d</sub>, &pi;) &nbsp; (1: full recovery &middot; 0: irrecoverable)</span>
+  <span class="eqn">T<sub>rec</sub>(s<sub>t<sub>d</sub></sub>) = min{ T &ge; 0 : &Phi;(s<sub>t<sub>d</sub>+T</sub>, t<sub>d</sub>+T) &ge; &Phi;<sup>nom</sup>(t<sub>d</sub>+T) &minus; &epsilon; } &nbsp; (&infin; if none)</span></div>
+
+  <h3>Summary</h3>
+  <table>
+    <tr><th>Metric</th><th>Symbol</th><th>Domain</th><th>What it captures</th></tr>
+    <tr><td>Robustness</td><td><span class="sym">R<sub>rob</sub></span></td><td>[0,1]</td><td>Worst-case performance ratio under bounded adversarial pressure</td></tr>
+    <tr><td>Robustness margin</td><td><span class="sym">&alpha;*</span></td><td>[0,1]</td><td>Largest tolerable deviation amplitude</td></tr>
+    <tr><td>Brittleness frontier</td><td><span class="sym">&#8497;</span></td><td><span class="sym">(k,&alpha;,&Delta;)</span></td><td>Boundary separating viability from failure</td></tr>
+    <tr><td>Brittleness index</td><td><span class="sym">B<sub>brit</sub></span></td><td>[0,&infin;)</td><td>Gradient magnitude at frontier — sharpness of collapse</td></tr>
+    <tr><td>Elasticity</td><td><span class="sym">E<sub>elas</sub></span></td><td>(&minus;&infin;,0]</td><td>Average rate of graceful performance loss</td></tr>
+    <tr><td>Recovery ratio</td><td><span class="sym">&rho;<sub>rec</sub></span></td><td>[0,1]</td><td>Fraction of nominal value recovered after degradation</td></tr>
+    <tr><td>Recovery time</td><td><span class="sym">T<sub>rec</sub></span></td><td><span class="sym">&#8469;&cup;{&infin;}</span></td><td>Steps to restore health above threshold</td></tr>
+  </table>
+
+  <!-- 13 EXAMPLE -->
+  <span class="flank" id="example">13 · instantiation</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Worked example — shared exploration &amp; phantom-coverage injection</h2>
+  <p>The full formalism is instantiated on a shared exploration mission: team-level coverage of an unknown environment within a finite horizon. It is information-coupled with a secondary topology coupling, and it shows concretely how a local lie propagates through frontier sharing into mission-level coverage loss.</p>
+  <ul>
+    <li><b>State.</b> A <span class="sym">W&times;W</span> grid; each agent occupies a cell <span class="sym">p&#8348;<sup>i</sup></span>; a coverage indicator <span class="sym">&xi;&#8348;</span> marks sensed cells; the comm graph is proximity-based: <span class="sym">(j,i)&isin;E&#8348; &hArr; &#8741;p&#8348;<sup>j</sup>&minus;p&#8348;<sup>i</sup>&#8741;<sub>&infin;</sub> &le; r<sub>comm</sub></span>. So <span class="sym">s&#8348; = ({p&#8348;<sup>i</sup>}, &xi;&#8348;, G&#8348;)</span>.</li>
+    <li><b>Observation.</b> Cells within a sensing radius <span class="sym">r<sub>sense</sub></span> — the local coverage fragment. No agent sees the full map.</li>
+    <li><b>Action / reward.</b> <span class="sym">{N,S,E,W,stay}</span>; coverage is monotone; team reward = incremental coverage gained per step.</li>
+    <li><b>Coupling — frontier sharing.</b> Agent <span class="sym">j</span> sends <span class="sym">m&#8348;<sup>j&rarr;i</sup> = (F&#8348;<sup>j</sup>, &xi;&#770;&#8348;<sup>j</sup>)</span> (its frontier + local coverage belief); aggregation is set union <span class="sym">c&#8348;<sup>i</sup> = &cup;<sub>j&isin;N&#7522;(t)</sub> &xi;&#770;&#8348;<sup>j</sup></span>. This is where propagation originates: a slightly wrong but plausible frontier shifts neighbors' moves, they sense the wrong cells, and forward messages that reinforce the mistake.</li>
+  </ul>
+  <div class="callout"><b>Phantom-coverage injection.</b> A compromised agent broadcasts a corrupted frontier by injecting <i>phantom covered cells</i> — cells reported as covered that are actually uncovered: <span class="sym">m&#771;&#8348;<sup>i&rarr;j</sup> = (F&#8348;<sup>i</sup>, &xi;&#770;&#8348;<sup>i</sup> &cup; P&#8348;<sup>i</sup>)</span>. Neighbors mark those cells covered, never visit them, and coverage loss accumulates and spreads <span class="sym">&ell;</span> hops in the time-expanded graph. <b>Stealth:</b> phantom cells outside every neighbor's sensing range are locally unverifiable — the false report satisfies the KL stealth constraint with <span class="sym">&epsilon;<sub>s</sub>=0</span> for those cells. <b>Break budget:</b> a single well-positioned agent injecting <span class="sym">O(W&#178;(1&minus;&theta;<sub>cov</sub>))</span> phantom cells can cause failure in <span class="sym">d</span> (graph-diameter) steps — <span class="sym">k</span> can be as small as 1 if the graph is well-connected and stealth is loose. Overlapping neighbor sensing lets phantom cells be verified and rejected, raising the break budget — the central structural trade-off between information redundancy and vulnerability.</div>
+  <p class="meta"><b>Second instantiation — communication relay (topology-coupled):</b> agents maintain end-to-end connectivity between source&ndash;destination pairs; the dominant health indicator is algebraic connectivity <span class="sym">&lambda;&#8322;</span>; the attack surface is the relay structure itself (position drift / message corruption reducing path redundancy); the break-budget driver is vertex connectivity <span class="sym">&kappa;</span>. The two instantiations demonstrate the formalism generalizes across mission families.</p>
+
+  <!-- 14 RQ -->
+  <span class="flank" id="rq">14 · agenda</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Focused research questions (RQ1&ndash;RQ6)</h2>
+  <p>The broad questions narrow into a focused agenda, each connected to a formal handle developed above.</p>
+  <table>
+    <tr><th>RQ</th><th>Question</th><th>Formal handle</th></tr>
+    <tr><td><b>RQ1</b><br>Propagation</td><td>How does a deviation in one agent's policy propagate into a system-level outcome under topology constraints and trust-by-default messaging? Which mechanisms dominate — information flow, role criticality, bottlenecks, feedback loops?</td><td>Multi-step influence <span class="sym">&#8496;<sub>t:t+&ell;</sub><sup>i&rarr;j</sup></span>; mission-level impact <span class="sym">&#8464;(D)</span></td></tr>
+    <tr><td><b>RQ2</b><br>Single&rarr;swarm</td><td>When can a single misbehaving agent cause only local inefficiency, and when can it trigger global collapse? Which mission-level conditions (relay role, unique information source) amplify small deviations into mission-wide failure?</td><td>Break budget <span class="sym">D*</span> with <span class="sym">k=1</span></td></tr>
+    <tr><td><b>RQ3</b><br>Brittleness</td><td>What is the minimum misbehavior budget that <i>breaks</i> the mission, not just degrades it? The smallest combination of subset size, amplitude, and time pattern crossing the feasibility boundary.</td><td>Brittleness frontier <span class="sym">&#8497;</span> &amp; elasticity surface</td></tr>
+    <tr><td><b>RQ4</b><br>Homo vs. hetero</td><td>How do homogeneous disturbances (same rule across <span class="sym">C</span>) differ from heterogeneous ones (diverse rules across agents/time) in failure modes and elasticity surfaces? Which families are more sensitive to heterogeneity?</td><td>Deviation profile <span class="sym">D</span>; performance response <span class="sym">&Gamma;</span></td></tr>
+    <tr><td><b>RQ5</b><br>Stealth</td><td>What does stealth mean when checks are local, lightweight, and topology-limited? Can a detector-agnostic plausibility budget be operational, and what local evidence suffices to detect misbehavior early enough to prevent breakage?</td><td>Stealth budget <span class="sym">&epsilon;<sub>s</sub></span> (local KL constraint)</td></tr>
+    <tr><td><b>RQ6</b><br>Recovery</td><td>If an agent reboots / loses its policy state, how can the swarm restore competence under the same decentralized constraints? When is it optimal to reboot-and-reintegrate vs. isolate? Can neighbor-assisted reconstruction shift the brittleness frontier?</td><td>Recovery ratio <span class="sym">&rho;<sub>rec</sub></span>; recovery time <span class="sym">T<sub>rec</sub></span></td></tr>
+  </table>
+
+  <!-- DOWNLOADS -->
+  <span class="flank" id="downloads">sources</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Source documents</h2>
+  <p>This page transcribes the formal content so the site carries it independently. The original source files (with their full TikZ figures, Pareto plots, and bibliography) are available for download:</p>
+  <div class="cards">
+    <a class="card" href="assets/sources/formalism.pdf"><h3>formalism.pdf</h3><p>The full <i>Mission-Centered Resiliency</i> document, typeset (figures, frontier plots, notation tables).</p></a>
+    <a class="card" href="assets/sources/formalism.tex"><h3>formalism.tex</h3><p>LaTeX source of the formalism (~3,100 lines).</p></a>
+    <a class="card" href="assets/sources/Swarm_resiliency_v1.3.pdf"><h3>Swarm_resiliency_v1.3.pdf</h3><p>The problem statement: Dec-POMDP tuple, aggregation interface, effect-based threat model, A1&ndash;A5.</p></a>
+    <a class="card" href="assets/sources/Formalization.docx"><h3>Formalization.docx</h3><p>The earliest backbone: the four interactional regimes &amp; the health / viability / resilience vocabulary.</p></a>
+  </div>
+  <p class="meta">Related pages: <a href="architecture.html">Architecture</a> — the engineering of the same swarm (the substrate these objects are measured on) · <a href="findings.html">Findings</a> — the empirical evidence, including the compromise sweep that instantiates the break budget and the stealth&ndash;damage frontier · <a href="related-work.html">Literature</a> — where this framework sits in the field.</p>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body></html>

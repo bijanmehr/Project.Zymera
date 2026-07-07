@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — Field Map</title><link rel="stylesheet" href="assets/style.css">
+<style>
+  /* page-local patterns for the field map */
+  .flank{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:38px 0 4px}
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0}
+
+  /* the five-mode simplex strip */
+  .simplex{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0}
+  .simplex .m{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:var(--card)}
+  .simplex .m b{display:block;color:var(--accent-d);font-size:14.5px;margin-bottom:3px}
+  .simplex .m .q{font-size:12.4px;color:var(--mut);font-style:italic}
+  .simplex .m.hot{border-color:#f5b7b1;background:#fdecea}
+  .simplex .m.hot b{color:var(--bad)}
+  @media(max-width:760px){.simplex{grid-template-columns:1fr 1fr}}
+
+  /* compact entry cards */
+  .ecount{font-size:12.5px;color:var(--mut);margin:4px 0 0}
+  .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin:14px 0 4px}
+  .ecard{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px 15px;font-size:13px}
+  .ecard .eh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px}
+  .ecard .et{font-weight:700;color:#11324f;font-size:13.6px;line-height:1.3}
+  .ecard .ey{color:var(--mut);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .ecard .ed{color:#33414d;font-size:12.6px;margin:0 0 7px;line-height:1.5}
+  .ecard .ea{color:var(--mut);font-size:11.5px;margin:0 0 6px}
+  .ecard .ev{font-size:11.3px;color:#444;margin-bottom:6px}
+  .ecard .ev .vt{color:var(--good);font-weight:700}
+  .ecard .ev .vp{color:var(--warn);font-weight:700}
+  .ecard .ev .vf{color:var(--mut)}
+  .ecard .tagrow{margin:5px 0 6px}
+  .ecard .tag{font-size:10.3px;padding:1px 7px;margin:1px 3px 1px 0}
+  .ecard .edge{font-size:11.4px;color:#33414d;margin:2px 0}
+  .ecard .edge .lx{color:var(--good);font-weight:700}
+  .ecard .edge .lc{color:var(--bad);font-weight:700}
+  .ecard .zr{font-size:11.5px;color:var(--accent-d);background:#eef3fb;border-radius:6px;padding:6px 9px;margin-top:7px;line-height:1.45}
+  .ecard .zr b{color:var(--accent-d)}
+  .grp{font-size:12.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--mut);font-weight:700;margin:20px 0 2px;border-bottom:1px dashed var(--line);padding-bottom:4px}
+  .modehd{font-size:18px;color:#11324f;margin:30px 0 2px;font-weight:800}
+  .modehd .ct{font-size:12.5px;color:var(--mut);font-weight:600;letter-spacing:.3px}
+</style></head><body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk active" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>The field map</h1>
+  <p class="sub">A navigable map of multi-agent autonomous-systems research, 2015&ndash;2026 &mdash; <b>70 algorithm / system / framework / benchmark entries</b> and <b>6 surveys</b>, organized so the absences between <i>classical MARL</i> and the <i>agentic-AI / LLM-agent</i> wave become visible at a glance. Transcribed from the project's generated taxonomy; the full generative YAML source is preserved under <code>assets/sources/marl_taxonomy/</code>.</p>
+
+  <div class="toc2">
+    <a href="#thesis">0 · The thesis: interaction mode as the primary axis</a>
+    <a href="#figures">1 · The map at a glance (figures)</a>
+    <a href="#entries">2 · The 70 entries (mode &rarr; paradigm &rarr; era)</a>
+    <a href="#surveys">3 · The 6 surveys</a>
+    <a href="#gaps">4 · Gaps &amp; opportunities</a>
+    <a href="#connectors">5 · Cross-disciplinary connectors</a>
+    <a href="#method">6 · Methodology</a>
+  </div>
+
+  <!-- ============ 0 THESIS ============ -->
+  <span class="flank" id="thesis">0 · the thesis</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Interaction mode is the primary axis</h2>
+  <p>Most MARL maps sort work by <i>method</i> (value-decomposition, policy-gradient, communication&hellip;). This map sorts by <b>interaction mode</b> instead &mdash; the relationship between the agents' interests &mdash; because that is the axis along which the classical-MARL literature and the 2023&ndash;2026 LLM-agent wave fail to meet. Five modes, each with a single distinguishing question:</p>
+
+  <div class="simplex">
+    <div class="m"><b>solo</b><div class="q">Is there only one agent?</div></div>
+    <div class="m"><b>cooperative</b><div class="q">Are interests <u>persistently</u> aligned across the whole horizon?</div></div>
+    <div class="m hot"><b>collaborative</b><div class="q">Are interests <u>temporarily</u> aligned around a sub-goal?</div></div>
+    <div class="m"><b>competitive</b><div class="q">Are interests strictly opposed (zero-sum / N-player rank)?</div></div>
+    <div class="m"><b>mixed-motive</b><div class="q">Are interests partially aligned (general-sum, social dilemma)?</div></div>
+  </div>
+
+  <div class="callout key"><b>The cooperative&ndash;vs&ndash;collaborative split is the map's load-bearing original contribution.</b> Most MARL literature collapses the two. But "cooperative-MARL methods" (MAPPO, QMIX, VDN&hellip;) assume <i>persistent reward identity</i> &mdash; a single team reward held for the entire horizon. That assumption breaks the moment interests are only aligned <i>around a sub-task</i> and dissolve when it ends. Naming the two modes distinctly is what makes the central absence legible.</div>
+
+  <div class="callout danger"><b>COLLABORATIVE mode is, in this corpus, <u>entirely</u> a 2023&ndash;2026 LLM-agent phenomenon &mdash; zero classical-MARL entries.</b> Every collaborative entry (AutoGen, MetaGPT, ChatDev, CrewAI, LangGraph, AgentVerse, CAMEL, Multi-Agent Debate) is an LLM-agent system from 2023 onward, coordinating in natural language with role-asymmetric, prompt-implicit rewards &mdash; no value function, no gradient update, no team reward. <b>That absence <i>is</i> the thesis:</b> the regime where most real agentic-AI coordination now lives is exactly the regime classical cooperative MARL cannot natively express. The Zymera research program (covert-misbehavior resilience at the <i>mission</i> level) sits in this seam &mdash; see <a href="related-work.html">Literature</a> and <a href="paper.html">Paper</a>.</div>
+
+  <h3>Secondary axes</h3>
+  <p>Each entry carries one <i>primary</i> mode (used for grouping and diagram coloring) plus honest secondary tags on three further axes:</p>
+  <table>
+    <tr><th>Axis</th><th>Values</th><th>What it captures</th></tr>
+    <tr><td><b>Paradigm</b></td><td>classical-MARL · llm-agent · hybrid · classical-RL-extended</td><td>Era + research community. <code>classical-MARL</code> is the 2018&ndash;2022 deep-MARL wave; <code>llm-agent</code> the 2023&ndash;2026 agentic-AI wave; <code>hybrid</code> bridges them; <code>classical-RL-extended</code> is single-agent work with multi-agent applicability.</td></tr>
+    <tr><td><b>Era</b></td><td>2015&ndash;2018 · 2018&ndash;2022 · 2023&ndash;2026</td><td>When the line of work landed. The timeline figure below shows the paradigm hand-off.</td></tr>
+    <tr><td><b>Method family</b></td><td>multi-tag (value-decomposition, policy-gradient, communication, GNN, role-based, language-model, &hellip;)</td><td>Multi-membership by default &mdash; MAPPO is "cooperative + CTDE + policy-gradient + parameter-sharing" all at once.</td></tr>
+  </table>
+
+  <!-- ============ 1 FIGURES ============ -->
+  <span class="flank" id="figures">1 · at a glance</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The map at a glance</h2>
+
+  <figure>
+    <img src="assets/figures/fieldmap/mode-tree.svg" alt="Mode tree: entries grouped by interaction mode then paradigm" style="max-width:760px">
+    <figcaption>Mode tree &mdash; the primary clustering: each interaction mode branches into its paradigms and then its entries.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/figures/fieldmap/timeline.svg" alt="Timeline of entries 2015 to 2026" style="max-width:760px">
+    <figcaption>Timeline &mdash; the classical-MARL wave (2018&ndash;2022) hands off to the LLM-agent wave (2023&ndash;2026); collaborative mode appears only on the right edge.</figcaption>
+  </figure>
+
+  <div class="two">
+    <figure>
+      <img src="assets/figures/fieldmap/mode-x-era.png" alt="Mode by era heatmap">
+      <figcaption>Mode &times; era &mdash; collaborative is dense only in 2023&ndash;2026; competitive peaks in 2018&ndash;2022.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/figures/fieldmap/mode-x-method.png" alt="Mode by method-family heatmap">
+      <figcaption>Mode &times; method-family &mdash; the empty cells in this matrix are what the gap report ranks.</figcaption>
+    </figure>
+  </div>
+
+  <figure>
+    <img src="assets/figures/fieldmap/paradigm-x-venue.png" alt="Paradigm by venue heatmap" style="max-width:640px">
+    <figcaption>Paradigm &times; venue &mdash; classical-MARL clusters at ICML / NeurIPS / ICLR / AAMAS; the llm-agent wave scatters across arXiv, frameworks, ACL, and UIST.</figcaption>
+  </figure>
+
+  <!-- ============ 2 ENTRIES ============ -->
+  <span class="flank" id="entries">2 · the corpus</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The 70 entries</h2>
+  <p>Grouped <b>mode &rarr; paradigm &rarr; era</b>. Each card carries the plain-language description, authors, venue + tier, method / coordination tags, key relationship edges (<span style="color:var(--good);font-weight:700">Extends</span> / <span style="color:var(--bad);font-weight:700">Contrasts</span>), and, where notable, the project-relevance note. Venue tiers are abbreviated: <span style="color:var(--good);font-weight:700">T1</span> tier-1, <span style="color:var(--warn);font-weight:700">T2</span> tier-2, <span style="color:var(--mut)">pre</span> preprint, <span style="color:var(--mut)">jrnl/bk/fw</span> journal / textbook / framework.</p>
+
+  <!-- ---------- SOLO ---------- -->
+  <div class="modehd">Solo <span class="ct">&mdash; one agent in an environment; baselines that anchor <i>extends</i> edges to multi-agent variants</span></div>
+
+  <div class="grp">Solo &middot; hybrid &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>inner-monologue</code> &middot; Inner Monologue</span><span class="ey">2022</span></div>
+      <p class="ed">Embodied LLM-agent that consumes natural-language environment feedback (success detection, scene description, human input) to drive an "inner monologue" that revises plans on the fly; closing the perception&ndash;language loop sharply improves long-horizon manipulation/navigation vs. open-loop planners.</p>
+      <p class="ea">Huang, Xia, Xiao, Chan, &hellip; Ichter</p>
+      <p class="ev"><span class="vp">T2</span> CoRL</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">memory</span><span class="tag">reflection</span></div>
+      <div class="edge"><span class="lx">Extends</span> SayCan &middot; <span class="lc">Contrasts</span> Voyager</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>saycan</code> &middot; SayCan</span><span class="ey">2022</span></div>
+      <p class="ed">Grounds an LLM planner in a robot's affordances by combining "Say" (LLM likelihood a skill helps the goal) with "Can" (a learned value function for executability). Foundational hybrid LLM-plus-RL system for embodied long-horizon instruction following.</p>
+      <p class="ea">Ahn, Brohan, Brown, Chebotar, &hellip; Zeng</p>
+      <p class="ev"><span class="vp">T2</span> CoRL</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">q-learning</span><span class="tag">memory</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Voyager</div>
+    </div>
+  </div>
+
+  <div class="grp">Solo &middot; llm-agent &middot; 2023&ndash;2026</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>react</code> &middot; ReAct</span><span class="ey">2023</span></div>
+      <p class="ed">Interleaves Reasoning and Acting in LLM agents: the model alternates verbal reasoning traces with external tool actions. The foundational pattern of the agentic-AI wave &mdash; nearly every later framework (AutoGen, LangGraph, MetaGPT) descends from a ReAct variant.</p>
+      <p class="ea">Yao, Zhao, Yu, Du, Shafran, Narasimhan, Cao</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">memory</span></div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>reflexion</code> &middot; Reflexion</span><span class="ey">2023</span></div>
+      <p class="ed">Self-reflective agent: after each trial the LLM verbalizes what went wrong and stores the reflection in episodic memory for the next attempt &mdash; "RL via verbal feedback" with an in-context rather than gradient-based policy update.</p>
+      <p class="ea">Shinn, Cassano, Berman, Gopinath, Narasimhan, Yao</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">memory</span><span class="tag">reflection</span></div>
+      <div class="edge"><span class="lx">Extends</span> ReAct</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>tot</code> &middot; Tree of Thoughts</span><span class="ey">2023</span></div>
+      <p class="ed">Frames LLM problem-solving as deliberate search over a tree of partial "thoughts": propose candidate steps, score them, explore by BFS/DFS. Generalizes Chain-of-Thought and ReAct from a linear trace into a search procedure.</p>
+      <p class="ea">Yao, Yu, Zhao, Shafran, Griffiths, Cao, Narasimhan</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">reflection</span></div>
+      <div class="edge"><span class="lx">Extends</span> ReAct &middot; <span class="lc">Contrasts</span> Reflexion</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>voyager</code> &middot; Voyager</span><span class="ey">2023</span></div>
+      <p class="ed">Lifelong-learning LLM agent in Minecraft that builds an ever-growing skill library via iterative prompting (propose, code, execute, reflect) with no gradient updates &mdash; open-ended exploration from in-context learning and external memory alone.</p>
+      <p class="ea">Wang, Xie, Jiang, Mandlekar, &hellip; Anandkumar</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">memory</span></div>
+      <div class="zr">Single-agent baseline for the agentic wave; contrast with AutoGen/MetaGPT showing multi-agent is not just "Voyager &times; N".</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>agentbench</code> &middot; AgentBench</span><span class="ey">2024</span></div>
+      <p class="ed">First systematic evaluation suite for LLM-as-agent across eight environments (OS, databases, knowledge graphs, card games, household, web browse/shop). The standard yardstick for solo-LLM-agent capability; exposed large API vs. open-source gaps.</p>
+      <p class="ea">Liu, Yu, Zhang, Xu, &hellip; Tang</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">language-model</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Melting Pot</div>
+    </div>
+  </div>
+
+  <div class="grp">Solo &middot; classical-RL-extended &middot; 2015&ndash;2018</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>options-framework</code> &middot; Options Framework</span><span class="ey">1999</span></div>
+      <p class="ed">Foundational formalism for temporally extended actions: an option is (initiation set, intra-option policy, termination); the resulting process is a semi-MDP. Underpins essentially every later hierarchical-RL method.</p>
+      <p class="ea">Sutton, Precup, Singh</p>
+      <p class="ev"><span class="vf">jrnl</span> AIJ</p>
+      <div class="tagrow"><span class="tag">hierarchical</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> FeUdal Networks</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>map-elites</code> &middot; MAP-Elites</span><span class="ey">2015</span></div>
+      <p class="ed">Quality-diversity algorithm maintaining a grid archive indexed by hand-designed behavior descriptors, keeping the best solution per cell &mdash; a diverse repertoire of local optima rather than one global optimum. Foundational for QD and behavior-space curriculum design.</p>
+      <p class="ea">Mouret, Clune</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">evolutionary</span><span class="tag">population</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> OpenAI ES</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>feudal-net</code> &middot; FeUdal Networks (FuN)</span><span class="ey">2017</span></div>
+      <p class="ed">Hierarchical RL where a high-level Manager emits abstract goals in a learned latent space and a low-level Worker is rewarded for moving along them. Decouples temporal abstraction from action selection; reference for hierarchical cooperative-MARL extensions.</p>
+      <p class="ea">Vezhnevets, Osindero, Schaul, Heess, &hellip; Kavukcuoglu</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">hierarchical</span><span class="tag">actor-critic</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Options Framework</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>openai-es</code> &middot; OpenAI ES</span><span class="ey">2017</span></div>
+      <p class="ed">Black-box policy optimization via natural-evolution-strategy gradient estimates from antithetic Gaussian perturbations. Trades sample efficiency for trivial parallelism (one perturbed rollout per worker, a tiny noise-seed broadcast). Reignited evolutionary methods for deep RL.</p>
+      <p class="ea">Salimans, Ho, Chen, Sidor, Sutskever</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">evolutionary</span><span class="tag">population</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> MAP-Elites</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>rlhf</code> &middot; RLHF (Deep RL from Human Preferences)</span><span class="ey">2017</span></div>
+      <p class="ed">Trains a reward model from pairwise human preference comparisons over trajectory snippets, then optimizes a policy against it with standard deep RL. The upstream root of the entire human-feedback alignment line (InstructGPT, ChatGPT, Constitutional AI, DPO).</p>
+      <p class="ea">Christiano, Leike, Brown, Martic, Legg, Amodei</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">imitation</span><span class="tag">language-model</span></div>
+    </div>
+  </div>
+
+  <div class="grp">Solo &middot; classical-RL-extended &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>world-models</code> &middot; World Models</span><span class="ey">2018</span></div>
+      <p class="ed">Three-part architecture: a VAE compresses observations, a recurrent mixture-density net predicts latent dynamics, and a small linear controller is evolved by CMA-ES inside the learned world. First popular demonstration of training a policy almost entirely "in imagination".</p>
+      <p class="ea">Ha, Schmidhuber</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">model-based</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> MuZero</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>muzero</code> &middot; MuZero</span><span class="ey">2020</span></div>
+      <p class="ed">Combines a learned value-equivalent dynamics model with MCTS, removing the need for a known simulator at planning time. Matches AlphaZero on Go/chess/shogi and is strong on Atari with one architecture.</p>
+      <p class="ea">Schrittwieser, Antonoglou, Hubert, Simonyan, &hellip; Silver</p>
+      <p class="ev"><span class="vt">T1</span> Nature</p>
+      <div class="tagrow"><span class="tag">model-based</span><span class="tag">planning</span><span class="tag">self-play</span><span class="tag">also: competitive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> DreamerV3, AlphaStar</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>paired</code> &middot; PAIRED</span><span class="ey">2020</span></div>
+      <p class="ed">Unsupervised environment design: a protagonist and an antagonist play environments produced by an adversary trained to maximize the regret between them, yielding a curriculum at the frontier of the protagonist's ability with minimax-regret guarantees.</p>
+      <p class="ea">Dennis, Jaques, Vinitsky, Bayen, &hellip; Levine</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">environment-design</span><span class="tag">curriculum</span><span class="tag">policy-gradient</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> ACCEL</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>accel</code> &middot; ACCEL</span><span class="ey">2022</span></div>
+      <p class="ed">Unsupervised environment design that drops the adversary network for an evolutionary edit operator: a buffer of high-regret levels is mutated and re-scored, compounding complexity along the agent's frontier. Often matches/beats PAIRED while being simpler.</p>
+      <p class="ea">Parker-Holder, Jiang, Dennis, Samvelyan, &hellip; Rockt&auml;schel</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">environment-design</span><span class="tag">curriculum</span><span class="tag">evolutionary</span></div>
+      <div class="edge"><span class="lx">Extends</span> PAIRED &middot; <span class="lc">Contrasts</span> PAIRED, MAESTRO</div>
+    </div>
+  </div>
+
+  <div class="grp">Solo &middot; classical-RL-extended &middot; 2023&ndash;2026</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>constitutional-ai</code> &middot; Constitutional AI (CAI / RLAIF)</span><span class="ey">2022</span></div>
+      <p class="ed">Aligns an LLM with a written "constitution" using AI feedback instead of human labels: the model critiques and revises its own outputs against the principles, producing preference data for an RLAIF stage. Showed AI-generated preferences can largely replace human ones.</p>
+      <p class="ea">Bai, Kadavath, Kundu, Askell, &hellip; Kaplan</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">imitation</span><span class="tag">policy-gradient</span><span class="tag">reflection</span></div>
+      <div class="edge"><span class="lx">Extends</span> RLHF &middot; <span class="lc">Contrasts</span> DPO</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dpo</code> &middot; Direct Preference Optimization</span><span class="ey">2023</span></div>
+      <p class="ed">Reformulates RLHF as a closed-form classification objective on pairwise preferences, eliminating the explicit reward model and the PPO loop. Now the dominant alignment recipe for open-source LLMs.</p>
+      <p class="ea">Rafailov, Sharma, Mitchell, Ermon, Manning, Finn</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">imitation</span></div>
+      <div class="edge"><span class="lx">Extends</span> RLHF &middot; <span class="lc">Contrasts</span> Constitutional AI</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dreamerv3</code> &middot; DreamerV3</span><span class="ey">2025</span></div>
+      <p class="ed">Latent-space world model that learns from pixels and trains an actor-critic entirely on imagined trajectories. Masters Minecraft diamonds from scratch with a single fixed hyperparameter set across 150+ tasks &mdash; model-based RL that is both general and robust.</p>
+      <p class="ea">Hafner, Pasukonis, Ba, Lillicrap</p>
+      <p class="ev"><span class="vt">T1</span> Nature</p>
+      <div class="tagrow"><span class="tag">model-based</span><span class="tag">actor-critic</span></div>
+      <div class="edge"><span class="lx">Extends</span> World Models &middot; <span class="lc">Contrasts</span> MuZero</div>
+    </div>
+  </div>
+
+  <!-- ---------- COOPERATIVE ---------- -->
+  <div class="modehd">Cooperative <span class="ct">&mdash; persistently aligned interests; one team reward across the whole horizon. SMAC, MPE-coop, Overcooked live here</span></div>
+
+  <div class="grp">Cooperative &middot; classical-MARL &middot; 2015&ndash;2018</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>iql</code> &middot; IQL (Independent Q-Learning)</span><span class="ey">1993</span></div>
+      <p class="ed">Foundational decentralized MARL: each agent runs independent Q-learning, treating others as environment dynamics. Trivial to scale; pays in non-stationarity and inability to coordinate beyond shared rewards. Still a competitive baseline today.</p>
+      <p class="ea">Ming Tan</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">q-learning</span><span class="tag">DTDE</span></div>
+      <div class="zr">Lower-bound baseline &mdash; the "DTDE" row in the RedWithinBlue paradigm-comparison table.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dec-pomdp</code> &middot; Dec-POMDP (complexity)</span><span class="ey">2002</span></div>
+      <p class="ed">Formal complexity anchor for cooperative MARL: defines the decentralized POMDP and proves finite-horizon optimal policies are NEXP-complete &mdash; ruling out tractable exact algorithms and explaining why cooperative MARL needs approximate, learning-based methods.</p>
+      <p class="ea">Bernstein, Givan, Immerman, Zilberstein</p>
+      <p class="ev"><span class="vf">jrnl</span> Math. Oper. Res.</p>
+      <div class="tagrow"><span class="tag">formal model</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Markov Games</div>
+      <div class="zr">The NEXP-hardness result is the standard justification for learning-based CTDE over exact DP; cited in <code>formalism.tex</code>.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>commnet</code> &middot; CommNet</span><span class="ey">2016</span></div>
+      <p class="ed">Foundational learned-communication architecture: each agent's hidden state is mean-pooled across all agents and broadcast back as next-layer input &mdash; a differentiable broadcast-to-all channel trained end-to-end with policy gradients. Anchors the communication family.</p>
+      <p class="ea">Sukhbaatar, Szlam, Fergus</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">policy-gradient</span><span class="tag">parameter-sharing</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> DIAL, BiCNet</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dial</code> &middot; DIAL</span><span class="ey">2016</span></div>
+      <p class="ed">First gradient-based learned-communication method: during centralized training agents pass continuous messages with gradients flowing through the channel; at execution messages are discretized (via the DRU). Pioneered differentiable-train / discrete-deploy.</p>
+      <p class="ea">Foerster, Assael, de Freitas, Whiteson</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">q-learning</span><span class="tag">parameter-sharing</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> CommNet, IC3Net</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>bicnet</code> &middot; BiCNet</span><span class="ey">2017</span></div>
+      <p class="ed">Models the team policy and Q-function as a bidirectional recurrent network whose hidden states act as an inter-agent channel (StarCraft 1 micro). Shows recurrent message passing captures team coordination, but the imposed ordering breaks permutation invariance.</p>
+      <p class="ea">Peng, Wen, Yang, Yuan, Tang, Long, Wang</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">actor-critic</span><span class="tag">parameter-sharing</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> CommNet, DIAL</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>maddpg</code> &middot; MADDPG</span><span class="ey">2017</span></div>
+      <p class="ed">Multi-Agent DDPG: per-agent centralized critics (see all obs+actions at training) with decentralized actors. Established the CTDE paradigm in deep MARL, with cooperative, competitive, and mixed-motive variants on the particle environment.</p>
+      <p class="ea">Lowe, Wu, Tamar, Harb, Abbeel, Mordatch</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span><span class="tag">also: comp/mixed</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> IQL, QMIX</div>
+      <div class="zr">CTDE anchor in <code>formalism.tex</code>; cited throughout the RedWithinBlue RL-taxonomy notes.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>mpe</code> &middot; MPE (Particle Environment)</span><span class="ey">2017</span></div>
+      <p class="ed">Lightweight 2D continuous-state particle environment introduced with MADDPG &mdash; cooperative navigation, predator-prey, speaker-listener, physical deception. The default sandbox for MADDPG, MAAC, M3DDPG, and most early CTDE policy-gradient methods.</p>
+      <p class="ea">Lowe, Wu, Tamar, Harb, Abbeel, Mordatch</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">benchmark</span><span class="tag">also: comp/mixed</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> SMAC, Melting Pot</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>coma</code> &middot; COMA</span><span class="ey">2018</span></div>
+      <p class="ed">Solves multi-agent credit assignment with a counterfactual baseline: the centralized critic estimates how much each agent's specific action contributed beyond a default, giving a stronger cooperative gradient than naive joint-policy gradient.</p>
+      <p class="ea">Foerster, Farquhar, Afouras, Nardelli, Whiteson</p>
+      <p class="ev"><span class="vt">T1</span> AAAI</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> MADDPG &middot; <span class="lc">Contrasts</span> QMIX</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>vdn</code> &middot; VDN</span><span class="ey">2018</span></div>
+      <p class="ed">Earliest deep value-decomposition method: the joint Q-function is the simple sum of per-agent utilities, trivially satisfying Individual-Global-Max. Limited expressiveness vs. QMIX's hypernetwork mixing; the foundational value-decomposition anchor.</p>
+      <p class="ea">Sunehag, Lever, Gruslys, Czarnecki, &hellip; Graepel</p>
+      <p class="ev"><span class="vt">T1</span> AAMAS</p>
+      <div class="tagrow"><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">parameter-sharing</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> IQL &middot; <span class="lc">Contrasts</span> MADDPG</div>
+    </div>
+  </div>
+
+  <div class="grp">Cooperative &middot; classical-MARL &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>mean-field-marl</code> &middot; Mean Field MARL</span><span class="ey">2018</span></div>
+      <p class="ed">Approximates the joint action of a large population by the empirical distribution (mean field) of neighbor actions, reducing the Q-function to a pairwise interaction with a population summary. Scales to hundreds&ndash;thousands of homogeneous agents.</p>
+      <p class="ea">Yang, Luo, Li, Zhou, Zhang, Wang</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">mean-field</span><span class="tag">q-learning</span><span class="tag">actor-critic</span><span class="tag">N: 20&ndash;1000</span><span class="tag">also: comp/mixed</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> MADDPG, QMIX, MAPPO</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>qmix</code> &middot; QMIX</span><span class="ey">2018</span></div>
+      <p class="ed">Factorizes the joint Q as a monotonic mixture of per-agent utilities, enforced by a non-negative-weight hypernetwork, satisfying IGM so per-agent argmax = joint argmax. Strong on discrete-action SMAC; the monotonicity constraint is its key limitation for sacrifice actions.</p>
+      <p class="ea">Rashid, Samvelyan, Schroeder de Witt, Farquhar, Foerster, Whiteson</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> VDN &middot; <span class="lc">Contrasts</span> MADDPG, MAPPO</div>
+      <div class="zr">Monotonicity is exactly the issue flagged in RedWithinBlue: connectivity maintenance often needs one agent to "sacrifice" so others can explore.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>bad</code> &middot; Bayesian Action Decoder</span><span class="ey">2019</span></div>
+      <p class="ed">Recasts a cooperative Dec-POMDP with hidden information as a public-belief MDP: agents condition on a Bayesian posterior over private states given public history, sharing an implicit language. Super-human on 2-player Hanabi.</p>
+      <p class="ea">Foerster, Song, Hughes, Burch, &hellip; Bowling</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">communication</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> MADDPG, QMIX</div>
+      <div class="zr">The public-belief construction is the canonical reference for grounded implicit communication.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>ic3net</code> &middot; IC3Net</span><span class="ey">2019</span></div>
+      <p class="ed">Adds a learned binary gate to CommNet so each agent decides at each step whether to broadcast at all &mdash; learning <i>when</i> to communicate matters as much as <i>what</i>. Extends to mixed settings where unconditional broadcast leaks info to opponents.</p>
+      <p class="ea">Singh, Jain, Sukhbaatar</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">policy-gradient</span><span class="tag">parameter-sharing</span><span class="tag">CTDE</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lx">Extends</span> CommNet &middot; <span class="lc">Contrasts</span> CommNet, TarMAC</div>
+      <div class="zr">Direct precedent for bandwidth-aware messaging: gating is the simplest "speak only when necessary" prior for connectivity-constrained missions.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>maven</code> &middot; MAVEN</span><span class="ey">2019</span></div>
+      <p class="ed">Augments QMIX with a hierarchical latent variable conditioning the joint policy, trained via mutual-information maximization to encourage diverse coordinated exploration &mdash; addressing QMIX's exploration weakness on sparse-reward tasks.</p>
+      <p class="ea">Mahajan, Rashid, Samvelyan, Whiteson</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> QPLEX</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>openai-five</code> &middot; OpenAI Five</span><span class="ey">2019</span></div>
+      <p class="ed">Defeated the world-champion Dota 2 team with PPO at unprecedented scale: five parameter-sharing LSTM agents on a cooperative team reward. Scale + self-play reached pro-level play in a 5v5 partially-observable game with no explicit multi-agent algorithm.</p>
+      <p class="ea">OpenAI: Berner, Brockman, Chan, &hellip; Zhang</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">self-play</span><span class="tag">parameter-sharing</span><span class="tag">CTCE</span><span class="tag">also: competitive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> AlphaStar</div>
+      <div class="zr">Major coop&harr;comp crossover: within-team cooperation from shared reward, cross-team competition from self-play &mdash; the mode-shifting framing applies directly.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>qtran</code> &middot; QTRAN</span><span class="ey">2019</span></div>
+      <p class="ed">Replaces QMIX's monotonic mixing with a soft regularization of the IGM condition, making the function class strictly broader. Strongest theory in the value-decomposition family but often empirically loses to QMIX/QPLEX because the regularizer is harder to tune.</p>
+      <p class="ea">Son, Kim, Kang, Hostallero, Yi</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> QPLEX</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>smac</code> &middot; SMAC</span><span class="ey">2019</span></div>
+      <p class="ed">Benchmark of cooperative StarCraft II micromanagement (2&ndash;27 unit agents, decentralized partial obs, scripted enemy). The de-facto cooperative-MARL benchmark on which QMIX, MAPPO, MAVEN, QPLEX were validated.</p>
+      <p class="ea">Samvelyan, Rashid, Schroeder de Witt, Farquhar, &hellip; Whiteson</p>
+      <p class="ev"><span class="vt">T1</span> AAMAS</p>
+      <div class="tagrow"><span class="tag">benchmark</span><span class="tag">N: 2&ndash;27</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Melting Pot, MPE</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>tarmac</code> &middot; TarMAC</span><span class="ey">2019</span></div>
+      <p class="ed">Replaces CommNet's mean-pool broadcast with signature-based soft attention: agents emit (key, value) pairs, listeners query to weight them &mdash; learning who to address and what to send. Established attention as the default learned-communication architecture.</p>
+      <p class="ea">Das, Gervet, Romoff, Batra, &hellip; Pineau</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">transformer</span><span class="tag">attention</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> CommNet &middot; <span class="lc">Contrasts</span> CommNet, IC3Net</div>
+      <div class="zr">Closest classical-MARL precedent for connectivity-aware messaging policies.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dgn</code> &middot; DGN (Graph Conv RL)</span><span class="ey">2020</span></div>
+      <p class="ed">Treats agents as nodes in a spatial-neighborhood graph and applies multi-head graph-attention to fuse local observations before Q-learning. GNN message passing scales cooperatively to ~100 agents. Anchor of the GNN family in cooperative MARL.</p>
+      <p class="ea">Jiang, Dun, Huang, Lu</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">GNN</span><span class="tag">q-learning</span><span class="tag">attention</span><span class="tag">CTDE</span><span class="tag">N: 10&ndash;100</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> CommNet, TarMAC</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>ippo</code> &middot; IPPO</span><span class="ey">2020</span></div>
+      <p class="ed">Independent PPO with parameter sharing: each agent runs PPO on its own observations and treats others as environment. The key result &mdash; IPPO (DTDE) often matches or beats QMIX (CTDE) on SMAC &mdash; challenged the field's CTDE-by-default assumption.</p>
+      <p class="ea">Schroeder de Witt, Gupta, Makoviichuk, &hellip; Whiteson</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">parameter-sharing</span><span class="tag">DTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> IQL &middot; <span class="lc">Contrasts</span> QMIX</div>
+      <div class="zr">DTDE baseline in the RedWithinBlue paradigm-comparison table.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>ndq</code> &middot; NDQ</span><span class="ey">2020</span></div>
+      <p class="ed">Combines QMIX value-decomposition with an information-theoretic regularizer minimizing mutual information between sent messages and the sender's full observation while preserving task content &mdash; minimal-bandwidth communication only when independent decomposition is insufficient.</p>
+      <p class="ea">Wang, Wang, Zheng, Zhang</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> TarMAC, CommNet</div>
+      <div class="zr">The information-bottleneck framing maps cleanly onto link-capacity constraints in connectivity-aware missions.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>roma</code> &middot; ROMA (Emergent Roles)</span><span class="ey">2020</span></div>
+      <p class="ed">Augments value-decomposition MARL with a stochastic role embedding per agent, regularized to be mutually informative with trajectories yet compact enough to drive specialization. Yields emergent roles without hand-designed priors; pairs with QMIX-style mixing.</p>
+      <p class="ea">Wang, Dong, Lesser, Zhang</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">role-based</span><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> QMIX, QPLEX, MAVEN</div>
+      <div class="zr">Classical-MARL precedent for asymmetric team coordination &mdash; relevant when scout-vs-follower roles must emerge without hand-specification.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>dicg</code> &middot; DICG (Implicit Coordination Graphs)</span><span class="ey">2021</span></div>
+      <p class="ed">Learns an implicit coordination graph end-to-end: an attention module produces a soft adjacency feeding a GNN reasoning layer over joint values/actions. Mitigates relative overgeneralization in predator-prey and competes with QMIX on SMAC without hand-specified structure.</p>
+      <p class="ea">Li, Gupta, Morales, Allen, Kochenderfer</p>
+      <p class="ev"><span class="vt">T1</span> AAMAS</p>
+      <div class="tagrow"><span class="tag">GNN</span><span class="tag">actor-critic</span><span class="tag">attention</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> DGN &middot; <span class="lc">Contrasts</span> MAGIC, QMIX</div>
+      <div class="zr">Implicit graph learning is the alternative to spatial-proximity graphs when "who-coordinates-with-whom" is task-dependent.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>magic</code> &middot; MAGIC</span><span class="ey">2021</span></div>
+      <p class="ed">Combines a Scheduler (when/to-whom to communicate) with a graph-attention Message Processor over a dynamically-learned communication graph &mdash; unifying the when/who/what axes that CommNet, IC3Net, TarMAC each addressed separately. Validated on a physical robot-soccer testbed.</p>
+      <p class="ea">Niu, Paleja, Gombolay</p>
+      <p class="ev"><span class="vt">T1</span> AAMAS</p>
+      <div class="tagrow"><span class="tag">communication</span><span class="tag">GNN</span><span class="tag">attention</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> TarMAC, DGN &middot; <span class="lc">Contrasts</span> CommNet, IC3Net, DICG</div>
+      <div class="zr">Tightest existing match for "learned dynamic comm-graph + attention message processing" &mdash; direct precedent for connectivity-aware multi-robot policies.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>qplex</code> &middot; QPLEX</span><span class="ey">2021</span></div>
+      <p class="ed">Duplex dueling decomposition with multi-head attention over agents, generalizing QMIX's monotonic mixing to non-monotonic interactions while still satisfying IGM. Outperforms QMIX and QTRAN on hard SMAC scenarios needing sacrifice actions.</p>
+      <p class="ea">Wang, Ren, Liu, Yu, Zhang</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">value-decomposition</span><span class="tag">q-learning</span><span class="tag">attention</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> QTRAN</div>
+      <div class="zr">Addresses the QMIX monotonicity limitation that is load-bearing in connectivity-maintenance tasks.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>updet</code> &middot; UPDeT</span><span class="ey">2021</span></div>
+      <p class="ed">Replaces the per-agent recurrent encoder with an entity-based transformer: each agent attends over a variable-length set of observed entities, and the policy head decouples into action groups. A single policy transfers across team sizes &mdash; universal in N.</p>
+      <p class="ea">Hu, Zhu, Chang, Liang</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">transformer</span><span class="tag">q-learning</span><span class="tag">attention</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX &middot; <span class="lc">Contrasts</span> QMIX, MAPPO</div>
+      <div class="zr">Entity-set attention is exactly what permutation-invariant multi-robot policies need.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>mamba</code> &middot; MAMBA</span><span class="ey">2022</span></div>
+      <p class="ed">Multi-agent latent world-model (Dreamer family): agents jointly maintain a shared latent state via learned communication and train policies on imagined rollouts. Model-based imagination matches/exceeds model-free CTDE at lower sample budgets.</p>
+      <p class="ea">Egorov, Shpilman</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">model-based</span><span class="tag">actor-critic</span><span class="tag">communication</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> DreamerV3, World Models &middot; <span class="lc">Contrasts</span> MAPPO, QMIX</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>mappo</code> &middot; MAPPO</span><span class="ey">2022</span></div>
+      <p class="ed">CTDE variant of PPO: a centralized value uses global state, decentralized actors use per-agent obs, agents share parameters. Empirically the strongest cooperative-MARL baseline on SMAC/MPE/Hanabi as of 2022, despite the field's earlier off-policy preference.</p>
+      <p class="ea">Yu, Velu, Vinitsky, Wang, Bayen, Wu</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">centralized-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> COMA, IPPO &middot; <span class="lc">Contrasts</span> QMIX, MADDPG</div>
+      <div class="zr">Phase 1&ndash;3 baseline in the RedWithinBlue curriculum.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>mat</code> &middot; MAT (Multi-Agent Transformer)</span><span class="ey">2022</span></div>
+      <p class="ed">Recasts cooperative MARL as sequence modeling: an encoder-decoder transformer encodes the joint observation and decodes agent actions one at a time, using the multi-agent advantage decomposition theorem for monotonic improvement. Beats MAPPO, QMIX, HAPPO on SMAC/MA-MuJoCo.</p>
+      <p class="ea">Wen, Kuba, Lin, Zhang, Wen, Wang, Yang</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">transformer</span><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> UPDeT, MAPPO &middot; <span class="lc">Contrasts</span> MAPPO, QMIX, QPLEX</div>
+    </div>
+  </div>
+
+  <div class="grp">Cooperative &middot; classical-MARL &middot; 2023&ndash;2026</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>haven</code> &middot; HAVEN</span><span class="ey">2023</span></div>
+      <p class="ed">Hierarchical cooperative MARL with dual coordination at both the high level (across subgoal selections) and low level (across primitive actions), combined with QMIX-style value decomposition. Improves on flat CTDE on long-horizon SMAC tasks.</p>
+      <p class="ea">Xu, Bai, Zhang, Li, Fan</p>
+      <p class="ev"><span class="vt">T1</span> AAAI</p>
+      <div class="tagrow"><span class="tag">hierarchical</span><span class="tag">value-decomposition</span><span class="tag">actor-critic</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lx">Extends</span> QMIX, FeUdal Networks &middot; <span class="lc">Contrasts</span> MAPPO, QMIX</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>maestro</code> &middot; MAESTRO</span><span class="ey">2023</span></div>
+      <p class="ed">Multi-agent extension of PAIRED: jointly co-evolves a population of co-players and a curriculum of environments to maximize regret in cooperative MARL. Targets the failure where environment design ignores the partner-policy distribution; partner-aware curricula generalize better.</p>
+      <p class="ea">Samvelyan, Khan, Dennis, Jiang, &hellip; Rockt&auml;schel</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">environment-design</span><span class="tag">curriculum</span><span class="tag">policy-gradient</span><span class="tag">population</span></div>
+      <div class="edge"><span class="lx">Extends</span> PAIRED &middot; <span class="lc">Contrasts</span> PAIRED, ACCEL</div>
+    </div>
+  </div>
+
+  <!-- ---------- COLLABORATIVE ---------- -->
+  <div class="modehd">Collaborative <span class="ct">&mdash; temporarily aligned around a sub-goal; different individual rewards/roles; alignment dissolves when the sub-task ends</span></div>
+  <div class="callout danger" style="margin-top:8px"><b>Every entry below is an LLM-agent system, 2023&ndash;2026.</b> There are <b>zero classical-MARL collaborative entries</b> in the corpus. Coordination is in natural language, rewards are prompt-implicit, roles are asymmetric, and there is no value function or gradient update. This empty classical column is the map's central finding.</div>
+
+  <div class="grp">Collaborative &middot; llm-agent &middot; 2023&ndash;2026</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>agentverse</code> &middot; AgentVerse</span><span class="ey">2023</span></div>
+      <p class="ed">Structures problem-solving into four phases &mdash; expert recruitment, collaborative decision-making, action execution, evaluation &mdash; dynamically assembling a team of role-tagged LLM agents with reflection. Explicit phase decomposition can beat free-form group chat.</p>
+      <p class="ea">Chen, Su, Zuo, Yang, &hellip; Zhou</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">natural-language</span><span class="tag">debate</span><span class="tag">reflection</span></div>
+      <div class="edge"><span class="lx">Extends</span> AutoGen &middot; <span class="lc">Contrasts</span> MetaGPT, ChatDev</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>autogen</code> &middot; AutoGen</span><span class="ey">2023</span></div>
+      <p class="ed">Microsoft's framework for multi-agent LLM apps: agents with roles (UserProxy, AssistantAgent, GroupChatManager) exchange natural-language messages to solve a user task, collaborating temporarily and dissolving afterward &mdash; quintessentially collaborative, with each role's reward implicit in its prompt.</p>
+      <p class="ea">Wu, Bansal, Zhang, Wu, &hellip; Wang</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">natural-language</span></div>
+      <div class="edge"><span class="lx">Extends</span> ReAct &middot; <span class="lc">Contrasts</span> MADDPG, MAPPO</div>
+      <div class="zr">Anchor for the collaborative paradigm &mdash; no explicit reward, no value function, no gradient updates, yet solves coordination via prompt design alone.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>camel</code> &middot; CAMEL</span><span class="ey">2023</span></div>
+      <p class="ed">Two-agent role-playing framework: an "AI user" and an "AI assistant" get complementary roles via "inception prompting" and exchange messages to solve a task. One of the earliest multi-agent LLM frameworks (March 2023); seeded AutoGen and MetaGPT.</p>
+      <p class="ea">Li, Hammoud, Itani, Khizbullin, Ghanem</p>
+      <p class="ev"><span class="vt">T1</span> NeurIPS</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">natural-language</span></div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>multi-agent-debate</code> &middot; Multi-Agent Debate</span><span class="ey">2023</span></div>
+      <p class="ed">Multiple LLM agents propose, critique, and refine each other's answers across structured debate rounds, improving factual accuracy and reasoning beyond single-agent baselines. Competitive-form mechanism producing a collaborative outcome &mdash; borderline mixed-motive in form.</p>
+      <p class="ea">Liang, He, Jiao, Wang, &hellip; Shi</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">opponent-modeling</span><span class="tag">debate</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> AutoGen</div>
+      <div class="zr">Cross-mode example: the same agents act competitively (debate) to reach a collaborative goal &mdash; the "regiments shifting modes" framing.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>chatdev</code> &middot; ChatDev</span><span class="ey">2024</span></div>
+      <p class="ed">LLM-agent virtual software company with role-based agents communicating via structured chat. Distinguishes itself from MetaGPT through explicit "double-agent" debate phases at each stage (designer &harr; reviewer). Strong collaborative role-based coordination.</p>
+      <p class="ea">Qian, Liu, Liu, Chen, &hellip; Sun</p>
+      <p class="ev"><span class="vp">T2</span> ACL</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">natural-language</span><span class="tag">debate</span></div>
+      <div class="edge"><span class="lx">Extends</span> AutoGen &middot; <span class="lc">Contrasts</span> MetaGPT</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>crewai</code> &middot; CrewAI</span><span class="ey">2024</span></div>
+      <p class="ed">Open-source Python framework orchestrating role-playing LLM agents as a "crew" &mdash; each with role, goal, backstory, tools &mdash; distributing tasks sequentially or hierarchically. A lightweight production-oriented alternative to AutoGen with explicit role abstractions.</p>
+      <p class="ea">Jo&atilde;o Moura</p>
+      <p class="ev"><span class="vf">fw</span> Framework</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">natural-language</span><span class="tag">hierarchical</span></div>
+      <div class="edge"><span class="lx">Extends</span> AutoGen &middot; <span class="lc">Contrasts</span> LangGraph, MetaGPT</div>
+      <div class="zr">Representative of how practitioners actually deploy multi-agent role coordination outside research labs.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>langgraph</code> &middot; LangGraph</span><span class="ey">2024</span></div>
+      <p class="ed">LangChain library for stateful multi-agent LLM workflows as explicit directed graphs with shared state: nodes are LLM agents or tool calls, edges are conditional transitions, persistent state enables long-horizon coordination and human-in-the-loop checkpoints.</p>
+      <p class="ea">LangChain Inc</p>
+      <p class="ev"><span class="vf">fw</span> Framework</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">planning</span><span class="tag">hierarchical</span></div>
+      <div class="edge"><span class="lx">Extends</span> AutoGen &middot; <span class="lc">Contrasts</span> CrewAI, MetaGPT</div>
+      <div class="zr">The closest production-grade analogue to formal coordination diagrams in classical MARL.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>metagpt</code> &middot; MetaGPT</span><span class="ey">2024</span></div>
+      <p class="ed">Software-development LLM-agent system encoding human SOPs: a Product Manager writes requirements, an Architect designs, Engineers implement, QA tests. Hand-designed workflows ("meta-programming via prompts") beat free-form multi-agent conversation on structured tasks.</p>
+      <p class="ea">Hong, Zhuge, Chen, Zheng, &hellip; Schmidhuber</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">role-based</span><span class="tag">hierarchical</span><span class="tag">natural-language</span></div>
+      <div class="edge"><span class="lx">Extends</span> AutoGen</div>
+      <div class="zr">Quintessential collaborative system &mdash; the role-asymmetry it relies on is exactly what classical cooperative MARL cannot natively express.</div>
+    </div>
+  </div>
+
+  <!-- ---------- COMPETITIVE ---------- -->
+  <div class="modehd">Competitive <span class="ct">&mdash; strictly opposed interests; two-player zero-sum, N-player rank contests, security games, adversarial MARL</span></div>
+
+  <div class="grp">Competitive &middot; classical-MARL &middot; 2015&ndash;2018</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>markov-games</code> &middot; Markov Games (Littman)</span><span class="ey">1994</span></div>
+      <p class="ed">Introduces Markov (stochastic) games as the formalism for competitive MARL and proposes minimax-Q, a value-iteration variant that converges in two-player zero-sum games. The standard ancestor citation for self-play and minimax-RL.</p>
+      <p class="ea">Michael L. Littman</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">q-learning</span><span class="tag">opponent-modeling</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Dec-POMDP</div>
+      <div class="zr">Foundational competitive-MARL formalism cited in <code>formalism.tex</code>; minimax-Q is the conceptual ancestor of M3DDPG.</div>
+    </div>
+  </div>
+
+  <div class="grp">Competitive &middot; classical-MARL &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>alphastar</code> &middot; AlphaStar</span><span class="ey">2019</span></div>
+      <p class="ed">Grandmaster-level StarCraft II from DeepMind via population-based self-play with a "league" of main agents, main exploiters, and league exploiters to prevent strategy cycles. Influential for the population-of-policies family.</p>
+      <p class="ea">Vinyals, Babuschkin, Czarnecki, Mathieu, &hellip; Silver</p>
+      <p class="ev"><span class="vt">T1</span> Nature</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">self-play</span><span class="tag">population</span><span class="tag">imitation</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> OpenAI Five</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>m3ddpg</code> &middot; M3DDPG</span><span class="ey">2019</span></div>
+      <p class="ed">Robust adversarial extension of MADDPG: trains each agent's policy against an adversarially perturbed approximation of the others as a minimax objective on the centralized critic (one-step linearized inner gradient). Improves robustness to adversarial co-players.</p>
+      <p class="ea">Li, Wu, Cui, Dong, Fang, Russell</p>
+      <p class="ev"><span class="vt">T1</span> AAAI</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">opponent-modeling</span><span class="tag">CTDE</span><span class="tag">also: cooperative</span></div>
+      <div class="edge"><span class="lx">Extends</span> MADDPG &middot; <span class="lc">Contrasts</span> MADDPG, OpenAI Five</div>
+      <div class="zr">Worst-case-robust CTDE baseline; relevant when blue-team policies must be hardened against red-team perturbations.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>pr2</code> &middot; PR2 (Recursive Reasoning)</span><span class="ey">2019</span></div>
+      <p class="ed">Models multi-agent decisions as recursive level-K reasoning where each agent assumes opponents reason one level shallower; uses variational inference to approximate the joint policy. Anchor for the Bayesian / cognitive-hierarchy branch of opponent modeling.</p>
+      <p class="ea">Wen, Yang, Luo, Wang, Pan</p>
+      <p class="ev"><span class="vt">T1</span> ICLR</p>
+      <div class="tagrow"><span class="tag">opponent-modeling</span><span class="tag">actor-critic</span><span class="tag">CTDE</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> ROMMEO, LOLA, MADDPG</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>rommeo</code> &middot; ROMMEO</span><span class="ey">2019</span></div>
+      <p class="ed">Builds an opponent model jointly with each agent's policy under a maximum-entropy objective, then regularizes the policy update against the inferred opponent posterior &mdash; a Bayes-optimal best-response under co-player uncertainty in general-sum and competitive games.</p>
+      <p class="ea">Tian, Wen, Gong, Punakkath, Zou, Wang</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">opponent-modeling</span><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">CTDE</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lx">Extends</span> MADDPG &middot; <span class="lc">Contrasts</span> PR2, LOLA, MADDPG</div>
+    </div>
+  </div>
+
+  <div class="grp">Competitive &middot; hybrid &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>cicero</code> &middot; CICERO</span><span class="ey">2022</span></div>
+      <p class="ed">Meta AI's human-level Diplomacy player: a planning module trained via no-press self-play plus a dialogue model fine-tuned on human games and conditioned on intended actions. Human-level competitive multi-agent natural-language negotiation.</p>
+      <p class="ea">Meta FAIR Diplomacy Team</p>
+      <p class="ev"><span class="vt">T1</span> Science</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">planning</span><span class="tag">opponent-modeling</span><span class="tag">self-play</span><span class="tag">also: mixed-motive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> AutoGen, MetaGPT</div>
+      <div class="zr">Combines RL self-play with LLM dialogue &mdash; a hybrid that classical MARL surveys mostly miss.</div>
+    </div>
+  </div>
+
+  <!-- ---------- MIXED-MOTIVE ---------- -->
+  <div class="modehd">Mixed-motive <span class="ct">&mdash; general-sum games; social dilemmas, negotiation, mechanism design, emergent-society simulation</span></div>
+
+  <div class="grp">Mixed-motive &middot; classical-MARL &middot; 2015&ndash;2018</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>lola</code> &middot; LOLA</span><span class="ey">2018</span></div>
+      <p class="ed">Differentiates each agent's update through a one-step lookahead on the opponent's learning step, so policies are shaped by how they influence the opponent's future gradient. Yields tit-for-tat cooperation in iterated prisoner's dilemma where naive learners defect.</p>
+      <p class="ea">Foerster, Chen, Al-Shedivat, Whiteson, Abbeel, Mordatch</p>
+      <p class="ev"><span class="vt">T1</span> AAMAS</p>
+      <div class="tagrow"><span class="tag">opponent-modeling</span><span class="tag">policy-gradient</span><span class="tag">CTDE</span><span class="tag">also: competitive</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> MADDPG, ROMMEO, PR2</div>
+      <div class="zr">Direct conceptual ancestor for any opponent-shaping mediator design in mixed-motive scenarios.</div>
+    </div>
+  </div>
+
+  <div class="grp">Mixed-motive &middot; classical-MARL &middot; 2018&ndash;2022</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>social-influence</code> &middot; Social Influence</span><span class="ey">2019</span></div>
+      <p class="ed">Adds an intrinsic reward proportional to one agent's causal influence on another's policy (KL between conditional and marginal action distributions) to encourage emergent communication and prosocial behavior in Cleanup/Harvest social dilemmas without explicit channels.</p>
+      <p class="ea">Jaques, Lazaridou, Hughes, Gulcehre, &hellip; de Freitas</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">policy-gradient</span><span class="tag">communication</span><span class="tag">opponent-modeling</span><span class="tag">CTDE</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Bayesian Action Decoder, LOLA</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>ai-economist</code> &middot; AI Economist</span><span class="ey">2020</span></div>
+      <p class="ed">Two-level RL where a "social planner" agent designs tax policy while heterogeneous worker agents simultaneously learn to respond (PPO at both levels), discovering tax schedules that improve equality-vs-productivity trade-offs. Anchor for RL-based mechanism design.</p>
+      <p class="ea">Zheng, Trott, Srinivasa, Parkes, Socher</p>
+      <p class="ev"><span class="vf">pre</span> arXiv</p>
+      <div class="tagrow"><span class="tag">mechanism-design</span><span class="tag">policy-gradient</span><span class="tag">actor-critic</span><span class="tag">hierarchical</span></div>
+      <div class="edge"><span class="lc">Contrasts</span> Melting Pot, CICERO</div>
+      <div class="zr">The hierarchical planner/worker decomposition mirrors the mediator role in RedWithinBlue.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>melting-pot</code> &middot; Melting Pot</span><span class="ey">2021</span></div>
+      <p class="ed">DeepMind benchmark of MARL environments around social dilemmas, free-rider problems, and common-pool resources. The most prominent infrastructure for studying generalization across cooperative &harr; competitive &harr; mixed-motive within one framework.</p>
+      <p class="ea">Leibo, Du&eacute;&ntilde;ez-Guzm&aacute;n, Vezhnevets, Agapiou, &hellip; Graepel</p>
+      <p class="ev"><span class="vt">T1</span> ICML</p>
+      <div class="tagrow"><span class="tag">benchmark</span><span class="tag">N: 2&ndash;16</span><span class="tag">also: coop/comp</span></div>
+      <div class="zr">Closest existing benchmark to the framing of agents shifting between coop / collab / compete modes.</div>
+    </div>
+  </div>
+
+  <div class="grp">Mixed-motive &middot; llm-agent &middot; 2023&ndash;2026</div>
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>generative-agents</code> &middot; Generative Agents</span><span class="ey">2023</span></div>
+      <p class="ed">25 LLM-driven agents in a sandbox town (Smallville) show believable individual and social behavior via a memory stream, reflection, and planning &mdash; emergent information spread, relationship formation, event coordination. Anchor for emergent-society simulation.</p>
+      <p class="ea">Park, O'Brien, Cai, Morris, Liang, Bernstein</p>
+      <p class="ev"><span class="vp">T2</span> UIST</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">memory</span><span class="tag">reflection</span><span class="tag">N: 25</span><span class="tag">also: collaborative</span></div>
+      <div class="zr">Mixed-motive and collaborative mode-shifting in one system &mdash; alignment shifts with context, exactly the dynamic-regiments framing.</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>ai-town</code> &middot; AI Town</span><span class="ey">2024</span></div>
+      <p class="ed">Open-source deployable virtual town inspired by Generative Agents: LLM-driven characters live, plan, gossip, and form relationships in a Convex-backed real-time world. A practical template for persistent multi-agent LLM societies, widely forked.</p>
+      <p class="ea">a16z Infra</p>
+      <p class="ev"><span class="vf">fw</span> Framework</p>
+      <div class="tagrow"><span class="tag">language-model</span><span class="tag">memory</span><span class="tag">reflection</span><span class="tag">also: collaborative</span></div>
+      <div class="edge"><span class="lx">Extends</span> Generative Agents</div>
+    </div>
+  </div>
+
+  <p class="ecount"><b>70 entries rendered by primary mode</b> &mdash; solo 19 (hybrid 2, llm-agent 5, classical-RL-extended 12), cooperative 31, collaborative 8, competitive 6, mixed-motive 6. Secondary modes (the "also:" tags) place several entries in more than one mode at once.</p>
+
+  <!-- ============ 3 SURVEYS ============ -->
+  <span class="flank" id="surveys">3 · the field's self-image</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The 6 surveys</h2>
+  <p>Surveys are treated as first-class nodes: they define the field's <i>self-image</i> at a moment in time. Each card lists what the survey <b>covers</b>, what it <b>explicitly omits</b>, and how many pool entries it <b>cites</b>. The omissions, cross-checked against the entry pool, drive the gap report below.</p>
+
+  <div class="egrid">
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>albrecht-christianos-schaefer-2024</code><br>MARL: Foundations &amp; Modern Approaches</span><span class="ey">2024</span></div>
+      <p class="ed">Most recent comprehensive textbook treatment of cooperative and competitive MARL. Strong on theory (Markov games, POSG, Nash, Bellman equations) and modern deep-MARL benchmarks; mostly excludes the LLM-agent wave and applied / mission-level work.</p>
+      <p class="ea">Albrecht, Christianos, Sch&auml;fer &middot; MIT Press <span class="vf">(textbook)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative, competitive, mixed-motive &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, emergent-society-simulation, real-world-deployment, mission-level-success, role-asymmetry, foundation-model-agents</div>
+      <div class="ev"><b>Cites:</b> 10 entries (mappo, qmix, vdn, maddpg, coma, &hellip;)</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>oroojlooyjadid-hajinezhad-2023</code><br>A review of cooperative MA deep RL</span><span class="ey">2023</span></div>
+      <p class="ed">Cooperative-MARL-only survey organized by communication, coordination, training paradigm, and applications. Useful for the cooperative-only literature; a conspicuous gap on competitive and mixed-motive.</p>
+      <p class="ea">OroojlooyJadid, Hajinezhad &middot; Applied Intelligence <span class="vf">(survey)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, competitive, mixed-motive, mission-level-success, foundation-model-agents</div>
+      <div class="ev"><b>Cites:</b> 5 entries (mappo, qmix, vdn, maddpg, coma)</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>du-ding-2023</code><br>A survey on MARL with communication</span><span class="ey">2023</span></div>
+      <p class="ed">Survey focused specifically on learned communication in MARL: protocols (broadcast, targeted, attention), representations (continuous, discrete, symbolic), and learning algorithms. Useful for the communication-learning cluster.</p>
+      <p class="ea">Zhai, Ding &middot; arXiv <span class="vf">(survey)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, mixed-motive, role-asymmetry, mission-level-success</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>gronauer-diepold-2022</code><br>Multi-agent deep RL: a survey</span><span class="ey">2022</span></div>
+      <p class="ed">Broad survey of deep MARL up to 2022, organized by training paradigm (centralized / decentralized / fully / partially observable). Predates the LLM-agent wave; useful as a "what classical MARL covered" reference for triangulating gaps.</p>
+      <p class="ea">Gronauer, Diepold &middot; AI Review <span class="vf">(survey)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative, competitive, mixed-motive &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, role-asymmetry, foundation-model-agents, real-world-deployment, mission-level-success</div>
+      <div class="ev"><b>Cites:</b> 6 entries (mappo, qmix, vdn, maddpg, coma, &hellip;)</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>zhang-yang-basar-2021</code><br>MARL: a selective overview</span><span class="ey">2021</span></div>
+      <p class="ed">Theory-leaning selective survey emphasizing convergence guarantees, Markov games, and game-theoretic foundations. Contrasts cooperative, competitive, and mixed settings via formal analysis; light on emerging deep-MARL empirical work.</p>
+      <p class="ea">Zhang, Yang, Ba&#351;ar &middot; Handbook of RL &amp; Control <span class="vf">(survey)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative, competitive, mixed-motive &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, foundation-model-agents, mission-level-success, real-world-deployment, role-asymmetry</div>
+      <div class="ev"><b>Cites:</b> 5 entries (maddpg, qmix, vdn, coma, iql)</div>
+    </div>
+    <div class="ecard">
+      <div class="eh"><span class="et"><code>hernandez-leal-2019</code><br>A survey and critique of MA deep RL</span><span class="ey">2019</span></div>
+      <p class="ed">Influential 2019 critique categorizing work into four open problems: emergent behaviors, learning communication, learning cooperation, agents modeling agents. A critical view that helps identify gaps &mdash; highlighting how thin coverage of communication and opponent modeling was at the time.</p>
+      <p class="ea">Hernandez-Leal, Kartal, Taylor &middot; JAAMAS <span class="vf">(survey)</span></p>
+      <div class="ev"><b>Covers:</b> cooperative, competitive, mixed-motive &middot; classical-MARL</div>
+      <div class="ev"><b>Omits:</b> llm-agent, foundation-model-agents, role-asymmetry, mission-level-success, real-world-deployment</div>
+      <div class="ev"><b>Cites:</b> 5 entries (maddpg, coma, vdn, qmix, iql)</div>
+    </div>
+  </div>
+
+  <!-- ============ 4 GAPS ============ -->
+  <span class="flank" id="gaps">4 · gaps</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Gaps &amp; opportunities</h2>
+  <p>The build pipeline auto-ranks every <i>(mode, method-family)</i> cell by an <b>interest score</b>: a cell is interesting if it is <i>sparse</i> (few entries) AND its neighbors are <i>dense</i>. Absences neighboring populated cells are more likely structural &mdash; opportunities for new work &mdash; than absences in already-empty regions.</p>
+
+  <h3>Top-ranked sparse cells</h3>
+  <table>
+    <tr><th>#</th><th>Mode</th><th>Method family</th><th>Cell</th><th>Max nbr</th><th>Score</th></tr>
+    <tr><td>1</td><td class="lose">collaborative</td><td>curriculum</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>2</td><td class="lose">collaborative</td><td>parameter-sharing</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>3</td><td class="lose">collaborative</td><td>mechanism-design</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>4</td><td>cooperative</td><td>mechanism-design</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>5</td><td>solo</td><td>parameter-sharing</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>6</td><td>solo</td><td>mechanism-design</td><td>0</td><td>15</td><td>16.00</td></tr>
+    <tr><td>7</td><td class="lose">collaborative</td><td>model-based</td><td>0</td><td>12</td><td>13.00</td></tr>
+    <tr><td>8</td><td class="lose">collaborative</td><td>q-learning</td><td>0</td><td>12</td><td>13.00</td></tr>
+    <tr><td>9</td><td class="lose">collaborative</td><td>actor-critic</td><td>0</td><td>12</td><td>13.00</td></tr>
+    <tr><td>10</td><td class="lose">collaborative</td><td>value-decomposition</td><td>0</td><td>12</td><td>13.00</td></tr>
+    <tr><td>11</td><td class="lose">collaborative</td><td>policy-gradient</td><td>0</td><td>12</td><td>13.00</td></tr>
+    <tr><td>13</td><td>cooperative</td><td>planning</td><td>0</td><td>10</td><td>11.00</td></tr>
+    <tr><td>14</td><td>cooperative</td><td>language-model</td><td>0</td><td>10</td><td>11.00</td></tr>
+    <tr><td>15&ndash;16</td><td class="lose">collaborative</td><td>GNN / communication</td><td>0</td><td>9</td><td>10.00</td></tr>
+  </table>
+  <p class="meta">Full top-30 ranking lives in <code>assets/sources/marl_taxonomy/</code> (the original <code>gaps.md</code>). The collaborative row dominates: nearly every classical method-family that is dense for cooperative is <b>completely empty</b> for collaborative &mdash; the same finding as the empty classical column above, now quantified.</p>
+
+  <h3>Mode &times; era absences</h3>
+  <div class="two">
+    <div class="callout danger"><b>collaborative</b> &mdash; dense in 2023&ndash;2026 (8 entries), sparse in 2015&ndash;2018 and 2018&ndash;2022. The mode simply did not exist as a studied object before the LLM-agent wave.</div>
+    <div class="callout warnbox"><b>competitive</b> &mdash; dense in 2018&ndash;2022 (5 entries), sparse in 2015&ndash;2018 and 2023&ndash;2026. The self-play / opponent-modeling peak was the deep-MARL middle era.</div>
+  </div>
+
+  <h3>The survey-omission finding</h3>
+  <p>Cross-checking each survey's <code>omits</code> field against the entry pool surfaces concepts that are present in the literature but absent from the canonical surveys:</p>
+  <div class="callout danger"><b><code>llm-agent</code> and <code>mission-level-success</code> are omitted by <u>all 6</u> surveys.</b> <code>role-asymmetry</code> is omitted by nearly all (5 of 6). <code>foundation-model-agents</code> by 5; <code>real-world-deployment</code> by 4. The field's own self-image has no place for the agentic-AI wave, for whether a <i>mission</i> actually succeeds, or for role-differentiated teams.</div>
+  <div class="callout gap"><b>This is precisely the project's governing research question.</b> Zymera asks how covert, within-bounds micro-level agent misbehavior propagates to <b>mission-level</b> failure in a spatial connectivity mission governed by <b>role / graph-position</b> &mdash; the exact triple (<code>mission-level-success</code> + <code>role-asymmetry</code> + the post-classical <code>llm-agent</code>/agentic regime) that every canonical survey leaves out. The gap the map measures and the gap the program targets are the same gap. See <a href="related-work.html">Literature</a> for the five-flank review and <a href="paper.html">Paper</a> for the formal statement.</div>
+
+  <p class="meta">25 pool entries are cited by <b>no</b> survey at all &mdash; nearly the entire llm-agent and classical-RL-extended frontier (Voyager, ReAct, AutoGen, MetaGPT, DPO, DreamerV3, &hellip;). The surveys' citation pool is almost exactly the classical cooperative core (MAPPO, QMIX, VDN, MADDPG, COMA, IQL).</p>
+
+  <!-- ============ 5 CONNECTORS ============ -->
+  <span class="flank" id="connectors">5 · connectors</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Cross-disciplinary connectors</h2>
+  <p>When the gap report flags an empty cell, it surfaces the <i>adjacent disciplines</i> tagged on the neighboring entries &mdash; out-of-the-box ideas that may apply. The connectors catalogue defines, for each field, the canonical methods that have crossed (or could cross) into MARL:</p>
+  <div class="cards">
+    <div class="card"><h3>game-theory</h3><p>No-regret learning &rarr; self-play convergence; mechanism design &rarr; mediator-induced cooperation; Stackelberg &rarr; leader-follower MARL.</p></div>
+    <div class="card"><h3>control</h3><p>Robust H&infin; for adversarial perturbations; consensus algorithms as networked-MARL precursors; MPC as a model-based planning baseline.</p></div>
+    <div class="card"><h3>information-theory</h3><p>Minimum-information communication (NDQ); information-bottleneck regularization for compositional policies.</p></div>
+    <div class="card"><h3>distributed-systems</h3><p>Byzantine-robust federated MARL; distributed Kalman filtering as a sensor-fusion precursor.</p></div>
+    <div class="card"><h3>graph-theory</h3><p>Spectral analysis of communication topologies; random-graph models for ad-hoc team formation.</p></div>
+    <div class="card"><h3>adversarial-ml</h3><p>Robust MARL under action / observation / communication / reward attacks; certified MARL policies.</p></div>
+    <div class="card"><h3>safe-rl</h3><p>Shielded MARL for mission-level safety guarantees; constrained CTDE with cost critics.</p></div>
+    <div class="card"><h3>mech-design</h3><p>Mediator-induced cooperation in social dilemmas; shared-reward design for collaborative LLM-agent teams.</p></div>
+    <div class="card"><h3>nlp</h3><p>Natural language as the coordination channel (AutoGen, CrewAI); RLHF as single-agent RL with a human partner.</p></div>
+    <div class="card"><h3>evolutionary-computation</h3><p>OpenAI ES as MARL hyperparameter search; MAP-Elites for diverse behavior repertoires; PBT for self-play.</p></div>
+    <div class="card"><h3>statistical-physics</h3><p>Mean-field MARL for very large N; phase transitions in cooperation under partial information.</p></div>
+    <div class="card"><h3>cognitive-science</h3><p>Theory-of-mind-augmented opponent modeling; level-K reasoning for cognitive-hierarchy MARL.</p></div>
+    <div class="card"><h3>swarm-robotics</h3><p>Behavior taxonomies (Brambilla, Schranz) as a macro-objective vocabulary; kilobot-style local rules as DTDE baselines.</p></div>
+    <div class="card"><h3>economics / social-choice</h3><p>Auction-based task allocation; negotiation as MARL in LLM settings; voting/aggregation in multi-agent debate; fair credit assignment.</p></div>
+  </div>
+  <p class="meta">Further connectors in the source catalogue: network-coding, operations-research, formal-methods, neuroscience, probability, optimization, behavioral.</p>
+
+  <!-- ============ 6 METHODOLOGY ============ -->
+  <span class="flank" id="method">6 · methodology</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Methodology</h2>
+  <blockquote>"Build a navigable map of multi-agent autonomous-systems research that makes <b>gaps and adjacencies visible</b>, rather than an encyclopedic listing."</blockquote>
+  <ul>
+    <li><b>Why interaction-mode is the primary axis.</b> A pure method-tree forces fuzzy methods into rigid boxes (MAPPO is coop + CTDE + policy-gradient + parameter-sharing at once). Sorting by interaction mode instead exposes the coop/collab seam that is otherwise collapsed &mdash; and that seam is where the classical and agentic literatures fail to meet.</li>
+    <li><b>Multi-tagging by default.</b> Each entry has one <i>primary</i> mode (for clustering / coloring) plus honest secondary modes, method-families, coordination tags, and adjacent disciplines. All tags surface in the matrices.</li>
+    <li><b>Surveys as first-class nodes.</b> The gap report cross-checks each survey's <code>omits</code> against the pool to flag concepts present in the literature but absent from the field's self-image.</li>
+    <li><b>The gap interest-score.</b> A <i>(mode, method-family)</i> cell scores high when it is <b>sparse and surrounded by dense neighbors</b> &mdash; the intuition being that an absence next to populated cells is structural (an opportunity), not peripheral.</li>
+    <li><b>Single source of truth.</b> The whole map is generated from YAML (<code>data/entries/*.yaml</code>, <code>data/surveys/*.yaml</code>, <code>venues.yaml</code>, <code>adjacencies.yaml</code>), pydantic-validated, and rendered to README + Graphviz diagrams + matplotlib matrices + the gap and venue reports. The README is never hand-edited.</li>
+  </ul>
+  <div class="callout"><b>Source preserved.</b> The full generative YAML source &mdash; all entry/survey definitions, the venue and adjacency catalogues, the schema, and the build pipeline &mdash; is archived under <code>assets/sources/marl_taxonomy/</code>, alongside the rendered <code>gaps.md</code> and <code>venues.md</code> reports this page draws from.</div>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a></div>
+</div>
+</body></html>

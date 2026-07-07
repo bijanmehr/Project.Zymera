@@ -1,0 +1,90 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Zymera — Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+ body{margin:0;font-family:"Helvetica Neue",Arial,system-ui,sans-serif;background:#f5f7fa;color:#1a1f29}
+ .top{padding:10px 22px;background:#0b1220;color:#e8edf5;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+ .top a{color:#8fb8ff;text-decoration:none;font-size:13px} .top b{font-size:15px}
+ .top .mut{color:#9aa7bd;font-size:12.5px}
+ .wrap{max-width:1120px;margin:0 auto;padding:18px 20px 60px}
+ .viewer{background:#fff;border:1px solid #dfe3e8;border-radius:14px;padding:16px;margin-bottom:8px;box-shadow:0 2px 10px rgba(20,30,50,.05);position:sticky;top:8px;z-index:5}
+ .viewer canvas{display:block;margin:0 auto;background:#fff;border:1px solid #d7dce3;border-radius:6px;max-width:100%;image-rendering:crisp-edges}
+ .vbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 4px;justify-content:center}
+ .vbar button{font-size:13px;padding:6px 15px;background:#0b4fb8;color:#fff;border:0;border-radius:6px;cursor:pointer}
+ #vslider{width:min(360px,60vw)}
+ .vcap{text-align:center;font-size:14px;color:#27303d;margin-top:4px}
+ .st{color:#5a6472;font-size:12.5px}
+ .legend{text-align:center;font-size:11.5px;color:#5a6472;margin:8px 0 0}
+ .legend span{padding:1px 7px;border-radius:3px;margin:0 2px}
+ h2.sec{font-size:15px;margin:24px 0 8px;color:#0d1b2b;border-bottom:2px solid #e5e9ef;padding-bottom:4px}
+ h2.best{color:#b07d0a;border-color:#f0d894}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:12px}
+ .card{background:#fff;border:1px solid #dfe3e8;border-radius:10px;padding:8px;cursor:pointer;transition:.12s;text-align:center}
+ .card:hover{border-color:#0b4fb8;box-shadow:0 3px 12px rgba(11,79,184,.14);transform:translateY(-1px)}
+ .card.best{border-color:#f0d894;background:#fffdf5}
+ .card canvas{width:100%;height:auto;border-radius:5px;border:1px solid #eef1f5;background:#fff}
+ .card .ds{font-size:11px;color:#33414f;margin-top:6px;line-height:1.35;min-height:28px}
+ .card .cv{font-size:11px;color:#1f7a3d;font-weight:700;margin-top:2px}
+ .card.on{outline:2px solid #0b4fb8;outline-offset:-1px}
+ h2.frag{color:#c0392b;border-color:#f3c3bd}
+ .card.fragc{border-color:#f3c3bd;background:#fff8f7}
+</style></head><body>
+<div class="top"><a href="../index.html">← Research hub</a><b>Simulator — current architecture</b>
+ <span class="mut">credit-driven, role-based · click a card to play it · single-rollout figures are demos, connectivity being re-measured</span></div>
+<div class="wrap">
+ <div class="viewer">
+  <canvas id="cv" width="440" height="440"></canvas>
+  <div class="vbar"><button id="play">▶ Play</button><input id="vslider" type="range" min="0" value="0"><span class="st" id="step">step 0</span></div>
+  <div class="vcap" id="cap"></div>
+  <div class="legend"><span style="background:#cfe3c8">covered</span><span style="background:#3a4150;color:#fff">wall</span> · <span style="color:#0072B2">●</span> explorer · <span style="color:#D55E00">●</span> relay · <span style="color:#1b7f76">—</span> comm link · faint circle = comm range</div>
+ </div>
+ <div id="sections"></div>
+</div>
+<script src="data.js"></script>
+<script>
+var T=window.TRAJ||{}, COL=['#0072B2','#D55E00','#009E73','#CC79A7','#E69F00'];
+function draw(ctx,v,t,cell){
+  var H=v.grid[0],W=v.grid[1],f=v.frames[t],i,p,id;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W*cell,H*cell);
+  ctx.fillStyle='#cfe3c8';for(i=0;i<f.cov.length;i++){id=f.cov[i];ctx.fillRect((id%W)*cell,((id/W)|0)*cell,cell,cell);}
+  ctx.fillStyle='#3a4150';for(i=0;i<v.walls.length;i++){id=v.walls[i];ctx.fillRect((id%W)*cell,((id/W)|0)*cell,cell,cell);}
+  ctx.strokeStyle='#e9ecf1';ctx.lineWidth=1;ctx.beginPath();
+  for(i=1;i<W;i++){ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,H*cell);}
+  for(i=1;i<H;i++){ctx.moveTo(0,i*cell);ctx.lineTo(W*cell,i*cell);}ctx.stroke();
+  var cr=v.comm_r||5;ctx.fillStyle='rgba(43,95,184,0.05)';
+  for(i=0;i<f.pos.length;i++){p=f.pos[i];ctx.beginPath();ctx.arc((p[1]+.5)*cell,(p[0]+.5)*cell,cr*cell,0,6.29);ctx.fill();}
+  ctx.strokeStyle='#1b7f76';ctx.lineWidth=Math.max(1,cell/8);ctx.beginPath();
+  for(i=0;i<f.edges.length;i++){var e=f.edges[i],a=f.pos[e[0]],b=f.pos[e[1]];ctx.moveTo((a[1]+.5)*cell,(a[0]+.5)*cell);ctx.lineTo((b[1]+.5)*cell,(b[0]+.5)*cell);}ctx.stroke();
+  for(i=0;i<f.pos.length;i++){p=f.pos[i];ctx.fillStyle=COL[(f.tags[i]||0)%COL.length];ctx.beginPath();ctx.arc((p[1]+.5)*cell,(p[0]+.5)*cell,cell*0.36,0,6.29);ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#2a2f3a';ctx.stroke();}
+}
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),cur=null,cell=12,fr=0,playing=false,timer=null;
+var slider=document.getElementById('vslider'),stepEl=document.getElementById('step'),capEl=document.getElementById('cap'),playBtn=document.getElementById('play');
+function sizeFor(v,b){return Math.max(4,Math.min(14,Math.floor(b/Math.max(v.grid[0],v.grid[1]))));}
+function show(t){fr=t;draw(ctx,cur,t,cell);slider.value=t;stepEl.textContent='step '+t+'/'+(cur.frames.length-1);}
+function loadBig(k){
+  cur=T[k];fr=0;cell=sizeFor(cur,440);cv.width=cur.grid[1]*cell;cv.height=cur.grid[0]*cell;
+  slider.max=cur.frames.length-1;slider.value=0;
+  capEl.innerHTML='<b>'+cur.cat+'</b> — '+cur.desc+' · <b>'+cur.cov+'% cov</b> · <span style="color:'+(cur.healthy?'#1f7a3d':'#c0392b')+'">'+cur.conn+'% connected'+(cur.healthy?'':' · FRAGMENTED')+'</span>';
+  draw(ctx,cur,0,cell);stepEl.textContent='step 0/'+(cur.frames.length-1);
+  var cards=document.querySelectorAll('.card');for(var i=0;i<cards.length;i++)cards[i].classList.toggle('on',cards[i].dataset.k===k);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+slider.oninput=function(){if(cur)show(+slider.value);};
+playBtn.onclick=function(){playing=!playing;playBtn.textContent=playing?'❚❚ Pause':'▶ Play';if(playing){timer=setInterval(function(){if(cur)show((fr+1)%cur.frames.length);},90);}else clearInterval(timer);};
+function mini(v){var c=document.createElement('canvas'),cl=sizeFor(v,150);c.width=v.grid[1]*cl;c.height=v.grid[0]*cl;draw(c.getContext('2d'),v,v.frames.length-1,cl);return c;}
+function card(k){var v=T[k],d=document.createElement('div');d.className='card'+(v.featured?' best':'')+(v.healthy?'':' fragc');d.dataset.k=k;
+  d.appendChild(mini(v));
+  var ds=document.createElement('div');ds.className='ds';ds.innerHTML=(v.featured?'★ ':'')+v.desc;d.appendChild(ds);
+  var cvv=document.createElement('div');cvv.className='cv';cvv.innerHTML=v.cov+'% cov · <span style="color:'+(v.healthy?'#1f7a3d':'#c0392b')+'">'+v.conn+'% conn</span>';d.appendChild(cvv);
+  d.onclick=function(){loadBig(k);};return d;}
+function section(title,keys,cls){if(!keys.length)return;var s=document.getElementById('sections');
+  var h=document.createElement('h2');h.className='sec '+(cls||'');h.textContent=title+' ('+keys.length+')';s.appendChild(h);
+  var g=document.createElement('div');g.className='grid';keys.forEach(function(k){g.appendChild(card(k));});s.appendChild(g);}
+var ks=Object.keys(T);
+var featured=ks.filter(function(k){return T[k].featured;});
+var frag=ks.filter(function(k){return !T[k].healthy;});
+section('★ Best — connected & covering',featured,'best');
+var cats={};ks.forEach(function(k){if(!T[k].healthy)return;var c=T[k].cat||'Other';(cats[c]=cats[c]||[]).push(k);});
+Object.keys(cats).sort().forEach(function(c){section(c,cats[c].sort());});
+section('⚠ Fragmented — team broke apart · connectivity < 90%',frag.sort(),'frag');
+if(featured.length)loadBig(featured[0]);else if(ks.length)loadBig(ks[0]);
+</script></body></html>
