@@ -43,6 +43,10 @@
     <tr><td>crowded</td><td>4.6%</td><td class="win">11.7%</td><td class="win">+7.1</td></tr>
   </table>
   <p><b>+7 to +23 points, 2–6×</b> — the predicted huddle→sweep transition, with credit as the control parameter. <b>But credit alone over-spreads and drops connectivity at scale</b> (the new wall): every agent is paid to cover, nothing chooses to hold.</p>
+  <div class="two">
+    <figure><img loading="lazy" src="assets/gifs/v3_credit_rooms_shared.gif" alt="shared team reward — the huddle"><figcaption><b>Shared team reward → the huddle.</b> One number for everyone: agents pile onto the same frontier and most of the map stays dark.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_credit_rooms_agent.gif" alt="difference-reward credit — the sweep"><figcaption><b>Difference-reward credit → the sweep.</b> Paid its own marginal contribution, each agent peels off to unclaimed ground — ~3× the coverage on the same map.</figcaption></figure>
+  </div>
 
   <h2>The relay backbone — recovering connectivity</h2>
   <p>An explicit relay role (a few agents holding the graph so explorers spread) under credit, at 32²/10. The <b>active "anchor" relay dominates in open floor</b> — more coverage <i>and</i> more connectivity, a genuine frontier shift; a static "hold" relay over-relays and hurts.</p>
@@ -53,6 +57,10 @@
     <tr><td>mixed</td><td>12.9 / 75.2</td><td>20.6 / 67.0</td><td>+cov, −conn</td></tr>
     <tr><td>rooms</td><td>22.0 / 64.3</td><td>22.2 / 60.6</td><td class="lose">no help (chokepoints)</td></tr>
   </table>
+  <div class="two">
+    <figure><img loading="lazy" src="assets/gifs/v3_relay_open_none.gif" alt="credit, no relay role — open floor"><figcaption><b>Credit, no relay.</b> Every agent explores; coverage is good, but the comm graph stretches thin as the team fans out.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_hero.gif" alt="active anchor relay backbone — open floor"><figcaption><b>Active "anchor" relay.</b> A few agents (<span style="color:#D55E00">orange</span>) hold a backbone so the explorers (<span style="color:#0072B2">blue</span>) spread <i>and</i> stay linked — more coverage <i>and</i> more connectivity.</figcaption></figure>
+  </div>
   <p>Watch these in the <a href="report/index.html">simulator</a> — the credit huddle→sweep pairs and the relay arms.</p>
 
   <div class="callout danger"><b>Honesty check.</b> The connectivity metric (final-iteration fraction of steps with λ₂ &gt; 0.5) is <b>bimodal and high-variance</b> — an identical config reproduced at <b>51% vs 77%</b> across runs. <b>Coverage effects are solid; the connectivity comparisons above are being re-measured</b> with deterministic checkpoint evaluation + error bars before any is treated as a headline number. The last points to 90 and the rooms case stay open — pointing at relay <i>positioning</i> (a λ₂-climbing relay + an explicit connectivity-centrality reward).</div>
@@ -67,6 +75,10 @@
     <tr><td><b>Every 16²/4 run</b> — small world, easy to stay in range (≈100%).</td><td class="lose"><b>32²/10 credit-alone</b> (no relay) — the sweep spreads past comm range, down to <b>30–48%</b> connected.</td></tr>
     <tr><td><b>32²/10 with the active "anchor" relay</b> — a backbone holds the graph while the rest cover.</td><td class="lose"><b>32²/10 "hold" relay</b> — static relays over-freeze and cluster wrong, still fraying (47–63%).</td></tr>
   </table>
+  <div class="two">
+    <figure><img loading="lazy" src="assets/gifs/v3_health_crowded_anchor.gif" alt="healthy connected team"><figcaption><b>Healthy — 94% connected.</b> 32²/10 crowded <i>with</i> the anchor relay: the team holds one connected component almost the whole rollout (teal links never fully break).</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_fragmented.gif" alt="fragmented team"><figcaption><b>Fragmented — 30% connected.</b> Same map, credit-<i>alone</i>: the sweep tears the team into islands that lose contact. The relay role is the only difference.</figcaption></figure>
+  </div>
   <p>Same story as the coverage↔connectivity tables above, now seen frame-by-frame: <b>credit spreads the team; only a
   few <i>active</i> relays buy that spread back into a connected sweep — and only once the world is big enough to need it.</b></p>
 
