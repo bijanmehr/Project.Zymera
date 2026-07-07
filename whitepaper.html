@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zymera — White Paper</title><link rel="stylesheet" href="assets/style.css">
+<style>
+  /* page-local patterns (aligned with theory.html) */
+  .toc2{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13.5px;margin:16px 0;columns:2}
+  .toc2 a{display:block;padding:2px 0}
+  .flank{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#fff;background:var(--accent-d);
+    display:inline-block;padding:3px 11px;border-radius:6px;font-weight:800;margin:40px 0 4px}
+  /* equations */
+  .eqrow{display:flex;align-items:center;gap:12px;margin:13px 0}
+  .eqrow .eq{flex:1;margin:0}
+  .eqrow .en{color:var(--mut);font-size:12px;white-space:nowrap;font-weight:600;font-variant-numeric:tabular-nums}
+  .eq{display:block;background:#fff;border:1px solid var(--line);border-left:3px solid var(--mut);border-radius:6px;
+    padding:9px 13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-x:auto;color:#13243a;white-space:nowrap}
+  .eq.key{border-left-color:var(--accent-d);background:#f6f9ff}
+  /* boxed notation */
+  .def{background:#eef3fb;border:1px solid #bcd0ff;border-left:4px solid var(--accent-d);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:13.8px}
+  .def .dt{font-weight:800;color:var(--accent-d);font-size:12.5px;display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+  .def b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:400;color:#0b3a63}
+  .sym{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.6px;background:#eef1f4;padding:1px 5px;border-radius:4px}
+  /* callout labels */
+  .callout .lab{font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:5px}
+  .callout.key .lab{color:var(--good)} .callout.gap .lab{color:var(--accent-d)}
+  .callout.danger .lab{color:var(--bad)} .callout.warnbox .lab{color:var(--warn)}
+  /* figures */
+  figure svg{max-width:100%;border:1px solid var(--line);border-radius:10px;background:#fff}
+  /* glossary + refs */
+  .gloss dt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.8px;font-weight:700;color:var(--accent-d);margin:13px 0 2px}
+  .gloss dd{margin:0;font-size:13.8px;color:#3a4652}
+  .refs{font-size:13.3px;padding-left:0;list-style:none;counter-reset:r}
+  .refs li{counter-increment:r;margin:0 0 7px;padding-left:2.2em;text-indent:-2.2em;color:#3a4652}
+  .refs li::before{content:"["counter(r)"] ";color:var(--accent-d);font-weight:700}
+  .agent{font-weight:700;padding:.03em .42em;border-radius:20px;font-size:.9em}
+  .a-blue{color:#08517f;background:#dcebf5} .a-orange{color:#8a3c0c;background:#f5e3d5}
+</style></head><body>
+<div class="nav"><div class="nav-inner">
+  <a class="brand" href="index.html">ZY<span>MERA</span></a>
+  <a class="lnk" href="report/index.html">Simulator</a>
+  <a class="lnk" href="index.html">Home</a>
+  <a class="lnk" href="paper.html">Paper</a>
+  <a class="lnk active" href="whitepaper.html">White Paper</a>
+  <a class="lnk" href="theory.html">Theory</a>
+  <a class="lnk" href="architecture.html">Architecture</a>
+  <a class="lnk" href="findings.html">Findings</a>
+  <a class="lnk" href="emergence.html">Emergence</a>
+  <a class="lnk" href="inspirations.html">Inspirations</a>
+  <a class="lnk" href="field-map.html">Field Map</a>
+  <a class="lnk" href="missions.html">Missions</a>
+  <a class="lnk" href="related-work.html">Literature</a>
+  <a class="lnk" href="journey.html">Journey</a>
+  <a class="lnk" href="documents.html">Docs</a>
+  <a class="lnk" href="about.html">About</a>
+</div></div>
+
+<div class="wrap">
+  <h1>Exploring together</h1>
+  <p class="sub">A <b>technical white paper</b> on the architecture of a team of autonomous agents that
+  covers a map without losing touch — the models, the mathematics, and the experiments that reshaped
+  them. Written for readers with an undergraduate CS background: it keeps the formalism and defines it
+  as it goes. Companion to the formal <a href="paper.html">Paper</a>, the <a href="theory.html">Theory</a>
+  page (full formalism), and the <a href="findings.html">Findings</a>.</p>
+
+  <div class="callout key">
+    <span class="lab">Thesis</span>
+    Across a multi-year search, the dominant lever was <b>not</b> the function approximator (perception
+    network, memory, attention) but the <b>reward decomposition</b>. Replacing a shared team return with
+    a per-agent <b>difference reward</b> — a counterfactual marginal-contribution signal — produced
+    larger gains than any architectural change. The bottleneck was the credit-assignment signal and the
+    action representation, not information.
+  </div>
+
+  <div class="toc2">
+    <a href="#s1">1 · Problem &amp; formal setting</a>
+    <a href="#s2">2 · The mission: coverage &amp; connectivity</a>
+    <a href="#s3">3 · The design space</a>
+    <a href="#s4">4 · Methods, axis by axis</a>
+    <a href="#s5">5 · Three turning points</a>
+    <a href="#s6">6 · Measurement &amp; honesty</a>
+    <a href="#s7">7 · Adversarial resilience</a>
+    <a href="#s8">8 · Open problems</a>
+    <a href="#gloss">Glossary</a>
+    <a href="#refs">References</a>
+  </div>
+
+  <!-- 1 -->
+  <span class="flank" id="s1">01 · setting</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Problem &amp; formal setting</h2>
+  <p>We study a team of <span class="sym">N</span> agents that act on local information, communicate only
+  over a range-limited, time-varying graph, and are scored by a single team-level objective. The formal
+  object is a finite-horizon cooperative <b>Dec-POMDP</b> (decentralized partially observable Markov
+  decision process) [1]:</p>
+
+  <div class="eqrow"><span class="eq">⟨ I, S, {A^i}, {Ω^i}, T, O, R, ρ₀, H ⟩</span><span class="en">(1)</span></div>
+
+  <div class="def"><span class="dt">Notation</span>
+    <b>I</b> = {1,…,N} agents · <b>S</b> states · <b>A^i</b> agent i's actions · <b>Ω^i</b> its
+    observations · <b>T</b>(s′|s,a) transition · <b>O</b> observation model · <b>R</b>(s,a) shared reward ·
+    <b>ρ₀</b> initial-state distribution · <b>H</b> horizon. A joint policy
+    <b>π</b> = (π₁,…,π_N) is scored by its expected return.
+  </div>
+
+  <div class="eqrow"><span class="eq">J(π) = E_τ [ Σ_{t=0..H} R(s_t, a_t) ]</span><span class="en">(2)</span></div>
+
+  <p>where <span class="sym">τ = (s₀,a₀,…,s_H)</span> is a trajectory. What makes the multi-agent case
+  distinctive is a decomposition into <b>three layers</b>, where interaction enters the mission
+  <i>twice</i> — shaping each agent's input, and shaping how local actions compose into the next state.</p>
+
+  <h3>Micro — the individual agent</h3>
+  <p>Agent <span class="sym">i</span> receives a local input <span class="sym">x_t^i = (o_t^i, q_t^i)</span>
+  (observation plus auxiliary channels — messages, role, belief), forms a history
+  <span class="sym">h_t^i</span>, and samples <span class="sym">a_t^i ~ π_i(·|h_t^i)</span>.</p>
+
+  <h3>Bridge — the interaction layer</h3>
+  <p>A time-varying directed graph <span class="sym">G_t = (I, E_t)</span> defines who can talk to whom.
+  Agent <span class="sym">i</span> aggregates messages from in-range neighbors
+  <span class="sym">N_i(t)</span> into a context:</p>
+
+  <div class="eqrow"><span class="eq">c_t^i = Agg_i( { m_t^{j→i} : j ∈ N_i(t) } )</span><span class="en">(3)</span></div>
+
+  <h3>Macro — the mission</h3>
+  <p>The Dec-POMDP objective, eq. (2). The research question is how a perturbation confined to the
+  <i>micro</i> level propagates through the <i>bridge</i> and manifests as a change in the <i>macro</i>
+  return — the <b>micro-to-macro gap</b>. Load-bearing assumptions: local agency, partial observability,
+  topology-constrained interaction, a mission-level objective, and trust-by-default among neighbors.</p>
+
+  <!-- 2 -->
+  <span class="flank" id="s2">02 · mission</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The mission: coverage and connectivity</h2>
+  <p>The concrete world is an <span class="sym">H×W</span> occupancy grid with obstacles. Two quantities
+  are measured every step and stand in tension.</p>
+
+  <h3>Coverage (the deliverable) is monotone submodular</h3>
+  <p>Let <span class="sym">f(·)</span> count distinct covered free cells. Coverage is a <b>monotone
+  submodular</b> set function: for all <span class="sym">A ⊆ B</span> and <span class="sym">e ∉ B</span>,</p>
+
+  <div class="eqrow"><span class="eq">f(A ∪ {e}) − f(A)  ≥  f(B ∪ {e}) − f(B)</span><span class="en">(4)</span></div>
+
+  <p>In words: <i>diminishing returns</i>. A revisit contributes zero, so two agents in the same region
+  is strictly wasteful — good policies must <b>partition</b> the space rather than pile onto it.</p>
+
+  <h3>Connectivity (the constraint) via the graph Laplacian</h3>
+  <p>Build the communication graph <span class="sym">G_t</span> with an edge between agents within range
+  <span class="sym">r</span>. With adjacency <span class="sym">A</span> and degree matrix
+  <span class="sym">D</span>, the <b>graph Laplacian</b> is <span class="sym">L = D − A</span>, eigenvalues
+  <span class="sym">0 = λ₁ ≤ λ₂ ≤ … ≤ λ_N</span>. The second-smallest, <span class="sym">λ₂</span>, is the
+  <b>algebraic connectivity</b> (Fiedler value) [2]:</p>
+
+  <div class="eqrow"><span class="eq key">G_t connected  ⇔  λ₂( L(G_t) ) > 0</span><span class="en">(5)</span></div>
+
+  <p>We use <span class="sym">g_conn(s) = −λ₂(L(G_t))</span> as a differentiable connectivity constraint:
+  <span class="sym">λ₂ = 0</span> exactly when the team fragments into multiple components; larger
+  <span class="sym">λ₂</span> means a more robustly connected team.</p>
+
+  <figure>
+    <svg viewBox="0 0 620 220" role="img" aria-labelledby="figc-t">
+      <title id="figc-t">A communication graph with a connected component and one out-of-range isolated agent</title>
+      <g stroke="#1b7f76" stroke-width="2.5">
+        <line x1="120" y1="70" x2="190" y2="120"/><line x1="190" y1="120" x2="120" y2="165"/>
+        <line x1="120" y1="70" x2="120" y2="165"/><line x1="190" y1="120" x2="255" y2="80"/>
+      </g>
+      <g fill="#0a6db3"><circle cx="120" cy="70" r="11"/><circle cx="190" cy="120" r="11"/><circle cx="120" cy="165" r="11"/><circle cx="255" cy="80" r="11"/></g>
+      <circle cx="470" cy="115" r="72" fill="none" stroke="#c05512" stroke-width="1.5" stroke-dasharray="5 6" opacity="0.7"/>
+      <line x1="255" y1="80" x2="398" y2="110" stroke="#c05512" stroke-width="2" stroke-dasharray="4 6" opacity="0.55"/>
+      <circle cx="470" cy="115" r="11" fill="#c05512"/>
+      <text x="187" y="205" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#586a66">component: λ₂ &gt; 0</text>
+      <text x="470" y="205" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#c05512">fragmented: λ₂ = 0</text>
+    </svg>
+    <figcaption><b>The communication graph and its algebraic connectivity.</b> An edge exists where two
+      agents are in range; when one drifts past range (dashed ring) the graph loses a component and
+      <span class="sym">λ₂</span> drops to 0.</figcaption>
+  </figure>
+
+  <div class="callout gap">
+    <span class="lab">The central tension</span>
+    Coverage (eq. 4) rewards <i>dispersion</i>; connectivity (eq. 5) rewards <i>proximity</i>. Maximizing
+    one naively destroys the other. Every method below attempts <span class="sym">max_π J(π)</span> subject
+    to <span class="sym">λ₂(G_t) ≥ λ_min</span> for all <span class="sym">t</span>.
+  </div>
+
+  <p>Agents are labeled <span class="agent a-blue">blue</span> (nominal) and
+  <span class="agent a-orange">red</span> (adversarial). Sections 1–6 build and analyze the blue team;
+  Section 7 introduces the adversary formally.</p>
+
+  <!-- 3 -->
+  <span class="flank" id="s3">03 · design space</span>
+  <h2 style="margin-top:6px;border:0;padding:0">The design space</h2>
+  <p>An "architecture" is a point chosen on several independent <b>axes</b>. Naming them separates the
+  variables so results are attributable; each axis maps onto a layer of the formalism.</p>
+
+  <table>
+    <tr><th>Axis</th><th>Formal object</th><th>Question</th></tr>
+    <tr><td><b>Learning method</b></td><td>argmax over <span class="sym">π_θ</span></td><td>Policy gradient, or evolution?</td></tr>
+    <tr><td><b>Reward decomposition</b></td><td><span class="sym">R</span> → per-agent signal</td><td>Shared return, or difference reward?</td></tr>
+    <tr><td><b>Perception &amp; belief</b></td><td><span class="sym">x_t^i, h_t^i</span> (micro)</td><td>What is observed and remembered?</td></tr>
+    <tr><td><b>Aggregation</b></td><td><span class="sym">Agg_i</span> (bridge)</td><td>How are neighbor messages fused?</td></tr>
+    <tr><td><b>Action representation</b></td><td><span class="sym">A^i</span></td><td>One-step move, or goal selection?</td></tr>
+    <tr><td><b>Roles</b></td><td>partition of <span class="sym">I</span></td><td>Homogeneous, or explorer/relay?</td></tr>
+    <tr><td><b>Connectivity mechanism</b></td><td>constraint on <span class="sym">λ₂</span></td><td>Hard mask, penalty, or Lagrangian?</td></tr>
+  </table>
+
+  <!-- 4 -->
+  <span class="flank" id="s4">04 · methods</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Methods, axis by axis</h2>
+
+  <h3>4.1 · Learning method: MAPPO under CTDE, and ES</h3>
+  <p>Policies are neural networks trained primarily with <b>PPO</b> (Proximal Policy Optimization) [3],
+  maximizing a clipped surrogate that bounds each update's policy change:</p>
+
+  <div class="eqrow"><span class="eq">L^CLIP(θ) = E_t[ min( r_t(θ)·Â_t ,  clip(r_t(θ), 1−ε, 1+ε)·Â_t ) ]</span><span class="en">(6)</span></div>
+
+  <p>with probability ratio <span class="sym">r_t(θ) = π_θ(a_t|o_t) / π_θold(a_t|o_t)</span> and advantage
+  <span class="sym">Â_t</span> from <b>GAE</b> (generalized advantage estimation) [4]:</p>
+
+  <div class="eqrow"><span class="eq">Â_t = Σ_{l≥0} (γλ)^l · δ_{t+l} ,   δ_t = r_t + γ·V(s_{t+1}) − V(s_t)</span><span class="en">(7)</span></div>
+
+  <p>The multi-agent instantiation is <b>MAPPO</b> [5] under <b>CTDE</b>: shared-parameter actors
+  <span class="sym">π_θ(a^i|o^i)</span> execute from local observations, while a <i>centralized critic</i>
+  <span class="sym">V_φ(s)</span> sees the global state — only during training, to cut advantage variance.
+  At deployment the critic is discarded.</p>
+
+  <div class="callout gap">
+    <span class="lab">In plain terms — CTDE</span>
+    Train with a coach who sees the whole board (the centralized critic <span class="sym">V_φ(s)</span>);
+    deploy players who see only their own patch (the actors <span class="sym">π_θ(a^i|o^i)</span>). We
+    ablated the coach — replacing it with a decentralized per-agent value head — and coverage collapsed to
+    ~8% at scale (a pure huddle), confirming the centralized baseline is load-bearing.
+  </div>
+
+  <p>For components where gradients are awkward (a small discrete role-selector) we used <b>evolution
+  strategies</b> (OpenAI-ES) [6], a gradient estimate from Gaussian parameter noise:</p>
+
+  <div class="eqrow"><span class="eq">∇_θ E_ε[ F(θ+σε) ] = (1/σ)·E_{ε∼N(0,I)}[ F(θ+σε)·ε ]</span><span class="en">(8)</span></div>
+
+  <p>ES trains a disjoint parameter set from the PPO executor and shares only the team return — a stable
+  evolutionary/gradient hybrid. Empirically, fully independent learners (IPPO) matched CTDE at small scale,
+  and both beat a fully centralized joint policy: decentralized execution is competitive, not merely a
+  deployment convenience.</p>
+
+  <h3>4.2 · Reward decomposition: the difference reward — the lever</h3>
+  <p>The default multi-agent reward is the shared return: every agent gets the team advantage from
+  <span class="sym">GAE(R_team)</span>. Under a shared signal an agent's gradient is nearly independent of
+  its own position — it is rewarded for team success whether or not it contributed. The unique-coverage
+  structure (eq. 4) then makes the risk-minimizing behavior to stay central, where connectivity is free.
+  Every agent reasons identically and the team converges to a degenerate near-equilibrium: the
+  <b>huddle</b> — <span class="sym">λ₂</span> high, coverage in the single digits.</p>
+
+  <p>The fix is the <b>difference reward</b> (Wolpert &amp; Tumer's Wonderful Life Utility) [7], paying each
+  agent its <i>counterfactual marginal contribution</i>:</p>
+
+  <div class="eqrow"><span class="eq key">D_i(z) = G(z) − G(z_−i)</span><span class="en">(9)</span></div>
+
+  <p>where <span class="sym">G</span> is the team objective and <span class="sym">z_−i</span> is the outcome
+  with agent <span class="sym">i</span>'s effect removed. Because <span class="sym">D_i</span> subtracts
+  everything agent <span class="sym">i</span> did not influence, it is <i>factored</i> (aligned with the
+  team objective) yet has far higher signal-to-noise for that agent's own decisions — the same insight COMA
+  [8] exploits with a learned counterfactual baseline. We compute <span class="sym">D_i</span> exactly from
+  the submodular coverage gain and run per-agent GAE on it, keeping the centralized value as baseline.</p>
+
+  <div class="callout gap">
+    <span class="lab">In plain terms — difference reward</span>
+    Your bonus = (team score <i>with</i> you) − (team score <i>without</i> you): a leave-one-out credit.
+    Shadowing a teammate onto already-covered cells yields <span class="sym">D_i ≈ 0</span>, so the optimum
+    shifts to covering ground no one else does. It converts "don't rock the boat" into "find your own region."
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 620 240" role="img" aria-labelledby="figh-t">
+      <title id="figh-t">Left: agents huddled covering little. Right: agents dispersed covering much more, still linked.</title>
+      <rect x="20" y="20" width="270" height="180" rx="8" fill="#fbfcfd" stroke="#e4e8ec"/>
+      <rect x="330" y="20" width="270" height="180" rx="8" fill="#fbfcfd" stroke="#e4e8ec"/>
+      <rect x="150" y="95" width="52" height="52" fill="#cfe3c8"/>
+      <g stroke="#1b7f76" stroke-width="2"><line x1="165" y1="105" x2="188" y2="118"/><line x1="188" y1="118" x2="170" y2="140"/><line x1="165" y1="105" x2="170" y2="140"/></g>
+      <g fill="#0a6db3"><circle cx="165" cy="105" r="8"/><circle cx="188" cy="118" r="8"/><circle cx="170" cy="140" r="8"/><circle cx="150" cy="122" r="8"/></g>
+      <text x="155" y="185" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#586a66">shared return → huddle</text>
+      <rect x="350" y="40" width="230" height="118" fill="#cfe3c8"/>
+      <g stroke="#1b7f76" stroke-width="2"><line x1="380" y1="70" x2="450" y2="60"/><line x1="450" y1="60" x2="520" y2="90"/><line x1="380" y1="70" x2="420" y2="130"/><line x1="520" y1="90" x2="540" y2="140"/></g>
+      <g fill="#0a6db3"><circle cx="380" cy="70" r="8"/><circle cx="450" cy="60" r="8"/><circle cx="520" cy="90" r="8"/><circle cx="420" cy="130" r="8"/><circle cx="540" cy="140" r="8"/></g>
+      <text x="465" y="185" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="13" fill="#586a66">difference reward → sweep</text>
+    </svg>
+    <figcaption><b>Same policy class, same map — only the reward decomposition differs.</b> The shared
+      return (eq. 2) yields the huddle; the difference reward (eq. 9) yields a dispersed, still-connected sweep.</figcaption>
+  </figure>
+
+  <p>On the 32×32 grid with 10 agents (four terrains, mean of two seeds, evaluated by sampling the
+  stochastic policy — never argmax):</p>
+
+  <table>
+    <tr><th>Terrain (32×32, N=10)</th><th>Shared <span class="sym">R_team</span></th><th>Difference <span class="sym">D_i</span></th><th>Δ</th></tr>
+    <tr><td>Open</td><td>4.4%</td><td class="win">27.7%</td><td class="win">+23.3</td></tr>
+    <tr><td>Rooms</td><td>6.7%</td><td class="win">18.9%</td><td class="win">+12.2</td></tr>
+    <tr><td>Mixed</td><td>1.7%</td><td class="win">14.7%</td><td class="win">+12.9</td></tr>
+    <tr><td>Crowded</td><td>4.6%</td><td class="win">11.7%</td><td class="win">+7.1</td></tr>
+  </table>
+  <p class="meta">+7 to +23 points, 2–6×. At 16×16/4 the same change lifts a 12% huddle to a 77% sweep.</p>
+
+  <div class="callout key">
+    <span class="lab">Key finding</span>
+    The lever is the <i>signal</i> (the term multiplying the log-probability in the policy gradient), not
+    the <i>function approximator</i>. A change to the reward decomposition — not to any network — produced
+    the largest coverage gain in the program. The cost: <span class="sym">D_i</span> pays everyone to
+    disperse, so at scale <span class="sym">λ₂</span> falls, re-opening the connectivity problem addressed
+    by roles (§4.5).
+  </div>
+
+  <h3>4.3 · Perception and belief</h3>
+  <p>Under partial observability each agent maintains a <b>belief</b> — an accumulated estimate of the map
+  and team from local observations. Findings:</p>
+  <ul>
+    <li><b>Frontier attention.</b> A learned soft attention over compass sectors biases the goal logits
+    toward the most-uncovered direction — a differentiable analogue of Yamauchi frontier exploration [9].
+    It roughly <i>doubled</i> coverage (13.5% → 31.6% at 32×32, <span class="sym">comm_r=5</span>) and was
+    the single most valuable perception change.</li>
+    <li><b>Occupancy belief.</b> Agents fold sensed cells into a shared three-valued occupancy map
+    (free / wall / unknown), gossiped within each connected component. An early wall-blind bug had
+    confounded prior obstacle results; fixing it was a prerequisite, not an improvement.</li>
+    <li><b>Size-invariant graph belief (GCRN).</b> A graph-convolutional recurrent network [10] with a
+    per-node GRU and per-step message passing, trained by privileged distillation against the true
+    adjacency. Trained only at 16×16/4, it transferred <i>zero-shot</i> to 32×32/10 at 72–74% adjacency
+    accuracy (vs. ~50% chance). A feedforward "snapshot" estimator hit 88% in-distribution but collapsed
+    out-of-distribution — evidence that graph-state estimation is a recurrent message-passing problem,
+    not single-frame classification.</li>
+    <li><b>Null / negative levers.</b> Neighbor self-attention, extra directional features, and recurrent
+    memory were all approximately neutral. An information-gain bonus <i>reward-hacked</i> — it maximized
+    proximity to unexplored cells rather than entering them; a coverage-scaled bump term dominated it.</li>
+  </ul>
+
+  <h3>4.4 · Action representation: the suspected ceiling</h3>
+  <p>Every agent used a one-step move head, <span class="sym">A^i = {N,S,E,W,stay}</span>. We argue this
+  is a <i>representational</i> ceiling. Optimal coverage of a submodular objective is a spatial
+  <i>assignment</i> — "region <span class="sym">R_k</span> is agent <span class="sym">i</span>'s" — but a
+  one-step action cannot commit to or hold a region; it only expresses a local displacement. The untested
+  high-value change is a <b>goal-selection head</b> (choose a frontier node) composed with an <b>A*</b>
+  planner [11] for transit — a change to the action set <span class="sym">A^i</span>, not to perception.
+  Independent evidence (region-based exploration policies) corroborates the one-step move as a general limiter.</p>
+
+  <h3>4.5 · Roles: explorer and active relay</h3>
+  <p>Difference reward disperses the team; roles buy connectivity back. The specialization:
+  <span class="agent a-blue">explorer</span> (maximize <span class="sym">D_i</span>) vs.
+  <span class="agent a-orange">relay</span> (raise the team's <span class="sym">λ₂</span> at a chokepoint).
+  The emergent-vs-authored debate — whether specialization arises from a homogeneous shared policy given
+  the right signal (ROMA [12], RODE [13]) or must be imposed — resolves, in our regime, to a middle path:
+  a hardcoded role assignment failed, but an <i>active</i> relay performing local gradient ascent on its
+  estimated <span class="sym">λ̂₂</span> beat both a homogeneous policy and a <i>static</i> "hold" relay.</p>
+
+  <table>
+    <tr><th>Open, 32×32</th><th>Coverage</th><th>Connectivity</th></tr>
+    <tr><td>Credit only, no role</td><td>27.9%</td><td>77%</td></tr>
+    <tr><td>+ active <span class="sym">λ₂</span>-anchor relay</td><td class="win">30.0%</td><td class="win">85%</td></tr>
+  </table>
+  <p class="meta">A few active relays dominate many static ones and improve both objectives at once. On
+  maze-like "rooms" maps the relay still cannot localize the chokepoint — open work.</p>
+
+  <h3>4.6 · Connectivity mechanisms, and why per-step enforcement fails</h3>
+  <p>We cast this as a <b>constrained MDP</b> [14] and tried three enforcement families for
+  <span class="sym">λ₂(G_t) ≥ λ_min</span>:</p>
+  <ul>
+    <li><b>Hard action mask.</b> Forbid any action whose greedy successor drops <span class="sym">λ₂</span>
+    below <span class="sym">λ_min</span> (STAY always feasible). Guarantees connectivity — and is
+    <i>banned</i> here (see callout).</li>
+    <li><b>Soft penalty.</b> Add <span class="sym">−w·max(0, λ_min − λ₂)</span> to the reward. Inert at
+    scale: the huddle already satisfies <span class="sym">λ₂ ≫ λ_min</span>, so the penalty is ~0 and never
+    shapes behavior.</li>
+    <li><b>Lagrangian / PID-Lagrangian.</b> Solve the constrained saddle-point with an adaptive dual
+    variable <span class="sym">λ ≥ 0</span> [15]:</li>
+  </ul>
+
+  <div class="eqrow"><span class="eq">max_π min_{λ≥0} [ J(π) − λ·( c(π) − c₀ ) ] ,   λ ← [ λ + η·( c(π) − c₀ ) ]₊</span><span class="en">(10)</span></div>
+
+  <p>The dual-ascent update needs a <i>violation</i> <span class="sym">c(π) − c₀ &gt; 0</span> to raise
+  <span class="sym">λ</span>. But the huddle never violates connectivity — it only fails to cover — so
+  empirically <span class="sym">λ</span> stayed flat (≈ 0.30 → 0.30, violation ≈ 0) and the controller was
+  structurally inert; the PID variant smoothed the dynamics but did not move the fixed point. The lesson is
+  precise: <b>a per-step connectivity constraint cannot break a policy whose failure mode is not a
+  connectivity violation.</b></p>
+
+  <div class="callout danger">
+    <span class="lab">Why the guaranteed fix is banned</span>
+    The hard mask makes <span class="sym">λ₂ ≥ λ_min</span> an invariant — connectivity becomes
+    <i>unbreakable by construction</i>. That is disqualifying for a study of resilience: our object of
+    interest is precisely <i>when and how</i> the constraint is violated, including under a covert adversary
+    (§7). Robustness that is assumed cannot be measured. We keep connectivity a <i>soft, earned</i> property
+    throughout. (This overrides an earlier finding that a hard mask adds ~20 coverage points at small scale.)
+  </div>
+
+  <p>A related point from resilient distributed systems: with <span class="sym">f</span> Byzantine agents,
+  consensus-style guarantees require <span class="sym">(2f+1)</span>-robust graph connectivity (the W-MSR
+  condition) [16] — tying tolerable fault count directly to topology, a bridge to §7.</p>
+
+  <!-- 5 -->
+  <span class="flank" id="s5">05 · turning points</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Three turning points</h2>
+
+  <h3>The team floods; it does not divide</h3>
+  <p>A fixed-horizon diagnostic measured redundancy — the mean number of agents covering each covered cell.
+  Scaling <span class="sym">N=6</span> → <span class="sym">N=18</span> raised redundancy ~3.7 → ~7.9 while
+  coverage rose only because more area was flooded. Added agents increased <i>overlap</i>, not
+  <i>partition</i> — a direct empirical signature of unsolved submodular credit assignment (eq. 4).</p>
+
+  <h3>A perfect connectivity signal is a null lever</h3>
+  <p>We supplied agents the <i>exact</i> <span class="sym">λ₂</span> and their per-agent Fiedler vector
+  component — a god's-eye oracle no deployed agent could compute. Relay formation did not improve (0–2%
+  relays; connectivity no better than baseline). This isolates the bottleneck: <b>not information</b>, but
+  the reward decomposition (nothing paid for relaying) and the action set (a one-step move cannot hold a
+  chokepoint). It falsified a multi-year "richer perception" hypothesis in one controlled experiment.</p>
+
+  <h3>Reframing the objective</h3>
+  <p>These results moved the question from <i>"which function approximator?"</i> to <i>"what is the
+  per-agent objective, and is the target behavior expressible in the action set?"</i> The difference reward
+  (§4.2) answers the first; the goal-selection head (§4.4) targets the second.</p>
+
+  <!-- 6 -->
+  <span class="flank" id="s6">06 · honesty</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Measurement &amp; honesty</h2>
+  <p><b>Reproducibility.</b> Coverage estimates are stable across seeds; connectivity estimates are not — an
+  identical configuration re-ran at 51% vs. 77% connected, a variance that implicates the <i>estimator</i>,
+  not just the policy. We therefore state coverage claims and <i>hold</i> connectivity claims pending
+  deterministic checkpoint evaluation with error bars.</p>
+  <p><b>A budget ceiling.</b> With <span class="sym">N=10</span>, horizon <span class="sym">H=100</span>, and
+  visit-only coverage (<span class="sym">cover_r=0</span>), the team makes at most
+  <span class="sym">N·H = 1000</span> visits against ~1024 free cells; a god's-eye Voronoi-partition oracle
+  caps near <b>72%</b>. So "why not 100%?" is often a budget answer, and we score against the achievable
+  oracle, not total coverage.</p>
+  <p><b>Evaluation protocol.</b> Policies are evaluated by <i>sampling</i> <span class="sym">π</span> (at
+  <span class="sym">ε=0</span>), never by argmax: greedy evaluation destroys the stochastic symmetry-breaking
+  that separates agents, and turned genuine 46% policies into catastrophic 0% ones in ablations.</p>
+
+  <div class="callout key">
+    <span class="lab">Methodological stance</span>
+    Reproduce before reporting; know the oracle ceiling; evaluate by sampling; and state which of your own
+    claims you do not yet believe. The connectivity numbers here are explicitly provisional.
+  </div>
+
+  <!-- 7 -->
+  <span class="flank" id="s7">07 · resilience</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Adversarial resilience: the research core</h2>
+  <p>The nominal blue team is the <i>substrate</i>; the program's target is resilience to <i>covert internal
+  misbehavior</i>. The threat is specified <b>effect-based</b> — by the mission-relevant outcome, not the
+  exploit — as a tuple:</p>
+
+  <div class="eqrow"><span class="eq">D = ( C, α, ε_s, Δ ) ,   k = |C|</span><span class="en">(11)</span></div>
+
+  <div class="def"><span class="dt">Threat parameters</span>
+    <b>C ⊆ I</b> the compromised set, <b>k</b> = |C| its size · <b>α</b> the per-step action-deviation
+    amplitude · <b>ε_s</b> the local stealth budget · <b>Δ</b> the activation pattern (when the attack is on).
+  </div>
+
+  <p>A compromised agent runs an <i>effective policy</i> mixing nominal and adversarial behavior under an
+  activation switch <span class="sym">β_t^i ∈ {0,1}</span>, with bounded amplitude in total-variation distance:</p>
+
+  <div class="eqrow"><span class="eq">π̂_i = (1−β_t^i)·π_i + β_t^i·π̃_i ,   d_TV(π̃_i, π_i) ≤ α</span><span class="en">(12)</span></div>
+
+  <p>The attack is <b>covert</b> if it stays within a per-edge stealth bound on its messages — no single
+  neighbor can reliably distinguish it (by Neyman–Pearson this bounds any local detector's Type-II error):</p>
+
+  <div class="eqrow"><span class="eq">D_KL( P_nom(m_t^{i→j}) ‖ P_pert(m_t^{i→j}) ) ≤ ε_s</span><span class="en">(13)</span></div>
+
+  <p>The key phenomenon is <b>propagation</b>: a per-edge-covert perturbation can still shift the whole
+  mission. One-step influence is a total-variation distance between induced next-inputs, and it composes
+  along paths (data-processing inequality + TV triangle inequality) into a multi-hop bound:</p>
+
+  <div class="eqrow"><span class="eq">Infl_{t:t+ℓ}^{i→j}  ≤  Σ_paths Π_edges Infl</span><span class="en">(14)</span></div>
+
+  <p>The blue/red interaction is a two-player zero-sum <b>POSG</b> (partially observable stochastic game):
+  blue seeks a max-min-robust policy, red the min-cost deviation. The headline quantities are the <b>return
+  gap</b> and the <b>minimum compromise size</b>:</p>
+
+  <div class="eqrow"><span class="eq key">ΔJ(k) = J(π,clean) − min_{D∈Φ_k} J(π,D) ,   k*(θ) = min{ k : ΔJ(k) ≥ θ }</span><span class="en">(15)</span></div>
+
+  <p>where <span class="sym">Φ_k</span> is the feasible deviation set at compromise size
+  <span class="sym">k</span>. Resilience is reported as threat-parameterized trajectory metrics —
+  robustness <span class="sym">R_rob = inf_D J(π̂)/J(π)</span>, a brittleness index
+  <span class="sym">B_brit = sup‖∇Γ‖</span> (cliff vs. slope), elasticity, and recovery time
+  <span class="sym">T_rec</span>. Early results already show a knee at <span class="sym">k=1</span>: a single
+  well-placed compromised agent is the most cost-effective attack, because the topology amplifies it
+  (clean 98.5% → 89.6% with one red). Working hypotheses: (H1) comms amplify small compromise at
+  influential graph positions; (H2) adaptive &gt; random attacks at equal budget; (H3) the dominant attack
+  surface — message, observation, or action — is mission-dependent.</p>
+
+  <div class="callout gap">
+    <span class="lab">Why the substrate had to come first</span>
+    Every quantity above — <span class="sym">ΔJ(k)</span>, <span class="sym">k*</span>,
+    <span class="sym">R_rob</span> — is defined relative to a <i>known, competent</i> nominal policy
+    <span class="sym">π</span>. Without a blue team that reliably covers and stays connected, there is no
+    baseline against which to measure an attack. Sections 1–6 built that baseline.
+  </div>
+
+  <!-- 8 -->
+  <span class="flank" id="s8">08 · open problems</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Open problems</h2>
+  <p>Highest-value untested directions, in priority order:</p>
+  <ul>
+    <li><b>Goal-selection + A* action head</b> (§4.4) — a change to <span class="sym">A^i</span> to test the
+    representational-ceiling hypothesis.</li>
+    <li><b>Hierarchical skill selector</b> — a high-level policy over learned options {disperse, regroup,
+    hold}, trained on difference reward; infrastructure built, not yet run at scale.</li>
+    <li><b>Relay localization on chokepoint maps</b> — a positioning controller that climbs the team's
+    <span class="sym">λ₂</span> gradient plus a connectivity-centrality reward.</li>
+    <li><b>Deterministic connectivity re-measurement</b> (§6) before any connectivity headline.</li>
+    <li><b>The adversarial POSG</b> of §7, now that the substrate is stable.</li>
+  </ul>
+  <p>The throughline: when a learning system will not produce the target behavior, interrogate the
+  <b>per-agent objective and the action representation</b> before enlarging the model.</p>
+
+  <!-- glossary -->
+  <span class="flank" id="gloss">reference</span>
+  <h2 style="margin-top:6px;border:0;padding:0">Glossary</h2>
+  <dl class="gloss">
+    <dt>Dec-POMDP</dt><dd>Decentralized partially observable MDP — the formal model of cooperative agents with local observations and a shared reward (eq. 1–2).</dd>
+    <dt>partial observability</dt><dd>Each agent observes only <span class="sym">o_t^i</span>, a local function of the true state — never the full state <span class="sym">s</span>.</dd>
+    <dt>communication graph G_t</dt><dd>Time-varying graph with an edge between in-range agents; the "bridge" layer.</dd>
+    <dt>algebraic connectivity λ₂</dt><dd>Second-smallest eigenvalue of the graph Laplacian <span class="sym">L=D−A</span>. Zero iff disconnected; larger = more robustly connected (Fiedler, eq. 5).</dd>
+    <dt>submodularity</dt><dd>Diminishing-returns property of a set function (eq. 4). Coverage is monotone submodular, so revisits are worthless.</dd>
+    <dt>policy π_θ</dt><dd>A neural network mapping observations to a distribution over actions, parameterized by weights <span class="sym">θ</span>.</dd>
+    <dt>PPO / GAE</dt><dd>Proximal Policy Optimization (clipped policy gradient, eq. 6) with Generalized Advantage Estimation (eq. 7) — the trainer.</dd>
+    <dt>CTDE / MAPPO</dt><dd>Centralized-training, decentralized-execution; a centralized critic <span class="sym">V_φ(s)</span> during training, local actors at deployment.</dd>
+    <dt>evolution strategies (ES)</dt><dd>Gradient-free optimization via Gaussian parameter perturbations (eq. 8); used for the discrete role-selector.</dd>
+    <dt>difference reward D_i</dt><dd>Counterfactual marginal-contribution signal <span class="sym">G(z)−G(z_−i)</span> (eq. 9); factored yet high-SNR per agent.</dd>
+    <dt>the huddle</dt><dd>Degenerate equilibrium of a shared return: agents cluster, <span class="sym">λ₂</span> high, coverage near zero.</dd>
+    <dt>frontier</dt><dd>Boundary between explored and unexplored space; a classic exploration heuristic (Yamauchi).</dd>
+    <dt>GCRN</dt><dd>Graph-convolutional recurrent network; a size-invariant belief over the team graph, trained by privileged distillation.</dd>
+    <dt>A*</dt><dd>Optimal best-first grid path planner; the proposed transit layer for a goal-selection action head.</dd>
+    <dt>role (explorer / relay)</dt><dd>Specialization: explorers maximize <span class="sym">D_i</span>; relays hold positions that raise team <span class="sym">λ₂</span>.</dd>
+    <dt>constrained MDP / Lagrangian</dt><dd>An MDP with a constraint, solved via a saddle-point with an adaptive dual price <span class="sym">λ</span> (eq. 10).</dd>
+    <dt>threat model D=(C,α,ε_s,Δ)</dt><dd>Effect-based adversary spec: compromised set, action amplitude, local stealth budget, activation pattern (eq. 11–13).</dd>
+    <dt>return gap ΔJ(k) / k*</dt><dd>Mission damage from <span class="sym">k</span> compromised agents, and the minimum <span class="sym">k</span> that forces damage <span class="sym">θ</span> (eq. 15).</dd>
+    <dt>POSG</dt><dd>Partially observable stochastic game; the blue-vs-red adversarial formulation.</dd>
+    <dt>blue / red</dt><dd>Nominal vs. adversarial agents. Zymera studies covert red agents embedded in a blue team.</dd>
+  </dl>
+
+  <!-- references -->
+  <span class="flank" id="refs">reference</span>
+  <h2 style="margin-top:6px;border:0;padding:0">References</h2>
+  <ol class="refs">
+    <li>Oliehoek &amp; Amato. <i>A Concise Introduction to Decentralized POMDPs.</i> Springer, 2016.</li>
+    <li>Fiedler. Algebraic connectivity of graphs. <i>Czechoslovak Math. Journal</i>, 1973.</li>
+    <li>Schulman et al. Proximal Policy Optimization Algorithms. arXiv:1707.06347, 2017.</li>
+    <li>Schulman et al. High-Dimensional Continuous Control Using GAE. arXiv:1506.02438, 2016.</li>
+    <li>Yu et al. The Surprising Effectiveness of PPO in Cooperative MARL (MAPPO). arXiv:2103.01955, 2022.</li>
+    <li>Salimans et al. Evolution Strategies as a Scalable Alternative to RL. arXiv:1703.03864, 2017.</li>
+    <li>Wolpert &amp; Tumer. Optimal Payoff Functions for Members of Collectives (Wonderful Life Utility), 2001; Tumer &amp; Agogino, AAMAS 2007.</li>
+    <li>Foerster et al. Counterfactual Multi-Agent Policy Gradients (COMA). AAAI, 2018.</li>
+    <li>Yamauchi. A Frontier-Based Approach for Autonomous Exploration. CIRA, 1997.</li>
+    <li>Seo et al. Structured Sequence Modeling with Graph Convolutional Recurrent Networks. ICONIP, 2018.</li>
+    <li>Hart, Nilsson &amp; Raphael. A Formal Basis for the Heuristic Determination of Minimum Cost Paths (A*), 1968.</li>
+    <li>Wang et al. ROMA: Multi-Agent RL with Emergent Roles. ICML, 2020.</li>
+    <li>Wang et al. RODE: Learning Roles to Decompose Multi-Agent Tasks. ICLR, 2021.</li>
+    <li>Altman. <i>Constrained Markov Decision Processes.</i> Chapman &amp; Hall, 1999.</li>
+    <li>Stooke, Achiam &amp; Abbeel. Responsive Safety in RL by PID Lagrangian Methods. ICML, 2020.</li>
+    <li>LeBlanc et al. Resilient Asymptotic Consensus in Robust Networks (W-MSR, (2f+1)-robustness). <i>IEEE JSAC</i>, 2013.</li>
+  </ol>
+
+  <div class="footer">Zymera research site · <a href="index.html">home</a> · Coverage results stated as
+  measured; connectivity results provisional pending deterministic re-measurement (§6). Blue = nominal, red = adversarial.</div>
+</div>
+</body></html>
