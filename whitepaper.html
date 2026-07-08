@@ -47,6 +47,8 @@
   .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
   .gal figure{margin:0}
   .gal img{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;display:block}
+  .gal a{display:block;cursor:zoom-in}
+  .gal a:hover img{outline:2px solid var(--accent);outline-offset:-1px}
   .gal figcaption{font-size:12px;color:var(--mut);margin-top:5px;text-align:center}
   @media(max-width:680px){.gal{grid-template-columns:1fr 1fr}}
   /* glossary + refs */
@@ -504,8 +506,8 @@
       <g stroke="#b7791f" stroke-width="1.6" fill="none" marker-end="url(#av)"><line x1="397" y1="204" x2="397" y2="170"/><line x1="424" y1="126" x2="424" y2="98"/></g>
       <text x="432" y="116" font-family="system-ui" font-size="10.5" fill="#8a5a10">→ actor's loss</text>
       <defs>
-        <marker id="fw" markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto"><path d="M1,1 L7,4.5 L1,8" fill="none" stroke="#3a4652" stroke-width="1.5"/></marker>
-        <marker id="av" markerWidth="9" markerHeight="9" refX="4.5" refY="3" orient="auto"><path d="M1,7 L4.5,2 L8,7" fill="none" stroke="#b7791f" stroke-width="1.5"/></marker>
+        <marker id="fw" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L7,4 L1,7 z" fill="#3a4652"/></marker>
+        <marker id="av" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1.5,1 L8,4.5 L1.5,8 z" fill="#b7791f"/></marker>
       </defs>
     </svg>
     <figcaption><b>Actor–critic.</b> The <span style="color:#0b4fb8">actor</span> (shared across agents) turns a
@@ -556,21 +558,19 @@
     <tr><td><b>Total trainable</b></td><td><b>152,870</b></td><td>≈ 0.15 M</td></tr>
   </table>
 
-  <p><b>Same network, every scale.</b> Parameters are identical across world sizes <i>and</i> team sizes — the
-  size-invariant backbone plus parameter sharing mean one net serves every rung; only the input grid and the
-  number of forward passes grow (verified by building the model at each rung):</p>
+  <p><b>Model size across the setups</b> — the numbers you actually want, in one table. All agents <b>share one
+  actor</b> and the backbone is grid-independent (global-average pooling), so the counts are the same at every
+  world and team size:</p>
   <table>
-    <tr><th>Rung</th><th>actor in</th><th>critic in</th><th>actor / critic / total</th><th>fwd passes · 100-step ep</th></tr>
-    <tr><td>16² / 4 agents</td><td>5×16×16</td><td>3×16×16</td><td>113,957 / 38,913 / 152,870</td><td>400</td></tr>
-    <tr><td>24² / 6 agents</td><td>5×24×24</td><td>3×24×24</td><td>113,957 / 38,913 / 152,870</td><td>600</td></tr>
-    <tr><td>32² / 10 agents</td><td>5×32×32</td><td>3×32×32</td><td>113,957 / 38,913 / 152,870</td><td>1000</td></tr>
+    <tr><th>Setup (world · agents)</th><th>per agent (shared actor)</th><th>critic (training)</th><th>total for the setup</th></tr>
+    <tr><td>16² · 4 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
+    <tr><td>24² · 6 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
+    <tr><td>32² · 10 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
   </table>
-  <p class="meta">This is counterintuitive but deliberate, from two mechanisms: (1) all N agents <b>share one
-  actor</b> (MARL parameter sharing) — 4 vs 10 agents is the same network run more times; (2) the backbone
-  <b>global-average-pools</b> its convolutions (<span class="sym">mean</span> over all cells → a fixed 64-d
-  belief), so 16×16 and 32×32 give the same-shaped input to every weight. So a bigger world or team costs more
-  <i>compute</i> (forward passes × input area), not more <i>parameters</i> — which is exactly what makes
-  warm-starting across the ladder legitimate (§4.9).</p>
+  <p class="meta">"Per agent" is the one shared network every agent runs — not one copy each. Were weights
+  <i>not</i> shared, 10 agents would need ≈ 1.14 M actor params instead of 114 k; sharing is why the whole setup
+  stays ≈ 0.15 M at any scale. A bigger world or team costs more <i>compute</i>, not more <i>parameters</i> —
+  which is what makes warm-starting (§4.9) legitimate.</p>
 
   <p><b>What actually changes the size</b> is the architecture, not the scale (real counts):</p>
   <table>
@@ -589,12 +589,8 @@
   reuses parameters already there. B-fork multiplies the actor by the number of groups; the shared critic is
   untouched.</p>
 
-  <p class="meta"><b>How heavy:</b> ≈ <b>0.15 M</b> parameters total — tiny by deep-learning standards (a ResNet-50
-  is ~25 M, ~160× larger). The backbone is 71% of the actor; the GRU is the next largest and is off by default,
-  so a typical run is lighter still. One shared actor runs a forward pass per agent per step (N = 4–10), so a full
-  100-step episode is well under a million forward passes of a 0.1 M-param net — it trains on a single GPU in
-  minutes and runs on CPU. Parameter count is <b>size-invariant</b>: the conv-plus-global-pool backbone yields the
-  same 64-d belief on any grid, so 16²/4 and 32²/10 use the identical network.</p>
+  <p class="meta"><b>How heavy:</b> ≈ <b>0.15 M</b> parameters — tiny (a ResNet-50 is ~160× larger); the backbone
+  is 71% of the actor, trains on one GPU in minutes, runs on CPU.</p>
 
   <p><b>Policy gradient — nudge good actions up.</b> The basic rule (the policy-gradient theorem / REINFORCE)
   raises the probability of actions that beat expectation and lowers the rest:</p>
@@ -813,6 +809,42 @@
     at scale <span class="sym">λ₂</span> falls, re-opening the connectivity problem addressed by roles (§4.7).
   </div>
 
+  <p><b>All the knobs in one place — and the cautionary findings.</b> The reward terms (this section) and the
+  loss terms (§4.2) are the whole tunable surface. Here they are together, each with its setting and a measured
+  verdict — including the three that <i>surprised us</i>:</p>
+  <table>
+    <tr><th>Knob</th><th>where</th><th>setting</th><th>verdict</th></tr>
+    <tr><td><b>credit</b> (shared → per-agent)</td><td>reward decomposition</td><td>shared → agent</td><td class="win">THE lever · +7–23 cov</td></tr>
+    <tr><td>coverage / connectivity / collision</td><td>reward</td><td>+1 / +2 / −4</td><td>the base terms</td></tr>
+    <tr><td>clip ε · GAE-λ · γ</td><td>PPO</td><td>0.2 · 0.95 · 0.99</td><td>standard</td></tr>
+    <tr><td>value coef <span class="sym">c_v</span></td><td>loss</td><td>0.5</td><td>critic fit</td></tr>
+    <tr><td>aux β (<span class="sym">λ̂₂</span> distillation)</td><td>loss</td><td>0.1</td><td>shapes connectivity belief</td></tr>
+    <tr><td>degree-reg (SizeShiftReg)</td><td>loss</td><td>1e-3</td><td>size-shift transfer / warm-start</td></tr>
+    <tr><td>weight-decay · grad-clip · lr</td><td>AdamW</td><td>1e-4 · 0.5 · 3e-4</td><td>stabilizers</td></tr>
+    <tr><td>dual λ (connectivity)</td><td>Lagrangian (§4.8)</td><td>lr<sub>λ</sub> 0.05</td><td>constraint, lives in the reward</td></tr>
+    <tr><td><b>entropy</b> <span class="sym">c_H</span></td><td>loss</td><td>0.01 → off</td><td class="lose">⚠ cautionary — hurt coverage</td></tr>
+    <tr><td><b>info-gain</b> (<span class="sym">einfo</span>)</td><td>reward</td><td>off</td><td class="lose">⚠ cautionary — reward-hacked</td></tr>
+    <tr><td>barrier (CBF) · congestion</td><td>reward</td><td>off</td><td>built, not yet isolated</td></tr>
+  </table>
+
+  <div class="callout warnbox">
+    <span class="lab">What "cautionary finding" means</span>
+    A knob that <i>looked</i> principled but empirically <b>backfired</b> — it hurt the metric or got gamed — so
+    we tuned it down or off. Three of them here, each a place the "obvious" term was wrong:
+    <p style="margin:8px 0 0"><b>1 · Entropy regularization hurt.</b> The standard exploration bonus
+    (<span class="sym">−c_H·H(π)</span>) <i>monotonically reduced</i> coverage — the exploration <i>reward</i>
+    already prevents collapse, so extra entropy only adds noise. Tuned toward 0.</p>
+    <p style="margin:6px 0 0"><b>2 · The info-gain bonus reward-hacked.</b> Paying for uncovered cells <i>in
+    sensor range</i> (<span class="sym">einfo</span>) made the optimum sit <i>next to</i> unexplored space and
+    never enter it — harvesting the bonus forever. Replaced by a coverage-scaled bump that only pays on real new
+    cells.</p>
+    <p style="margin:6px 0 0"><b>3 · Per-step connectivity penalties were inert.</b> Soft-λ and the Lagrangian
+    (§4.8) never bit at scale, because the huddle already <i>satisfies</i> the connectivity constraint — it fails
+    by not covering, which the constraint says nothing about.</p>
+    <p style="margin:6px 0 0">The throughline: a term earns its place by an <i>ablation</i>, not by sounding
+    reasonable — which is why every row above carries a verdict, not a hope.</p>
+  </div>
+
   <h3>4.5 · Perception and belief</h3>
   <p>Under partial observability each agent maintains a <b>belief</b> — an accumulated estimate of the map and
   team from local observations (a learned summary of the history <span class="sym">h_{i,t}</span>). Findings:</p>
@@ -949,12 +981,12 @@
   corridors and dense obstacles are progressively harder, and absolute coverage at 32²/10 is capped by the
   visit budget (§6) — so read these as %-of-achievable, not %-of-map:</p>
   <div class="gal">
-    <figure><img loading="lazy" src="assets/gifs/v3_credit_open_agent.gif" alt="best open 16²/4"><figcaption><b>Open · 16²/4</b><br>77% covered · connected</figcaption></figure>
-    <figure><img loading="lazy" src="assets/gifs/v3_best_rooms_16.gif" alt="best corridors 16²/4"><figcaption><b>Corridors · 16²/4</b><br>37% covered · 95% conn</figcaption></figure>
-    <figure><img loading="lazy" src="assets/gifs/v3_best_crowded_16.gif" alt="best obstacles 16²/4"><figcaption><b>Obstacles · 16²/4</b><br>46% covered · connected</figcaption></figure>
-    <figure><img loading="lazy" src="assets/gifs/v3_best_open_32.gif" alt="best open 32²/10"><figcaption><b>Open · 32²/10</b><br>28% covered · 92% conn</figcaption></figure>
-    <figure><img loading="lazy" src="assets/gifs/v3_best_rooms_32.gif" alt="best corridors 32²/10"><figcaption><b>Corridors · 32²/10</b><br>23% covered · 100% conn</figcaption></figure>
-    <figure><img loading="lazy" src="assets/gifs/v3_health_crowded_anchor.gif" alt="best obstacles 32²/10"><figcaption><b>Obstacles · 32²/10</b><br>13% · anchor relay · 94% conn</figcaption></figure>
+    <figure><a href="assets/gifs/v3_credit_open_agent.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_credit_open_agent.gif" alt="best open 16²/4"></a><figcaption><b>Open · 16²/4</b><br>77% covered · connected</figcaption></figure>
+    <figure><a href="assets/gifs/v3_best_rooms_16.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_best_rooms_16.gif" alt="best corridors 16²/4"></a><figcaption><b>Corridors · 16²/4</b><br>37% covered · 95% conn</figcaption></figure>
+    <figure><a href="assets/gifs/v3_best_crowded_16.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_best_crowded_16.gif" alt="best obstacles 16²/4"></a><figcaption><b>Obstacles · 16²/4</b><br>46% covered · connected</figcaption></figure>
+    <figure><a href="assets/gifs/v3_best_open_32.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_best_open_32.gif" alt="best open 32²/10"></a><figcaption><b>Open · 32²/10</b><br>28% covered · 92% conn</figcaption></figure>
+    <figure><a href="assets/gifs/v3_best_rooms_32.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_best_rooms_32.gif" alt="best corridors 32²/10"></a><figcaption><b>Corridors · 32²/10</b><br>23% covered · 100% conn</figcaption></figure>
+    <figure><a href="assets/gifs/v3_health_crowded_anchor.gif" target="_blank" rel="noopener" title="Open full size in a new tab"><img loading="lazy" src="assets/gifs/v3_health_crowded_anchor.gif" alt="best obstacles 32²/10"></a><figcaption><b>Obstacles · 32²/10</b><br>13% · anchor relay · 94% conn</figcaption></figure>
   </div>
 
   <span class="flank" id="s5">05 · turning points</span>
