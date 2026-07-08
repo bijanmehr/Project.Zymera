@@ -230,6 +230,27 @@
   Load-bearing assumptions: local agency, partial observability, topology-constrained interaction, a
   mission-level objective, and trust-by-default among neighbors.</p>
 
+  <div class="callout gap">
+    <span class="lab">"Twice" — the two channels of interaction</span>
+    <p style="margin:0 0 6px">The bridge touches the mission through <b>two mechanically separate channels</b>:
+    an agent's presence affects the outcome once on the way <i>in</i> to others' decisions, and once on the way
+    <i>out</i> through the shared dynamics.</p>
+    <p style="margin:0 0 6px"><b>1 · Through the input (information coupling).</b> Before agent
+    <span class="sym">i</span> decides, it folds in neighbor messages: <span class="sym">c_{i,t}</span> is part
+    of its input <span class="sym">x_{i,t}</span> (eq. 3). What others sense and say changes what
+    <span class="sym">i</span> <i>believes and chooses</i>. Cut all communication and this channel vanishes.
+    <i>E.g.</i> a neighbor signals which corridor it already swept, so <span class="sym">i</span> goes elsewhere.</p>
+    <p style="margin:0 0 6px"><b>2 · Through the transition (dynamics coupling).</b> After everyone decides, the
+    next state <span class="sym">s_{t+1} = T(·|s_t, a_t)</span> is a function of the <i>joint</i> action, not of
+    <span class="sym">i</span>'s alone. Actions physically compose: collisions, the <i>union</i> that defines
+    coverage (eq. 4), and the graph that defines connectivity (eq. 5) all depend on where <i>everyone</i> is.
+    This channel is present <i>even with zero communication</i>. <i>E.g.</i> whether <span class="sym">i</span>'s
+    move newly covers a cell depends on whether anyone else already did.</p>
+    <p style="margin:0">The two are independent — either can exist without the other. Both are why a <i>micro</i>
+    fault becomes a <i>macro</i> failure, and a compromised agent can inject through either: poisoned messages
+    (channel 1) or corrupting actions (channel 2) — the message/observation vs. action attack surfaces of §7.</p>
+  </div>
+
   <!-- 2 -->
   <span class="flank" id="s2">02 · mission</span>
   <h2 style="margin-top:6px;border:0;padding:0">The mission: coverage and connectivity</h2>
