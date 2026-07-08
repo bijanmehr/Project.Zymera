@@ -571,6 +571,13 @@
   <i>not</i> shared, 10 agents would need ≈ 1.14 M actor params instead of 114 k; sharing is why the whole setup
   stays ≈ 0.15 M at any scale. A bigger world or team costs more <i>compute</i>, not more <i>parameters</i> —
   which is what makes warm-starting (§4.9) legitimate.</p>
+  <p class="meta"><b>Why a bigger grid adds no parameters</b> (the natural expectation): a convolution is a small
+  <i>sliding filter</i> — the first-layer kernel is a fixed <span class="sym">(64, 5, 3, 3)</span> tensor (5→64
+  channels, 3×3) whether it slides over a 16×16 or a 32×32 grid; a bigger grid just applies the <i>same</i> filter
+  more times (more compute). <b>Global-average pooling</b> then collapses any spatial size to a fixed 64-d belief,
+  so no weight tensor ever contains the grid dimension — we checked directly: <b>all 51 actor weight tensors are
+  shape-identical at 16×16 and 32×32</b>. A network that <i>flattened</i> the grid <i>would</i> grow with it; we
+  pool precisely so it doesn't, which is what lets a 16²/4 checkpoint transfer to 32²/10.</p>
 
   <p><b>What actually changes the size</b> is the architecture, not the scale (real counts):</p>
   <table>
