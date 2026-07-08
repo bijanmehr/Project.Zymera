@@ -572,6 +572,12 @@
   weights are <i>shared</i> across the N agents (MARL parameter sharing), so the optimizer only trains 113,957
   distinct actor params (the "Total trainable" in the component table above) — the <span class="sym">× N</span>
   here is the <i>deployed</i> team footprint, N instances of that one network.</p>
+  <p class="meta"><b>Caveat — the weights are shared only in the default.</b> We did try making agents distinct
+  in training (§4.7): <b>B-dico</b> gives each agent an <i>identity-conditioned</i> residual (same weights,
+  keyed on <span class="sym">i/N</span> → unique <i>behaviour</i>), and <b>B-fork</b> uses <i>separate</i>
+  sub-actor weights per group — which genuinely multiplies the trained params by the number of groups (the
+  B-fork row in the architecture table above: 2 groups → 227,914). So the shared 114 k holds for the default
+  runs; individuation is a real, tried option.</p>
   <p class="meta"><b>Why the per-agent size doesn't grow with the grid</b>: a convolution is a small <i>sliding
   filter</i> — the first-layer kernel is a fixed <span class="sym">(64, 5, 3, 3)</span> tensor (5→64 channels,
   3×3) whether it slides over a 16×16 or a 32×32 grid; a bigger grid just applies the <i>same</i> filter more
