@@ -146,58 +146,39 @@
   <p>Sense / Organize / Act are the three corners of a barycentric (ternary) simplex with coordinates <code>(s, o, a)</code>, <code>s + o + a = 1</code>. A pure-corner mission lives at a vertex; <b>real deployments rarely sit at a single corner</b>. Most are <b>composites — points in the interior of the simplex</b>. We place a handful of widely-cited systems by their dominant deliverable; colour encodes the dominant family (blue Sense, green Organize, orange Act, purple composite).</p>
 
   <div class="simplex-wrap">
-    <div class="simplex">
-      <!-- triangle: Sense at top, Organize at bottom-left, Act at bottom-right -->
-      <svg class="tri" viewBox="0 0 100 92" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <!-- gridlines every 0.25 -->
-        <g stroke="#e4e8ec" stroke-width="0.4">
-          <!-- s = const (horizontal-ish lines) -->
-          <line x1="37.5" y1="22.5" x2="62.5" y2="22.5"/>
-          <line x1="25"   y1="45"   x2="75"   y2="45"/>
-          <line x1="12.5" y1="67.5" x2="87.5" y2="67.5"/>
-          <!-- o = const -->
-          <line x1="12.5" y1="67.5" x2="56.25" y2="11.25"/>
-          <line x1="25"   y1="45"   x2="68.75" y2="11.25"/>
-          <line x1="37.5" y1="22.5" x2="81.25" y2="11.25"/>
-          <!-- a = const -->
-          <line x1="87.5" y1="67.5" x2="43.75" y2="11.25"/>
-          <line x1="75"   y1="45"   x2="31.25" y2="11.25"/>
-          <line x1="62.5" y1="22.5" x2="18.75" y2="11.25"/>
-        </g>
-        <!-- triangle outline -->
-        <polygon points="50,0 0,90 100,90" fill="none" stroke="#1a2027" stroke-width="1.1"/>
-      </svg>
-
-      <!-- corner labels -->
-      <div class="corner c-sense">Sense<small>(I) Information Gathering</small></div>
-      <div class="corner c-org"><small style="margin-bottom:1px">Organize</small>(II) Collective Organization</div>
-      <div class="corner c-act">Act<small>(III) Action and Intervention</small></div>
-
-      <!-- dots placed by barycentric (s,o,a); cartesian = (50 - 50o + 50a, 90 - 90s) within the SVG box, mapped to % -->
-      <!-- DARPA SubT (0.40,0.30,0.30): x=50, y=54 -->
-      <span class="dot d-sense" style="left:50%;top:54%"></span>
-      <span class="lab l-sense" style="left:53%;top:54%">DARPA SubT</span>
-
-      <!-- NASA Starling (0.60,0.25,0.15): x=45, y=36 — composite -->
-      <span class="dot d-comp" style="left:45%;top:36%"></span>
-      <span class="lab l-comp" style="left:48%;top:36%">NASA Starling</span>
-
-      <!-- NASA CADRE (0.25,0.70,0.05): x=17.5, y=67.5 — composite -->
-      <span class="dot d-comp" style="left:17.5%;top:67.5%"></span>
-      <span class="lab l-comp" style="left:20.5%;top:62%">NASA CADRE</span>
-
-      <!-- Kilobot (0.10,0.80,0.10): x=15, y=81 -->
-      <span class="dot d-org" style="left:15%;top:81%"></span>
-      <span class="lab l-org" style="left:18%;top:81%">Kilobot</span>
-
-      <!-- TERMES (0.25,0.20,0.55): x=67.5, y=67.5 -->
-      <span class="dot d-act" style="left:67.5%;top:67.5%"></span>
-      <span class="lab l-act" style="left:55%;top:62%">TERMES</span>
-
-      <!-- SAGA (0.10,0.10,0.80): x=85, y=81 -->
-      <span class="dot d-act" style="left:85%;top:81%"></span>
-      <span class="lab l-act" style="left:70%;top:81%">SAGA</span>
-    </div>
+    <svg viewBox="0 0 360 300" width="100%" style="max-width:470px;height:auto;display:block;margin:0 auto" role="img" aria-label="Ternary Sense/Organize/Act simplex; cited systems placed at their exact barycentric (s,o,a) coordinates. Sense apex top, Organize bottom-left, Act bottom-right.">
+      <!-- gridlines every 0.25 (const-s, const-o, const-a) -->
+      <g stroke="#dde4e1" stroke-width="0.8" fill="none">
+        <line x1="75" y1="202" x2="285" y2="202"/><line x1="110" y1="148" x2="250" y2="148"/><line x1="145" y1="95" x2="215" y2="95"/>
+        <line x1="250" y1="255" x2="145" y2="95"/><line x1="180" y1="255" x2="110" y2="148"/><line x1="110" y1="255" x2="75" y2="202"/>
+        <line x1="110" y1="255" x2="215" y2="95"/><line x1="180" y1="255" x2="250" y2="148"/><line x1="250" y1="255" x2="285" y2="202"/>
+      </g>
+      <polygon points="180,42 40,255 320,255" fill="none" stroke="#1a2027" stroke-width="1.4"/>
+      <!-- corner labels (in the margins, outside the triangle) -->
+      <text x="180" y="15" text-anchor="middle" font-weight="700" font-size="13" fill="#2c5a8c">Sense</text>
+      <text x="180" y="29" text-anchor="middle" font-size="10" font-style="italic" fill="#5b6570">(I) Information Gathering</text>
+      <text x="6" y="273" font-weight="700" font-size="13" fill="#256e43">Organize</text>
+      <text x="6" y="287" font-size="10" font-style="italic" fill="#5b6570">(II) Collective Organization</text>
+      <text x="354" y="273" text-anchor="end" font-weight="700" font-size="13" fill="#a86c14">Act</text>
+      <text x="354" y="287" text-anchor="end" font-size="10" font-style="italic" fill="#5b6570">(III) Action &amp; Intervention</text>
+      <!-- dots at exact barycentric positions: x = 180s + 40o + 320a, y = 255 - 213s -->
+      <g stroke="#fff" stroke-width="1.5">
+        <circle cx="180" cy="170" r="5" fill="#3b6ea5"/>
+        <circle cx="166" cy="127" r="5" fill="#7d3a8c"/>
+        <circle cx="89" cy="202" r="5" fill="#7d3a8c"/>
+        <circle cx="82" cy="234" r="5" fill="#2f8f57"/>
+        <circle cx="229" cy="202" r="5" fill="#c98a2b"/>
+        <circle cx="278" cy="234" r="5" fill="#c98a2b"/>
+      </g>
+      <g font-size="11">
+        <text x="189" y="173" fill="#2c5a8c">DARPA SubT</text>
+        <text x="175" y="130" fill="#6a2f78" font-weight="600">NASA Starling</text>
+        <text x="97" y="205" fill="#6a2f78" font-weight="600">NASA CADRE</text>
+        <text x="91" y="237" fill="#256e43">Kilobot</text>
+        <text x="238" y="205" fill="#a86c14">TERMES</text>
+        <text x="287" y="237" fill="#a86c14">SAGA</text>
+      </g>
+    </svg>
     <div class="legend">
       <span><i class="d-sense" style="background:#3b6ea5"></i>Sense</span>
       <span><i class="d-org" style="background:#2f8f57"></i>Organize</span>
@@ -208,7 +189,7 @@
 
   <p>Reading the interior: <b>Kilobot</b> sits close to the Organize corner for programmable self-assembly; <b>SAGA</b> sits close to the Act corner for allocated agricultural intervention; <b>TERMES</b> sits inboard of SAGA, with an additional Organize share carried by its stigmergic construction rules; <b>DARPA SubT</b> sits near the simplex centroid — a Sense-led mission that nonetheless demands a mesh-maintenance Organize layer and active mobility. Two composites sit firmly inside the simplex: <b>NASA CADRE</b>, just above Kilobot, where autonomous formation driving and a mesh among four lunar rovers (Organize) produce a cooperative subsurface radar map (Sense); and <b>NASA Starling</b>, near the Sense corner, which runs cooperative observation over formation maintenance and an in-space MANET together.</p>
 
-  <p class="meta">Approximate deliverable weights <code>(s / o / a)</code> for the photographed anchors: Kilobot <code>(10 / 75 / 15)</code>, NASA CADRE <code>(35 / 60 / 5)</code>, DARPA OFFSET <code>(45 / 20 / 35)</code>, NASA Starling <code>(45 / 45 / 10)</code>.</p>
+  <p class="meta">Deliverable weights <code>(s / o / a)</code> — the exact barycentric coordinates of the dots above: Kilobot <code>(10 / 80 / 10)</code>, NASA CADRE <code>(25 / 70 / 5)</code>, DARPA SubT <code>(40 / 30 / 30)</code>, NASA Starling <code>(60 / 25 / 15)</code>, TERMES <code>(25 / 20 / 55)</code>, SAGA <code>(10 / 10 / 80)</code>.</p>
 
   <!-- ===================== COMPOSITES & STRATA ===================== -->
   <span class="flank" id="composites">composites &amp; strata</span>
