@@ -160,6 +160,7 @@
   <h2 style="margin-top:6px;border:0;padding:0">Every model, part by part</h2>
   <table>
     <tr><th>module · era</th><th>network</th><th>learning</th><th>inputs → outputs</th><th>size</th><th>result</th></tr>
+    <tr><td><b>Credit-driven CTDE · E5 (current)</b></td><td>shared CNN+GNN actor + central CNN critic</td><td>MAPPO-CTDE + difference-reward credit</td><td>5-ch local obs → 9 goal logits (+role, +value)</td><td>~114k / ~39k</td><td class="win">+7–23 cov; relay recovers conn</td></tr>
     <tr><td>Frontier-attention AC · E1</td><td>AC + spatial frontier cross-attention</td><td>PPO (IPPO/CTDE; return-norm)</td><td>grid+agent obs → move + value</td><td>~122k</td><td class="win">97.7% cov; conn 32%</td></tr>
     <tr><td>Compass · Stack 1</td><td>deterministic heuristic</td><td>—</td><td>certainty field → goal cell</td><td>0</td><td>~99%@16 / 76%@32</td></tr>
     <tr><td>ES role-switcher · Stack 2</td><td>MLP 7→16→1 + hysteresis</td><td>OpenAI-ES; mission-safety fitness</td><td>graph-criticality feats → P(relay)</td><td>~145</td><td class="win">cut-vertex relay 94%; transfers</td></tr>
@@ -169,17 +170,19 @@
     <tr><td>GCRN belief · Stack 3</td><td>per-node GRU + message-pass + bilinear</td><td>privileged distillation, BPTT; k-fold</td><td>F_IN=4 → full adjacency</td><td>HID 16</td><td class="win">95.9%@16; 72.5±1.2%@32</td></tr>
     <tr><td>Belief-wired switcher · E4</td><td>11-feat ES MLP + belief relay action</td><td>ES</td><td>local+belief feats → P(relay)+target</td><td>~209</td><td class="lose">64/13 (the wall)</td></tr>
   </table>
+  <p class="meta">The table above is the historical catalog (the E1–E4 old stack — kept because it is <i>why</i> we
+  pivoted). The clips below are the <b>current</b> credit-driven design and its results, not the deprecated stack:</p>
   <div class="two">
-    <figure><img src="assets/figures/curves.png" alt="curves"><figcaption>E1 — PPO training curves.</figcaption></figure>
-    <figure><img src="assets/figures/pareto.png" alt="pareto"><figcaption>E2 — the λ Pareto saturation.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_credit_open_shared.gif" alt="shared reward huddle"><figcaption><b>Shared reward → huddle</b> — agents clump, ~12% covered.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_credit_open_agent.gif" alt="difference-reward sweep"><figcaption><b>Difference-reward credit → sweep</b> — the team fans out, ~77%.</figcaption></figure>
   </div>
   <div class="two">
-    <figure><img src="assets/figures/gnnac.gif" alt="gnnac"><figcaption>E2 — GNN actor-critic (structure-blind → dropped).</figcaption></figure>
-    <figure><img src="assets/figures/swarm32.gif" alt="swarm32"><figcaption>E2/E4 — the 32×32 swarm fragments: the geometric wall.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_relay_open_none.gif" alt="credit no relay"><figcaption><b>Credit, no relay</b> — the comm graph stretches thin as everyone explores.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_hero.gif" alt="anchor relay backbone"><figcaption><b>Active relay backbone</b> — a few hold the graph so the rest spread and stay linked.</figcaption></figure>
   </div>
   <div class="two">
-    <figure><img src="assets/figures/three-stack.gif" alt="three-stack"><figcaption>Stack 1+2 — relay (amber) vs frontier (blue).</figcaption></figure>
-    <figure><img src="assets/figures/transfer32.gif" alt="transfer32"><figcaption>Stack 3 — the size-invariant belief, zero-shot @32.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_best_open_32.gif" alt="best open 32"><figcaption><b>32²/10 open</b> — 10 agents spawn in one corner and disperse across the world.</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_health_crowded_anchor.gif" alt="best crowded 32"><figcaption><b>32²/10 obstacles</b> — the anchor relay holds one connected component (94%).</figcaption></figure>
   </div>
 
   <!-- ================= 5 PAPER ================= -->
