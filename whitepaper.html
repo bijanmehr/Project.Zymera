@@ -427,18 +427,18 @@
       <text x="270" y="248" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">greedy/A* move-to-goal · SLAM · λ̂₂</text>
       <rect x="205" y="280" width="130" height="24" rx="6" fill="#0b1f3a"/>
       <text x="270" y="296" text-anchor="middle" font-family="system-ui" font-size="11.5" font-weight="600" fill="#eaf1fb">environment</text>
-      <g stroke="#0b4fb8" stroke-width="2.2" fill="none" marker-end="url(#dn)">
-        <line x1="240" y1="72" x2="240" y2="109"/><line x1="240" y1="166" x2="240" y2="203"/><line x1="240" y1="260" x2="240" y2="278"/>
+      <g stroke="#0b4fb8" stroke-width="2.4" fill="none" stroke-linecap="round">
+        <line x1="240" y1="76" x2="240" y2="103"/><line x1="240" y1="170" x2="240" y2="197"/><line x1="240" y1="264" x2="240" y2="272"/>
+      </g>
+      <g fill="#0b4fb8">
+        <path d="M233,103 L247,103 L240,111 z"/><path d="M233,197 L247,197 L240,205 z"/><path d="M233,272 L247,272 L240,279 z"/>
       </g>
       <text x="252" y="95" font-family="system-ui" font-size="10.5" fill="#0b4fb8">goal / skill / role</text>
       <text x="252" y="189" font-family="system-ui" font-size="10.5" fill="#0b4fb8">behaviour</text>
       <text x="252" y="273" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#0b4fb8">move a_{i,t}</text>
       <path d="M420,233 H452 V45 H426" fill="none" stroke="#c05512" stroke-width="2.2" stroke-linejoin="round"/>
-      <path d="M424,45 l10,-5 v10 z" fill="#c05512"/>
-      <text x="464" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#c05512" transform="rotate(90 464 150)" text-anchor="middle">belief b_{i,t}</text>
-      <defs>
-        <marker id="dn" markerWidth="9" markerHeight="9" refX="4.5" refY="6" orient="auto"><path d="M1,1 L4.5,6 L8,1" fill="none" stroke="#0b4fb8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
-      </defs>
+      <path d="M420,45 l11,-5.5 v11 z" fill="#c05512"/>
+      <text x="466" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#c05512" transform="rotate(90 466 150)" text-anchor="middle">belief b_{i,t}</text>
     </svg>
     <figcaption><b>Multi-layer cognition.</b> The learned policy (L3) chooses a role/skill/goal from the belief;
     the skill layer (L2) names a behaviour; the scripted controller (L1) turns it into primitive moves and runs
@@ -565,8 +565,12 @@
     <tr><td>24² / 6 agents</td><td>5×24×24</td><td>3×24×24</td><td>113,957 / 38,913 / 152,870</td><td>600</td></tr>
     <tr><td>32² / 10 agents</td><td>5×32×32</td><td>3×32×32</td><td>113,957 / 38,913 / 152,870</td><td>1000</td></tr>
   </table>
-  <p class="meta">A bigger world or team costs more <i>compute</i> (input area × forward passes), not more
-  <i>parameters</i> — which is exactly what makes warm-starting across the ladder legitimate (§4.9).</p>
+  <p class="meta">This is counterintuitive but deliberate, from two mechanisms: (1) all N agents <b>share one
+  actor</b> (MARL parameter sharing) — 4 vs 10 agents is the same network run more times; (2) the backbone
+  <b>global-average-pools</b> its convolutions (<span class="sym">mean</span> over all cells → a fixed 64-d
+  belief), so 16×16 and 32×32 give the same-shaped input to every weight. So a bigger world or team costs more
+  <i>compute</i> (forward passes × input area), not more <i>parameters</i> — which is exactly what makes
+  warm-starting across the ladder legitimate (§4.9).</p>
 
   <p><b>What actually changes the size</b> is the architecture, not the scale (real counts):</p>
   <table>
@@ -655,6 +659,27 @@
     ~8% at scale (a pure huddle), confirming the centralized baseline is load-bearing. (This is also the
     licence, from §2, to use global <span class="sym">λ₂</span> in the <i>training</i> signal.)
   </div>
+
+  <p><b>The full training loss — everything we tuned.</b> The clipped surrogate is only the first term. Actor and
+  critic are trained together against a composite loss, and several of these terms cost real effort to get right:</p>
+
+  <div class="eqrow"><div class="eq key">\mathcal{L}(\theta,\varphi) = \underbrace{L^{\mathrm{CLIP}}}_{\text{policy}} \;+\; c_v\,\underbrace{\big(V_\varphi(s)-\hat{R}\big)^2}_{\text{value}} \;+\; \beta_{\mathrm{aux}}\,\underbrace{\big(\hat{\lambda}_2-\lambda_2\big)^2}_{\text{connectivity aux}} \;+\; c_{\deg}\,\underbrace{\mathrm{Var}_{\text{batch}}(\bar{d})}_{\text{degree reg}} \;-\; c_H\,\underbrace{H(\pi)}_{\text{entropy}}</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button></div></div>
+
+  <dl class="gloss">
+    <dt>L^CLIP — policy</dt><dd>the clipped PPO surrogate (eq. 6) on the goal head — the learning signal proper.</dd>
+    <dt>c_v · value  (c_v = 0.5)</dt><dd>the critic's mean-squared error to the observed return, fitting <span class="sym">V_φ(s)</span>. Half-weighted so it never dominates the policy term.</dd>
+    <dt>β_aux · connectivity aux  (β = 0.1)</dt><dd>a <b>self-supervised auxiliary task</b>: the decentralized estimator <span class="sym">λ̂₂</span> (§2, §4.5) is regressed toward the true <span class="sym">λ₂</span> (privileged distillation). It doesn't change the objective — it <i>shapes the belief</i> to encode connectivity, which is what lets an agent sense it is losing the graph.</dd>
+    <dt>c_deg · degree reg  (c = 1e-3)</dt><dd>a <b>SizeShiftReg-style</b> regularizer: penalize the batch-variance of per-node mean degree, so the network can't key on absolute degree (which grows with team size). It buys the size-shift robustness that makes warm-starting (§4.9) transfer.</dd>
+    <dt>−c_H · entropy  (c = 0.01)</dt><dd>the usual exploration bonus — but a <b>cautionary finding</b>: entropy regularization <i>monotonically hurt</i> coverage in our runs (the exploration reward already prevents collapse), so we keep it minimal/off. A term we deliberately tuned <i>down</i>.</dd>
+  </dl>
+
+  <p>Two standard stabilizers wrap all of it: <b>AdamW</b> with <i>decoupled</i> weight decay
+  (<span class="sym">1e-4</span>) and <b>global-norm gradient clipping</b> (<span class="sym">0.5</span>); optimizer
+  <span class="sym">lr = 3e-4</span>, <span class="sym">γ = 0.99</span>, <span class="sym">GAE-λ = 0.95</span>.
+  Note what is <i>deliberately absent</i>: the connectivity <b>constraint</b> is not a loss term — it enters
+  through the reward via a dual variable updated by ascent (the Lagrangian of §4.8,
+  <span class="sym">lr_λ = 0.05</span>), so the mission constraint and the training objective stay cleanly
+  separated.</p>
 
   <h3>4.3 · Gradients and evolution: why we tried coexisting PPO + ES</h3>
   <p>One thing we <i>tried</i> was training two <b>different optimizers on two different parts of the agent at
