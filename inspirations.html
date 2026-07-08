@@ -35,7 +35,7 @@
 
 <div class="wrap">
   <h1>Inspirations — physics &amp; biology for the redesign</h1>
-  <p class="sub">Cross-disciplinary mechanisms we're drawing on to break the two open walls — getting the team to <b>divide the map</b> (coordination / redundancy) and to <b>stay linked at scale</b> (the connectivity wall). Candidate ideas feeding the proposed <a href="architecture.html">Stack&nbsp;C</a> redesign — not results.</p>
+  <p class="sub">Cross-disciplinary mechanisms we're drawing on to break the two open walls — getting the team to <b>divide the map</b> (coordination / redundancy) and to <b>stay linked at scale</b> (the connectivity wall). These fed the <b>July&nbsp;2026 pivot</b> to the current <a href="architecture.html">credit-driven design</a>; the ideas still live below aim at the two open walls — not results.</p>
 
   <div class="callout key">
     <b>The reframe that filters everything below: this is a small TEAM, not a swarm.</b> At <b>N ≈ 4–16</b> agents, large-N self-organization (ant colonies, starling murmurations, soap-foam coarsening, percolation in the thermodynamic limit) is a <i>statistical</i> effect that doesn't exist at our scale — at best a metaphor. And two obvious "swarm" fixes — a fixed <b>50/50</b> relay/explorer split and <b>role rotation</b> — were <span class="tagfit tried">tried · ruled out</span>. So the inspirations here are filtered for <b>small-N, role-differentiated, position-determined</b> mechanisms.
@@ -59,6 +59,7 @@
   <div class="callout danger">
     <b>Don't misread the rope.</b> The <i>restoring-force</i> reading (a spring that pulls everyone back together) is just the <b>soft tether we already tried</b> — it loses to the hard guardrail and, at the limit, gives the <b>clump</b>. Tension must be a <b>constraint</b> (don't exceed the break budget), <b>not a reward term</b> (a "minimize tension" objective Goodharts into the huddle, as adaptive-λ did). Ropes <b>attach on contact</b>, not as a complete mesh. And the rope is a <i>connectivity/comms</i> idea — it does <b>not</b> fix coverage division.
   </div>
+  <p class="meta"><b>Now partly built.</b> The <i>constraint</i> form of the rope — not the failed "minimize-tension" reward — is instantiated as the <b>Hyper-Singularity / CBF barrier</b> term in the current reward (<a href="whitepaper.html">White&nbsp;Paper §4.4</a>): exactly 0 in the safe zone, stiffening toward ∞ (finite-capped) as a link nears its break range, so an agent is pushed back <i>before</i> the rope snaps — a control-barrier function, not a spring pulling everyone home. It is built but default-off; the elastic-band <b>grace</b> lever (spread to the <i>elastic</i> limit, not the range limit) is still the untried part.</p>
 
   <!-- ============ PHYSICS ============ -->
   <h2>2 · Physics — useful as theory, not as large-N dynamics</h2>
@@ -112,7 +113,7 @@
       <li><b>Maintain <i>rigidity</i>, not just connectivity</b> — the right structural target for a distance-constrained (roped) small team, deployable from range alone.</li>
     </ul>
   </div>
-  <p><b>Honest caveat:</b> this gives the <i>who-holds-the-net</i> law — it does <b>not</b> by itself fix coverage <b>division</b> (the redundancy / flooding problem). That still needs the <b>goal/region action head</b> (so an agent can actually <i>go hold the bridge</i> its structural position assigns it) plus a partition target (foam/Voronoi/CVT). Rigidity + Shapley give the <b>role law</b>; the action-representation change gives the <b>ability to execute it</b>. See <a href="architecture.html">Architecture → Stack&nbsp;C</a>.</p>
+  <p><b>Honest caveat:</b> this gives the <i>who-holds-the-net</i> law — it does <b>not</b> by itself fix coverage <b>division</b> (the redundancy / flooding problem). That still needs the <b>goal/region action head</b> (so an agent can actually <i>go hold the bridge</i> its structural position assigns it) plus a partition target (foam/Voronoi/CVT). Rigidity + Shapley give the <b>role law</b>; the action-representation change gives the <b>ability to execute it</b>. See <a href="architecture.html">Architecture</a>.</p>
 
   <!-- ============ RULED OUT ============ -->
   <h2>6 · Already tried / ruled out</h2>
@@ -125,10 +126,12 @@
     <tr><td><b>Adaptive-λ</b> (Lagrangian on connectivity)</td><td class="lose">degenerates into the all-relay clump (λ→1.5, coverage dies)</td></tr>
     <tr><td><b>Fiedler oracle</b> as a feature</td><td class="lose">null — a perfect global signal didn't help; the limit is the action space</td></tr>
     <tr><td>Per-step <b>1-step move head</b></td><td class="lose">the action-representation bottleneck; can't represent "claim a region"</td></tr>
+    <tr><td><b>Small language model (SLM)</b> in place of the GNN</td><td class="lose">wrong tool for the low-level <i>bridge</i>: an LM is a <i>sequence</i> model, not a <i>graph</i> one — serialising neighbours loses the permutation- and size-invariance that lets one net run at 16²/4 and 32²/10 (or you bolt on graph-attention = a GNN). Its core mechanism, attention, we already tested as the aggregator (<code>--agg multihead</code>) and it was <b>null</b> (max ≈ mean ≈ attention); and it is ~10³× over-parameterised for a 0.15 M-param spatial-control task with no useful pretraining corpus. (Same grounds retired "tiny-LM".)</td></tr>
   </table>
+  <p class="meta"><b>Where a language model <i>would</i> fit — just not here.</b> An SLM / transformer belongs at the <b>high</b> level, not the low-level bridge: mission-conditioning, plan/role reasoning, or the natural-language coordination of the <a href="field-map.html">LLM-agent regime</a> our field map flags as the adjacent frontier — a different (mission&nbsp;#2+) direction, not a replacement for the GNN.</p>
 
   <div class="callout">
-    <b>Status.</b> These are candidate inspirations, grounded in the cited literature, feeding the <a href="architecture.html">Stack&nbsp;C</a> redesign (proposed, not yet approved). They attack the <a href="findings.html">measured</a> walls and the <a href="emergence.html">failure modes</a>, and the rope/AoI &amp; force-chain ideas double as the covert-attack surface for the <a href="whitepaper.html">resilience</a> question. Our prior literature sweeps were arXiv-weighted, so the rigidity, Shapley-MARL, and cooperative-biology threads still owe a targeted robotics-/biology-venue review before any paper claim.
+    <b>Status.</b> These are candidate inspirations, grounded in the cited literature, that fed the current <a href="architecture.html">credit-driven design</a> (post the July&nbsp;2026 pivot); the ones still open aim at the two walls. They attack the <a href="findings.html">measured</a> walls and the <a href="emergence.html">failure modes</a>, and the rope/AoI &amp; force-chain ideas double as the covert-attack surface for the <a href="whitepaper.html">resilience</a> question. Our prior literature sweeps were arXiv-weighted, so the rigidity, Shapley-MARL, and cooperative-biology threads still owe a targeted robotics-/biology-venue review before any paper claim.
   </div>
 
   <div class="footer">Zymera research site · <a href="index.html">home</a></div>
