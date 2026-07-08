@@ -162,10 +162,12 @@
 
   <div class="eqrow"><div class="eq">\tau = (\, s_0,\, a_0,\, s_1,\, a_1,\, \ldots,\, s_H \,)</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button></div></div>
 
-  <p>Because the start state (<span class="sym">ρ₀</span>), the policies (which are <i>stochastic</i> — they
-  sample actions), and the transitions (<span class="sym">T</span>) all involve randomness,
-  <span class="sym">τ</span> is a random object: run the same <span class="sym">π</span> twice and you get two
-  different trajectories. The mission <b>return</b> is the total reward summed along one trajectory, and
+  <p>Because the start state (<span class="sym">ρ₀</span>) is drawn at random and the policies are
+  <i>stochastic</i> (they sample actions), <span class="sym">τ</span> is a random object: run the same
+  <span class="sym">π</span> twice and you get two different trajectories. (In the general Dec-POMDP the
+  transition <span class="sym">T</span> can add further randomness too; in <i>our</i> grid it is nearly
+  deterministic, so <span class="sym">ρ₀</span> and the policies are the operative sources.) The mission
+  <b>return</b> is the total reward summed along one trajectory, and
   <span class="sym">J(π)</span> is its <b>expected value</b> — the probability-weighted average over all
   trajectories <span class="sym">π</span> could produce:</p>
 
