@@ -934,6 +934,28 @@
 
   <div class="eqrow"><div class="eq">\max_{\pi}\ \min_{\lambda \ge 0}\ \big[\, J(\pi) - \lambda\,\big( c(\pi) - c_0 \big) \,\big], \qquad \lambda \leftarrow \big[\, \lambda + \eta\,\big( c(\pi) - c_0 \big) \,\big]_{+}</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button><span class="en">(10)</span></div></div>
 
+  <div class="callout gap">
+    <span class="lab">In plain terms — the Lagrangian, and its "price" λ</span>
+    <p style="margin:0 0 6px">We want to <i>maximize coverage</i> <b>while</b> <i>staying connected</i>. An
+    optimizer can't directly juggle "maximize this, but never break that," so the <b>Lagrangian</b> trick turns
+    the constraint into a <b>price</b>. The dual variable <span class="sym">λ ≥ 0</span> is that price: the reward
+    is docked <span class="sym">λ</span> for every unit the connectivity target is missed
+    (<span class="sym">c(π) − c₀</span> is the shortfall). Now there is just one number to maximize — reward
+    minus price×shortfall — which is the <span class="sym">max_π</span> half of eq. (10).</p>
+    <p style="margin:0 0 6px"><b>Who sets the price?</b> Nobody by hand — it is <i>adaptive</i>, and that is the
+    <span class="sym">min_{λ≥0}</span> half plus the <b>dual-ascent</b> update. Read it as a <b>thermostat</b>:
+    if the policy is <i>violating</i> connectivity (shortfall &gt; 0), push the price <span class="sym">λ</span>
+    <b>up</b> until compliance hurts enough; if it is comfortably satisfying it, let the price <b>drift down</b>
+    (stop over-charging). It is a congestion price that self-tunes to exactly the level the constraint needs.
+    The pair is a <b>saddle point</b>: the policy climbs (max), the price chases it (min), and they settle at a
+    balance where the constraint is just met.</p>
+    <p style="margin:0"><b>What PID-Lagrangian adds.</b> Plain dual ascent is a blunt "raise/lower" that tends to
+    <i>overshoot and oscillate</i> — the price swings, the policy thrashes. <b>PID-Lagrangian</b> [15] replaces
+    it with a PID controller (the same control loop as cruise-control): it moves the price using the shortfall's
+    size (P), its build-up over time (I), and its rate of change (D), so the price adjusts <i>smoothly</i>. It
+    stabilizes the dynamics — it does not change <i>where</i> they settle, which matters next.</p>
+  </div>
+
   <p>The dual-ascent update needs a <i>violation</i> <span class="sym">c(π) − c₀ &gt; 0</span> to raise
   <span class="sym">λ</span>. But the huddle never violates connectivity — it only fails to cover — so
   empirically <span class="sym">λ</span> stayed flat (≈ 0.30 → 0.30, violation ≈ 0) and the controller was
