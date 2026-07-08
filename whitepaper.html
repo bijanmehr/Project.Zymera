@@ -44,6 +44,11 @@
   .callout.danger .lab{color:var(--bad)} .callout.warnbox .lab{color:var(--warn)}
   /* figures */
   figure svg{max-width:100%;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+  .gal figure{margin:0}
+  .gal img{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;display:block}
+  .gal figcaption{font-size:12px;color:var(--mut);margin-top:5px;text-align:center}
+  @media(max-width:680px){.gal{grid-template-columns:1fr 1fr}}
   /* glossary + refs */
   .gloss dt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.8px;font-weight:700;color:var(--accent-d);margin:13px 0 2px}
   .gloss dd{margin:0;font-size:13.8px;color:#3a4652}
@@ -411,8 +416,7 @@
   <b>multi-layer cognition</b>, so learning is spent only where it earns its keep:</p>
 
   <figure>
-    <svg viewBox="0 0 560 296" role="img" aria-labelledby="figstk">
-      <title id="figstk">Multi-layer cognition: L3 decision on top, then L2 skills, then L1 controller and perception, then the environment; decisions flow down the centre, the belief flows up the right margin outside the boxes.</title>
+    <svg viewBox="0 0 560 316" role="img" aria-label="Multi-layer cognition stack: L3 decision on top, then L2 skills, then L1 controller and perception, then the environment; decisions flow down the centre, the belief flows up the right margin outside the boxes.">
       <rect x="120" y="18" width="300" height="54" rx="10" fill="#eaf1fb" stroke="#1f6feb" stroke-width="1.5"/>
       <text x="270" y="41" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">L3 · Decision  (learned)</text>
       <text x="270" y="60" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">pick a role · a skill · a goal — from the belief</text>
@@ -470,8 +474,7 @@
   the expected future return, with weights <span class="sym">φ</span>. The actor decides; the critic grades.</p>
 
   <figure>
-    <svg viewBox="0 0 620 300" role="img" aria-labelledby="figac">
-      <title id="figac">Actor-critic: the actor maps a local observation to action probabilities; the critic maps the global state to a scalar value; their difference is the advantage.</title>
+    <svg viewBox="0 0 620 300" role="img" aria-label="Actor-critic architecture: the actor maps a local observation to action probabilities; the critic maps the global state to a scalar value; their difference is the advantage.">
       <rect x="12" y="44" width="92" height="50" rx="7" fill="#eef1f4" stroke="#7a8794"/>
       <text x="58" y="65" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">local obs</text>
       <text x="58" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">o_{i,t}: 5×H×W</text>
@@ -514,6 +517,31 @@
     <span class="sym">φ</span>; at deployment the critic is discarded and only the actor runs, on local obs.</figcaption>
   </figure>
 
+  <p><b>Inside the actor: a CNN, then a GNN — and the order is the point.</b></p>
+  <ul>
+    <li><b>CNN — local perception.</b> Each agent's input is a 5-channel map (its own position, covered cells,
+    walls, other agents, the field boundary). A small convolutional net reads that grid: convolutions exploit
+    spatial locality and translation-equivariance — a wall is a wall wherever it sits — which a flat MLP would
+    discard, and it pools the map to one feature vector: "what I, alone, can see."</li>
+    <li><b>GNN — message-passing, and why it matters most.</b> This is the multi-agent part, and it <i>is</i>
+    the <b>bridge</b> layer of §1. The in-range agents form the graph <span class="sym">G_t</span>; the GNN
+    passes messages along its edges — each agent updates its feature by aggregating its neighbours' features (the
+    <span class="sym">Agg</span> operator, eq. 3), for two rounds. So an agent's final 64-d belief is not just
+    what it sees but what its neighbours see, one or two hops out. Three reasons it is load-bearing: (1) it is
+    the <i>only</i> channel coordination information can cross — cut the graph and each agent is blind to the
+    team; (2) it makes the belief <i>connectivity-aware</i> — an agent can feel itself losing neighbours,
+    exactly what a relay needs to decide to hold; (3) it is naturally <b>size-invariant</b> — the same weights
+    run on a graph of any size or shape, which is why (the counts below) 16²/4 and 32²/10 use one identical
+    network. This CNN→GNN stack is the LPAC (Learnable Perception–Action–Communication) pattern.</li>
+  </ul>
+  <p><b>What is <span class="sym">V</span>?</b> The critic's output <span class="sym">V_φ(s)</span> is the
+  <b>value function</b>: from the global state <span class="sym">s</span> it predicts the <i>expected total
+  remaining team reward</i> under the current policy — one number, a grade for the situation, not an action. Its
+  whole job is to be the baseline in the advantage <span class="sym">Â_t = return − V_φ(s_t)</span>: subtracting
+  "how good this state is on average" isolates "how much better this action was than average," which is what
+  cuts the variance of the policy-gradient step. It sees the whole board (centralized) and is discarded at
+  deployment — the running agent never computes a value.</p>
+
   <p><b>How big is it?</b> Real counts from the built model (width 64, depth 2, 2 message-passing rounds).
   The actor's input is a <b>5-channel</b> egocentric map (<span class="sym">5×H×W</span>); the critic's is the
   <b>3-channel</b> global map; both pool to a 64-dimensional belief. Outputs: 9 goal-candidate logits (plus a
@@ -528,6 +556,36 @@
     <tr><td><b>Critic</b> — CNN over the 3-channel global map → scalar</td><td><b>38,913</b></td><td>centralized, <i>training-only</i>, discarded at deployment</td></tr>
     <tr><td><b>Total trainable</b></td><td><b>152,870</b></td><td>≈ 0.15 M</td></tr>
   </table>
+
+  <p><b>Same network, every scale.</b> Parameters are identical across world sizes <i>and</i> team sizes — the
+  size-invariant backbone plus parameter sharing mean one net serves every rung; only the input grid and the
+  number of forward passes grow (verified by building the model at each rung):</p>
+  <table>
+    <tr><th>Rung</th><th>actor in</th><th>critic in</th><th>actor / critic / total</th><th>fwd passes · 100-step ep</th></tr>
+    <tr><td>16² / 4 agents</td><td>5×16×16</td><td>3×16×16</td><td>113,957 / 38,913 / 152,870</td><td>400</td></tr>
+    <tr><td>24² / 6 agents</td><td>5×24×24</td><td>3×24×24</td><td>113,957 / 38,913 / 152,870</td><td>600</td></tr>
+    <tr><td>32² / 10 agents</td><td>5×32×32</td><td>3×32×32</td><td>113,957 / 38,913 / 152,870</td><td>1000</td></tr>
+  </table>
+  <p class="meta">A bigger world or team costs more <i>compute</i> (input area × forward passes), not more
+  <i>parameters</i> — which is exactly what makes warm-starting across the ladder legitimate (§4.9).</p>
+
+  <p><b>What actually changes the size</b> is the architecture, not the scale (real counts):</p>
+  <table>
+    <tr><th>Variant</th><th>actor</th><th>critic</th><th>total</th></tr>
+    <tr><td>width 64 (default)</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
+    <tr><td>width 128</td><td>431,973</td><td>151,553</td><td>583,526</td></tr>
+    <tr><td>width 256</td><td>1,682,405</td><td>598,017</td><td>2,280,422</td></tr>
+    <tr><td>depth 3 (extra conv layer)</td><td>150,885</td><td>75,841</td><td>226,726</td></tr>
+    <tr><td>message-passing rounds 3</td><td>134,693</td><td>38,913</td><td>173,606</td></tr>
+    <tr><td><b>neighbour-attention</b> (agg = multihead)</td><td>113,957</td><td>38,913</td><td class="win">152,870 — no change</td></tr>
+    <tr><td>edge-distance messages</td><td>114,213</td><td>38,913</td><td>153,126</td></tr>
+    <tr><td>B-fork ×2 (grouped sub-actors)</td><td>227,914</td><td>38,913</td><td>266,827</td></tr>
+  </table>
+  <p class="meta"><b>Width</b> is the dominant lever (≈ 4× per doubling). <b>Attention costs nothing</b>: the
+  multihead aggregator's query/key projections are <i>always</i> built into the backbone, so switching it on
+  reuses parameters already there. B-fork multiplies the actor by the number of groups; the shared critic is
+  untouched.</p>
+
   <p class="meta"><b>How heavy:</b> ≈ <b>0.15 M</b> parameters total — tiny by deep-learning standards (a ResNet-50
   is ~25 M, ~160× larger). The backbone is 71% of the actor; the GRU is the next largest and is off by default,
   so a typical run is lighter still. One shared actor runs a forward pass per agent per step (N = 4–10), so a full
@@ -599,13 +657,15 @@
     licence, from §2, to use global <span class="sym">λ₂</span> in the <i>training</i> signal.)
   </div>
 
-  <h3>4.3 · Gradients vs evolution: PPO and ES, and how they coexist</h3>
-  <p>PPO is a <i>gradient</i> method: it needs a differentiable objective and assigns credit through the
-  advantage. That fits the dense, continuous executor policy, but is weakest exactly where our hardest choice
-  lives — a <b>small, discrete, sparsely-rewarded role-selector</b> (L3) whose effect on the mission return is
-  delayed and non-smooth. There a <i>black-box</i> optimiser is the better tool. <b>Evolution strategies</b>
-  (OpenAI-ES) [6] treat the return as an opaque score: perturb the weights with Gaussian noise, keep what scores
-  well, and estimate a search direction from the outcomes —</p>
+  <h3>4.3 · Gradients and evolution: why we tried coexisting PPO + ES</h3>
+  <p>One thing we <i>tried</i> was training two <b>different optimizers on two different parts of the agent at
+  once</b>. The motivation is a real mismatch, not a whim. PPO is a <i>gradient</i> method: it needs a
+  differentiable objective and assigns credit through the advantage — ideal for the dense, continuous executor
+  policy, but weakest exactly where our hardest choice lives: a <b>small, discrete, sparsely-rewarded
+  role-selector</b> (L3) whose effect on the mission return is delayed and non-smooth. A gradient through that
+  is faint and noisy — the selector barely learns. There a <i>black-box</i> optimizer is the natural tool.
+  <b>Evolution strategies</b> (OpenAI-ES) [6] treat the return as an opaque score: perturb the weights with
+  Gaussian noise, keep what scores well, and estimate a search direction from the outcomes —</p>
 
   <div class="eqrow"><div class="eq">\nabla_\theta\, \mathbb{E}_{\epsilon}\!\big[\, F(\theta + \sigma\epsilon) \,\big] = \tfrac{1}{\sigma}\, \mathbb{E}_{\epsilon \sim \mathcal{N}(0,\,I)}\!\big[\, F(\theta + \sigma\epsilon)\, \epsilon \,\big]</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button><span class="en">(8)</span></div></div>
 
@@ -618,8 +678,9 @@
     <li><b>A shared team return.</b> Both are scored by the same mission outcome, so they pull toward one
     objective rather than competing proxies.</li>
     <li><b>Timescale separation.</b> ES is the slow outer loop (one selector generation spans many PPO updates) —
-    the classic evolutionary-RL hybrid (ERL, CEM-RL). Empirically the pairing composes: an ES-elite selector on
-    top of a CTDE-trained executor beat either alone at 16×16/4.</li>
+    the classic evolutionary-RL hybrid (ERL, CEM-RL). In our first test the pairing <i>composed</i> — an ES-elite
+    selector on a CTDE-trained executor beat either alone at 16×16/4 — a small-scale, preliminary result we have
+    not yet pushed to scale.</li>
   </ul>
   <p>Two more results on this axis, for completeness: fully independent learners (IPPO) matched CTDE at small
   scale, and both beat a fully centralized joint policy — decentralized execution is competitive, not merely a
@@ -639,7 +700,7 @@
     <tr><td><b>connectivity</b> <span class="sym">ρ_reach</span></td><td>+2.0</td><td>each agent's reach-fraction — the share of the team it can still reach</td><td>weighted 2× coverage; a "scale-huddle" suspect</td></tr>
     <tr><td><b>collision</b></td><td>−4.0</td><td>two agents on one cell</td><td>keeps footprints disjoint</td></tr>
     <tr><td>anti-overlap / bump</td><td>small</td><td>shaping toward fresh ground</td><td>2nd-order</td></tr>
-    <tr><td>connectivity-floor barrier <span class="meta">(Hyper-Singularity)</span></td><td>opt. (off)</td><td>a finite "wall" that rises as a link nears its break range — a silent per-agent floor that composes with every other term</td><td>built; default-off, not yet isolated</td></tr>
+    <tr><td>connectivity-floor barrier <span class="meta">(Hyper-Singularity, CBF)</span></td><td>opt. (off)</td><td>a CBF-style <b>spring</b>: 0 in the safe zone, stiffening toward ∞ (finite-capped) as a link nears its break range — pushes the agent back <i>before</i> connectivity is lost</td><td>built; default-off, not yet isolated</td></tr>
     <tr><td>congestion price <span class="meta">(free-market)</span></td><td>opt. (off)</td><td>per-agent penalty for picking a skill its in-range neighbours also picked — anti-collapse for the selector</td><td>built; not yet swept at scale</td></tr>
     <tr><td>exploration info-gain <span class="sym">einfo</span></td><td>opt.</td><td>uncovered cells in sensor range</td><td class="lose">⚠ reward-hacked (below)</td></tr>
   </table>
@@ -649,7 +710,7 @@
     <dt>w_connectivity · ρ_reach (+2.0)</dt><dd>each agent's <i>reach-fraction</i>: the share of the rest of the team it can still reach over the comm graph. A local, per-agent proxy — no global <span class="sym">λ₂</span> at run time (§2). Weighted 2× coverage, itself a "scale-huddle" suspect: over-pay proximity and the team clumps.</dd>
     <dt>w_collision (−4.0)</dt><dd>penalty for two agents on one cell — reinforces the disjoint partition coverage wants.</dd>
     <dt>anti_overlap</dt><dd>optional shaping: subtract a penalty proportional to same-step overlap (two agents claiming the same fresh cell at once). A 2nd-order nudge toward non-overlapping ground.</dd>
-    <dt>barrier_* (Hyper-Singularity)</dt><dd>a per-agent connectivity <i>floor</i>: exactly 0 while a link is safely in range, rising explosively-but-finitely as a link nears its break distance, capped at a ceiling. A silent guard that composes with every other term; strength <span class="sym">k = barrier_weight</span>, off (0) by default.</dd>
+    <dt>barrier_* (Hyper-Singularity)</dt><dd>a <b>control-barrier-function (CBF)</b> idea we tried for connectivity: a per-agent term that is exactly 0 while a link is safely in range, then stiffens like a <b>spring</b> — rising toward <b>infinity (finite-capped)</b> as the link approaches its break distance — so the agent is pushed back <i>before</i> the link snaps, not penalised after it does (a "keep-out" barrier on the unsafe set, in CBF terms). Composes silently with every other term; strength <span class="sym">k = barrier_weight</span>, off (0) by default; built for a Phase-2′ safety floor, not yet isolated.</dd>
     <dt>congestion (free-market price)</dt><dd>a per-agent penalty for picking a skill that in-range neighbours also picked — a local congestion price that stops the team collapsing onto one skill. Off by default; pairs with the L2 selector.</dd>
     <dt>explore_infogain (einfo)</dt><dd>optional bonus for uncovered cells within sensor range — the reward-hacking example below (it pays for <i>proximity</i>, not entry).</dd>
     <dt>soft_lambda_penalty</dt><dd>when the connectivity mechanism is <span class="sym">soft_lambda</span> (§4.8), the weight on the λ-penalty added to the reward — the reward form of that mechanism.</dd>
@@ -837,6 +898,15 @@
     range <b>pinned at <span class="sym">comm_r = 5</span></b> across both. A hard-won lesson: let
     <span class="sym">comm_r</span> drift with scale and it silently confounds every connectivity comparison.
     Coverage is <b>visit-only</b> (<span class="sym">cover_r = 0</span>); horizon <span class="sym">H = 100</span>.</li>
+    <li><b>Warm-start (the scale ladder), and why it is legitimate.</b> We do not train 32²/10 from scratch — we
+    train the cheap 16²/4 rung first and <i>warm-start</i> the larger rung from those weights. This is
+    mathematically clean, not a hack: §4.2 showed the parameter count is <b>byte-identical at every scale</b>
+    (the conv-plus-global-pool + graph backbone has shapes that depend on channels/width/depth, never on grid or
+    agent count), so a small-rung weight tensor drops <i>exactly</i> into the large-rung model — same parameter
+    space, a valid initialization, no reshaping or re-init. Why we do it: it is a curriculum (easy → hard) and a
+    far faster path to convergence (≈ 26× in wall-clock in our runs). The one condition is that
+    <span class="sym">comm_r</span> stays pinned across rungs, so the two share the same objective and the
+    transfer is meaningful.</li>
     <li><b>Seeds.</b> At least two seeds per cell, mean reported. Coverage is seed-stable; connectivity is not
     (the 51%-vs-77% spread of §6), so connectivity claims are <i>held</i>, not headlined.</li>
     <li><b>Evaluation.</b> Always by <i>sampling</i> the stochastic policy at <span class="sym">ε = 0</span>,
@@ -850,6 +920,19 @@
     <li><b>One axis at a time.</b> Every result varies a single row of the §3 table against a fixed baseline, so
     a change is <i>attributable</i> — the reason a "null lever" can be called null with a straight face.</li>
   </ul>
+
+  <p><b>Representative best rollouts.</b> The strongest run we have for each terrain at each scale (sampled
+  <span class="sym">π</span>, <span class="sym">ε = 0</span>). Open floor is where dispersion works best;
+  corridors and dense obstacles are progressively harder, and absolute coverage at 32²/10 is capped by the
+  visit budget (§6) — so read these as %-of-achievable, not %-of-map:</p>
+  <div class="gal">
+    <figure><img loading="lazy" src="assets/gifs/v3_credit_open_agent.gif" alt="best open 16²/4"><figcaption><b>Open · 16²/4</b><br>77% covered · connected</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_best_rooms_16.gif" alt="best corridors 16²/4"><figcaption><b>Corridors · 16²/4</b><br>37% covered · 95% conn</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_best_crowded_16.gif" alt="best obstacles 16²/4"><figcaption><b>Obstacles · 16²/4</b><br>46% covered · connected</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_best_open_32.gif" alt="best open 32²/10"><figcaption><b>Open · 32²/10</b><br>28% covered · 92% conn</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_best_rooms_32.gif" alt="best corridors 32²/10"><figcaption><b>Corridors · 32²/10</b><br>23% covered · 100% conn</figcaption></figure>
+    <figure><img loading="lazy" src="assets/gifs/v3_health_crowded_anchor.gif" alt="best obstacles 32²/10"><figcaption><b>Obstacles · 32²/10</b><br>13% · anchor relay · 94% conn</figcaption></figure>
+  </div>
 
   <span class="flank" id="s5">05 · turning points</span>
   <h2 style="margin-top:6px;border:0;padding:0">Three turning points</h2>
