@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Zymera — Architecture</title>
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  figure svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff;display:block;margin:8px auto}
+  figure{margin:20px 0;text-align:center}
+</style>
 </head>
 <body>
 <div class="nav"><div class="nav-inner">
@@ -35,6 +39,37 @@
 
   <h2>The three layers <span class="tag">multi-layer cognition</span></h2>
 
+  <figure>
+    <svg viewBox="0 0 560 316" role="img" aria-label="Multi-layer cognition stack: L3 decision on top, then L2 skills, then L1 controller and perception, then the environment; decisions flow down the centre, the belief flows up the right margin outside the boxes.">
+      <rect x="120" y="18" width="300" height="54" rx="10" fill="#eaf1fb" stroke="#1f6feb" stroke-width="1.5"/>
+      <text x="270" y="41" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">L3 · Decision  (learned)</text>
+      <text x="270" y="60" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">pick a role · a skill · a goal — from the belief</text>
+      <rect x="120" y="112" width="300" height="54" rx="10" fill="#e6f3ef" stroke="#1b7f76" stroke-width="1.5"/>
+      <text x="270" y="135" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#12695f">L2 · Skills  (library)</text>
+      <text x="270" y="154" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">disperse · relay-backbone · flock</text>
+      <rect x="120" y="206" width="300" height="54" rx="10" fill="#eef1f4" stroke="#7a8794" stroke-width="1.5"/>
+      <text x="270" y="229" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#3a4652">L1 · Controller + perception  (scripted)</text>
+      <text x="270" y="248" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">greedy/A* move-to-goal · SLAM · λ̂₂</text>
+      <rect x="205" y="280" width="130" height="24" rx="6" fill="#0b1f3a"/>
+      <text x="270" y="296" text-anchor="middle" font-family="system-ui" font-size="11.5" font-weight="600" fill="#eaf1fb">environment</text>
+      <g stroke="#0b4fb8" stroke-width="2.4" fill="none" stroke-linecap="round">
+        <line x1="240" y1="76" x2="240" y2="103"/><line x1="240" y1="170" x2="240" y2="197"/><line x1="240" y1="264" x2="240" y2="272"/>
+      </g>
+      <g fill="#0b4fb8">
+        <path d="M233,103 L247,103 L240,111 z"/><path d="M233,197 L247,197 L240,205 z"/><path d="M233,272 L247,272 L240,279 z"/>
+      </g>
+      <text x="252" y="95" font-family="system-ui" font-size="10.5" fill="#0b4fb8">goal / skill / role</text>
+      <text x="252" y="189" font-family="system-ui" font-size="10.5" fill="#0b4fb8">behaviour</text>
+      <text x="252" y="273" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#0b4fb8">move a_{i,t}</text>
+      <path d="M420,233 H452 V45 H426" fill="none" stroke="#c05512" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M420,45 l11,-5.5 v11 z" fill="#c05512"/>
+      <text x="466" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#c05512" transform="rotate(90 466 150)" text-anchor="middle">belief b_{i,t}</text>
+    </svg>
+    <figcaption>The learned policy (L3) chooses a role/skill/goal from the belief; the skill layer (L2) names a
+    behaviour; the scripted controller (L1) turns it into primitive moves and runs perception. Decisions flow
+    down (blue); the belief flows up (orange). Only L2–L3 are learned.</figcaption>
+  </figure>
+
   <h3>L1 · Execution &amp; perception <span class="tag">heuristic · 0 learned params</span></h3>
   <p><b>Motion:</b> A* to a goal cell, collision avoidance, and the relay controllers — <i>hold</i> (a static beacon that keeps the bridge from where it stands) and <i>λ₂-anchor</i> (actively climb local connectivity). <b>Perception, always on:</b> a SLAM / occupancy belief (the neighbour-fused map), a <b>geodesic distance field</b> over that belief (true reach cost with walls respected — not Euclidean), and a decentralized <b>λ̂₂ (Fiedler) estimator</b> — how load-bearing each agent is to the comm graph. These are <b>capabilities, not choices</b>: rich, always available, never selected.</p>
 
@@ -48,6 +83,59 @@
 
   <h3>L3 · The decision <span class="tag">learned · credit-driven</span></h3>
   <p>One head picks each agent's role — <b>explorer (CVT)</b> vs <b>relay</b> — trained by <b>per-agent marginal credit</b>. Roles are <b>load-bearing and self-sizing</b>: a redundant relay earns ≈0 and flips to exploring, so the right relay count emerges per map instead of being an authored number. This is the deliberate reversal of the deprecated "roles emerge from a flat, homogeneous policy" proposal — our own experiments showed a homogeneous policy will <i>not</i> hold connectivity, because nothing chooses to hold.</p>
+
+  <h2>The learned policy — a compact actor–critic <span class="tag">CTDE</span></h2>
+  <p>L2–L3 are one small network trained with MAPPO under CTDE: a <b>shared actor</b> mapping each agent's local
+  observation to action logits, and a <b>centralized critic</b> that scores the global state during training only
+  (discarded at deployment). The backbone is <b>CNN local perception → GNN message-passing</b> — the comm graph is
+  the bridge along which agents fuse neighbours' features — pooled to a 64-d belief. That pooling makes it
+  <i>size-invariant</i>: one network serves every world and team size.</p>
+
+  <figure>
+    <svg viewBox="0 0 620 300" role="img" aria-label="Actor-critic architecture: the actor maps a local observation to action probabilities; the critic maps the global state to a scalar value; their difference is the advantage.">
+      <rect x="12" y="44" width="92" height="50" rx="7" fill="#eef1f4" stroke="#7a8794"/>
+      <text x="58" y="65" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">local obs</text>
+      <text x="58" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">o_{i,t}: 5×H×W</text>
+      <rect x="140" y="38" width="146" height="62" rx="8" fill="#eaf1fb" stroke="#1f6feb"/>
+      <text x="213" y="63" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">Actor  π_θ</text>
+      <text x="213" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">CNN+GNN · 64d · ≈114k</text>
+      <rect x="322" y="44" width="150" height="50" rx="7" fill="#fff" stroke="#1f6feb"/>
+      <text x="397" y="64" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">π_θ(·|o)</text>
+      <text x="397" y="81" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">9 goal logits</text>
+      <text x="540" y="62" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">sample</text>
+      <text x="540" y="78" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#3a4652">a_{i,t}</text>
+      <rect x="12" y="206" width="92" height="50" rx="7" fill="#eef1f4" stroke="#7a8794"/>
+      <text x="58" y="227" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">global state</text>
+      <text x="58" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#12695f">s: 3×H×W</text>
+      <rect x="140" y="200" width="146" height="62" rx="8" fill="#e6f3ef" stroke="#1b7f76"/>
+      <text x="213" y="225" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#12695f">Critic  V_φ</text>
+      <text x="213" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">CNN · 64d · ≈39k</text>
+      <rect x="322" y="206" width="150" height="50" rx="7" fill="#fff" stroke="#1b7f76"/>
+      <text x="397" y="226" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#12695f">V_φ(s)</text>
+      <text x="397" y="243" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">scalar value</text>
+      <g stroke="#3a4652" stroke-width="1.7" fill="none" marker-end="url(#fw2)">
+        <line x1="106" y1="69" x2="137" y2="69"/><line x1="288" y1="69" x2="319" y2="69"/><line x1="474" y1="69" x2="506" y2="69"/>
+        <line x1="106" y1="231" x2="137" y2="231"/><line x1="288" y1="231" x2="319" y2="231"/>
+      </g>
+      <rect x="322" y="128" width="204" height="40" rx="7" fill="#fff7e6" stroke="#b7791f"/>
+      <text x="424" y="146" text-anchor="middle" font-family="system-ui" font-size="11.5" font-weight="600" fill="#8a5a10">advantage</text>
+      <text x="424" y="161" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#8a5a10">Â_t = return − V_φ(s_t)</text>
+      <g stroke="#b7791f" stroke-width="1.6" fill="none" marker-end="url(#av2)"><line x1="397" y1="204" x2="397" y2="170"/><line x1="424" y1="126" x2="424" y2="98"/></g>
+      <text x="432" y="116" font-family="system-ui" font-size="10.5" fill="#8a5a10">→ actor's loss</text>
+      <defs>
+        <marker id="fw2" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1,1 L7,4 L1,7 z" fill="#3a4652"/></marker>
+        <marker id="av2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1.5,1 L8,4.5 L1.5,8 z" fill="#b7791f"/></marker>
+      </defs>
+    </svg>
+    <figcaption>The <span style="color:#0b4fb8">actor</span> (shared by all agents) turns a local observation into
+    action probabilities; the <span style="color:#12695f">critic</span> turns the global state into one value
+    (training only). Their gap is the advantage that scales the actor's update; the critic is discarded at deployment.</figcaption>
+  </figure>
+
+  <p class="meta"><b>Size:</b> ≈ 114k actor params (shared across all N agents) + ≈ 39k critic (training-only) ≈
+  <b>0.15 M</b> — tiny, size-invariant, CPU-runnable. The full technical build-out — CNN/GNN internals, exact
+  parameter tables, the composite training loss (policy + value + connectivity-aux + regularizers), the
+  Lagrangian, and the adversarial threat model — is in the <a href="whitepaper.html">White Paper, §4</a>.</p>
 
   <h2>The training signal — difference-reward credit <span class="tag">the coverage lever</span></h2>
   <p>Each agent is paid its <b>marginal contribution</b> <code>D<sub>i</sub> = G(team) − G(team without i)</code>, not one shared team reward. At <code>cover_r = 0</code> that is the fresh cells <i>only it</i> covered (coverage) plus its Fiedler-centrality (connectivity). This is the <b>coverage lever</b>: it breaks the <b>huddle</b> (agents clumped — connectivity satisfied, coverage dead) into a <b>sweep</b>, <b>+7 to +23 coverage points at 32²/10, 2–6×</b> over a shared reward (see <a href="findings.html">findings</a>). Under CTDE the central critic still trains on the team return; only the <i>policy</i> advantage becomes per-agent.</p>
