@@ -389,7 +389,7 @@
   <table>
     <tr><th>Axis</th><th>What it sets (formal → plain)</th><th>Options we actually ran</th><th>§</th></tr>
     <tr><td><b>Learning / optimizer</b></td><td><span class="sym">argmax_θ J(π_θ)</span> — how the weights improve</td><td>MAPPO-CTDE (main) · IPPO · joint policy · evolution strategies (coexisting)</td><td>4.2–4.3</td></tr>
-    <tr><td><b>Reward &amp; credit</b></td><td>the per-agent training signal from <span class="sym">R</span> — what each agent is <i>paid for</i></td><td>shared team return · <b>difference reward</b> <span class="sym">D_i</span> · term weights</td><td>4.4</td></tr>
+    <tr><td><b>Reward &amp; credit</b></td><td>the per-agent training signal from <span class="sym">R</span> — what each agent is <i>paid for</i></td><td><b>credit:</b> shared return vs per-agent difference reward <span class="sym">D_i</span> · <b>terms:</b> coverage · reach-connectivity · collision · anti-overlap · conn-floor barrier · congestion price · info-gain</td><td>4.4</td></tr>
     <tr><td><b>Perception &amp; belief</b></td><td>the input <span class="sym">x_{i,t}</span> and memory <span class="sym">h_{i,t}</span> — what it sees and remembers</td><td>frontier attention · occupancy belief · size-invariant graph belief (GCRN) · <span class="meta">(null: neighbor-attn, features, recurrence)</span></td><td>4.5</td></tr>
     <tr><td><b>Aggregation</b></td><td>the bridge operator <span class="sym">Agg_i</span> — how neighbor messages fuse</td><td>sum · mean · max · attention</td><td>4.3</td></tr>
     <tr><td><b>Action abstraction</b></td><td>what the learned policy commits to; a low-level <b>controller</b> renders it into the primitive moves <span class="sym">A_i</span></td><td>short-horizon goal-pointer + greedy controller (current) · <span class="meta">frontier/region-pointer + A* (proposed)</span></td><td>4.6</td></tr>
@@ -619,8 +619,14 @@
     <tr><td><b>connectivity</b> <span class="sym">ρ_reach</span></td><td>+2.0</td><td>each agent's reach-fraction — the share of the team it can still reach</td><td>weighted 2× coverage; a "scale-huddle" suspect</td></tr>
     <tr><td><b>collision</b></td><td>−4.0</td><td>two agents on one cell</td><td>keeps footprints disjoint</td></tr>
     <tr><td>anti-overlap / bump</td><td>small</td><td>shaping toward fresh ground</td><td>2nd-order</td></tr>
-    <tr><td>exploration info-gain</td><td>opt.</td><td>uncovered cells in sensor range</td><td class="lose">⚠ reward-hacked (below)</td></tr>
+    <tr><td>connectivity-floor barrier <span class="meta">(Hyper-Singularity)</span></td><td>opt. (off)</td><td>a finite "wall" that rises as a link nears its break range — a silent per-agent floor that composes with every other term</td><td>built; default-off, not yet isolated</td></tr>
+    <tr><td>congestion price <span class="meta">(free-market)</span></td><td>opt. (off)</td><td>per-agent penalty for picking a skill its in-range neighbours also picked — anti-collapse for the selector</td><td>built; not yet swept at scale</td></tr>
+    <tr><td>exploration info-gain <span class="sym">einfo</span></td><td>opt.</td><td>uncovered cells in sensor range</td><td class="lose">⚠ reward-hacked (below)</td></tr>
   </table>
+  <p class="meta">Two further connectivity-side knobs round out the reward accounting: a <b>soft-<span class="sym">λ₂</span>
+  penalty</b> term (the reward form of the §4.8 masking mechanism, used when the mechanism is <span class="sym">soft_lambda</span>)
+  and a <b>normalized-coverage</b> option (divide the coverage term by the free-cell count). Both are minor and left at
+  their defaults for the runs reported here.</p>
 
   <p><b>A cautionary term.</b> An "information-gain" bonus (<span class="sym">einfo</span>) that paid for
   <i>uncovered cells within sensor range</i> looked principled and <i>reward-hacked</i>: the optimum is to sit
