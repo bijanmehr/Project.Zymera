@@ -558,26 +558,26 @@
     <tr><td><b>Total trainable</b></td><td><b>152,870</b></td><td>≈ 0.15 M</td></tr>
   </table>
 
-  <p><b>Model size across the setups</b> — the numbers you actually want, in one table. All agents <b>share one
-  actor</b> and the backbone is grid-independent (global-average pooling), so the counts are the same at every
-  world and team size:</p>
+  <p><b>Model size across the setups.</b> The setup total is one agent's parameters <b>times the number of
+  agents</b> (plus the shared critic) — 10 agents is 10× one agent. What stays fixed is the <i>per-agent</i> count
+  across <i>world</i> sizes (the backbone is grid-independent, explained below):</p>
   <table>
-    <tr><th>Setup (world · agents)</th><th>per agent (shared actor)</th><th>critic (training)</th><th>total for the setup</th></tr>
-    <tr><td>16² · 4 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
-    <tr><td>24² · 6 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
-    <tr><td>32² · 10 agents</td><td>113,957</td><td>38,913</td><td>152,870</td></tr>
+    <tr><th>Setup (world · agents)</th><th>per-agent actor</th><th>× N agents</th><th>+ critic</th><th>total for the setup</th></tr>
+    <tr><td>16² · 4 agents</td><td>113,957</td><td>455,828</td><td>38,913</td><td>494,741</td></tr>
+    <tr><td>24² · 6 agents</td><td>113,957</td><td>683,742</td><td>38,913</td><td>722,655</td></tr>
+    <tr><td>32² · 10 agents</td><td>113,957</td><td class="win">1,139,570</td><td>38,913</td><td class="win">1,178,483</td></tr>
   </table>
-  <p class="meta">"Per agent" is the one shared network every agent runs — not one copy each. Were weights
-  <i>not</i> shared, 10 agents would need ≈ 1.14 M actor params instead of 114 k; sharing is why the whole setup
-  stays ≈ 0.15 M at any scale. A bigger world or team costs more <i>compute</i>, not more <i>parameters</i> —
-  which is what makes warm-starting (§4.9) legitimate.</p>
-  <p class="meta"><b>Why a bigger grid adds no parameters</b> (the natural expectation): a convolution is a small
-  <i>sliding filter</i> — the first-layer kernel is a fixed <span class="sym">(64, 5, 3, 3)</span> tensor (5→64
-  channels, 3×3) whether it slides over a 16×16 or a 32×32 grid; a bigger grid just applies the <i>same</i> filter
-  more times (more compute). <b>Global-average pooling</b> then collapses any spatial size to a fixed 64-d belief,
-  so no weight tensor ever contains the grid dimension — we checked directly: <b>all 51 actor weight tensors are
-  shape-identical at 16×16 and 32×32</b>. A network that <i>flattened</i> the grid <i>would</i> grow with it; we
-  pool precisely so it doesn't, which is what lets a 16²/4 checkpoint transfer to 32²/10.</p>
+  <p class="meta">So the total <b>scales with the team</b>: ≈ 0.49 M → 0.72 M → 1.18 M. It does <i>not</i> scale
+  with the <b>world size</b> — the per-agent 114 k is identical at 16² and 32². One wording caveat: the actor
+  weights are <i>shared</i> across the N agents (MARL parameter sharing), so the optimizer only trains 113,957
+  distinct actor params (the "Total trainable" in the component table above) — the <span class="sym">× N</span>
+  here is the <i>deployed</i> team footprint, N instances of that one network.</p>
+  <p class="meta"><b>Why the per-agent size doesn't grow with the grid</b>: a convolution is a small <i>sliding
+  filter</i> — the first-layer kernel is a fixed <span class="sym">(64, 5, 3, 3)</span> tensor (5→64 channels,
+  3×3) whether it slides over a 16×16 or a 32×32 grid; a bigger grid just applies the <i>same</i> filter more
+  times (more compute). <b>Global-average pooling</b> then collapses any spatial size to a fixed 64-d belief, so
+  no weight tensor contains the grid — verified: <b>all 51 actor weight tensors are shape-identical at 16² and
+  32²</b>. That grid-invariance is what lets a 16²/4 checkpoint warm-start 32²/10 (§4.9).</p>
 
   <p><b>What actually changes the size</b> is the architecture, not the scale (real counts):</p>
   <table>
