@@ -180,24 +180,30 @@
   <i>twice</i> — shaping each agent's input, and shaping how the joint action composes into the next state.</p>
 
   <h3>Micro — the individual agent (and: history vs. trajectory)</h3>
-  <p>Agent <span class="sym">i</span>'s local input is <span class="sym">x_{i,t} = (o_{i,t}, q_{i,t})</span>:
-  its observation <span class="sym">o_{i,t}</span> (what it senses, above) plus an <b>auxiliary vector</b>
-  <span class="sym">q_{i,t}</span> carrying everything else the agent conditions on that is <i>not</i> raw
-  sensing — the aggregated neighbor messages (<span class="sym">c_{i,t}</span> below), a role indicator
-  (explorer / relay), its current belief/occupancy estimate, and any trust features. Because a single
-  observation is a thin slice of the world, the agent also keeps a <b>history</b>:</p>
+  <p>Agent <span class="sym">i</span>'s local input at step <span class="sym">t</span> is
+  <span class="sym">x_{i,t} = (o_{i,t}, q_{i,t})</span>: its observation <span class="sym">o_{i,t}</span>
+  (what it senses, above) plus an <b>auxiliary vector</b> <span class="sym">q_{i,t}</span> holding the other
+  things it <i>receives</i> this step — chiefly the aggregated neighbor messages
+  (<span class="sym">c_{i,t}</span> below) and its role tag. Because one input is a thin slice of the world,
+  the agent's decision depends on its whole <b>history</b> — the sequence of the full inputs it has taken in,
+  interleaved with its own past actions:</p>
 
-  <div class="eqrow"><div class="eq">h_{i,t} = (\, o_{i,0},\, a_{i,0},\, o_{i,1},\, a_{i,1},\, \ldots,\, o_{i,t} \,)</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button></div></div>
+  <div class="eqrow"><div class="eq">h_{i,t} = (\, x_{i,0},\, a_{i,0},\, x_{i,1},\, a_{i,1},\, \ldots,\, x_{i,t} \,)</div><div class="eqtools"><button class="cpy" type="button">Copy LaTeX</button></div></div>
 
-  <p>the agent's own past observations and actions — its private memory. Under partial observability a
-  well-defined policy conditions on this history (or a learned summary of it, the belief), because the
-  state is unavailable: <span class="sym">a_{i,t} ~ π_i( · | h_{i,t} )</span>.</p>
+  <p>Note this accumulates the full inputs <span class="sym">x</span> — each already carrying the messages the
+  agent received — <i>not</i> the bare observations <span class="sym">o</span>. (The textbook
+  "action–observation history" writes <span class="sym">o</span> only because there the observation is defined
+  to subsume received communication; since we split messages out into <span class="sym">q</span>, the history
+  must carry <span class="sym">x</span>.) The <b>belief</b> <span class="sym">b_{i,t}</span> — the agent's
+  occupancy map, its connectivity estimate <span class="sym">λ̂₂</span>, and trust features — is a <i>learned
+  sufficient statistic</i> of this history, so in practice the policy conditions on the belief rather than
+  replaying the whole sequence: <span class="sym">a_{i,t} ~ π_i(·|h_{i,t}) ≈ π_i(·|b_{i,t})</span>.</p>
 
   <div class="callout gap">
     <span class="lab">History vs. trajectory — don't conflate them</span>
     The <b>trajectory</b> <span class="sym">τ</span> is the <i>global, god's-eye</i> record of the whole
     episode — all states and joint actions. The <b>history</b> <span class="sym">h_{i,t}</span> is <i>one
-    agent's local, partial</i> record — only its own observations and actions. An agent never sees
+    agent's local, partial</i> record — only its own past inputs and actions. An agent never sees
     <span class="sym">τ</span>; it only ever has <span class="sym">h_{i,t}</span>. That asymmetry is the
     whole difficulty.
   </div>
@@ -693,8 +699,8 @@
     <dt>state S</dt><dd>The complete god's-eye configuration (all positions, covered cells, obstacles, comm graph). No agent observes it directly.</dd>
     <dt>observation model O / partial observability</dt><dd>Agent i receives <span class="sym">o_{i,t} ~ O(·|s_t,i)</span> — a local, lossy reading of the state. The gap between <span class="sym">s_t</span> and <span class="sym">o_{i,t}</span> is partial observability.</dd>
     <dt>transition T(s'|s,a)</dt><dd>The environment's dynamics: probability of the next state given the current state and joint action.</dd>
-    <dt>x_{i,t}, q_{i,t}</dt><dd>Agent i's input at time t = (observation, auxiliary vector). <span class="sym">q_{i,t}</span> holds aggregated messages, role, belief, trust — everything beyond raw sensing.</dd>
-    <dt>history h_{i,t} vs. trajectory τ</dt><dd>History = one agent's own past observations/actions (local, partial). Trajectory = the global sequence of states and joint actions (god's-eye). The agent has only the history.</dd>
+    <dt>x_{i,t}, q_{i,t}</dt><dd>Agent i's per-step input = (observation <span class="sym">o_{i,t}</span>, auxiliary vector <span class="sym">q_{i,t}</span>). <span class="sym">q_{i,t}</span> holds what it <i>receives</i> beyond raw sensing — the aggregated neighbor messages <span class="sym">c_{i,t}</span> and its role tag. Belief / occupancy / trust are the <i>derived</i> summary of the history, not raw input.</dd>
+    <dt>history h_{i,t} vs. trajectory τ</dt><dd>History = the sequence of one agent's own past inputs <span class="sym">x</span> and actions (local, partial); the belief is a learned summary of it. Trajectory = the global sequence of states and joint actions (god's-eye). The agent has only the history.</dd>
     <dt>joint policy π / J(π)</dt><dd><span class="sym">π = (π_1,…,π_N)</span>; "joint" because the mission depends on all agents together. <span class="sym">J(π)</span> is the expected total reward over trajectories (eq. 2).</dd>
     <dt>Agg_i</dt><dd>The bridge operator (eq. 3): a permutation-invariant, variable-count pooling (sum/mean/max/attention) of neighbor messages into a fixed-size context.</dd>
     <dt>submodularity</dt><dd>Diminishing-returns property of the union-coverage set function over agents (eq. 4). Its marginal is the difference reward.</dd>
