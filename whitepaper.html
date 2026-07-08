@@ -57,7 +57,6 @@
   <a class="brand" href="index.html">ZY<span>MERA</span></a>
   <a class="lnk" href="report/index.html">Simulator</a>
   <a class="lnk" href="index.html">Home</a>
-  <a class="lnk" href="paper.html">Paper</a>
   <a class="lnk active" href="whitepaper.html">White Paper</a>
   <a class="lnk" href="theory.html">Theory</a>
   <a class="lnk" href="architecture.html">Architecture</a>
@@ -77,8 +76,8 @@
   <p class="sub">A <b>technical white paper</b> on the architecture of a team of autonomous agents that
   covers a map without losing touch — the models, the mathematics, and the experiments that reshaped
   them. Written for readers with an undergraduate CS background: it keeps the formalism and defines every
-  symbol as it goes. Companion to the formal <a href="paper.html">Paper</a>, the <a href="theory.html">Theory</a>
-  page (full formalism), and the <a href="findings.html">Findings</a>.</p>
+  symbol as it goes. Companion to the <a href="theory.html">Theory</a>
+  page (full formalism) and the <a href="findings.html">Findings</a>.</p>
 
   <div class="callout key">
     <span class="lab">Thesis</span>
@@ -412,30 +411,30 @@
   <b>multi-layer cognition</b>, so learning is spent only where it earns its keep:</p>
 
   <figure>
-    <svg viewBox="0 0 600 300" role="img" aria-labelledby="figstk">
-      <title id="figstk">Multi-layer cognition: L3 decision on top, then L2 skills, then L1 controller and perception, then the environment; decisions flow down, the belief flows up.</title>
-      <rect x="150" y="16" width="300" height="56" rx="8" fill="#eaf1fb" stroke="#1f6feb"/>
-      <text x="300" y="40" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">L3 · Decision  (learned)</text>
-      <text x="300" y="59" text-anchor="middle" font-family="system-ui" font-size="12" fill="#33414d">pick a role · a skill · a goal — from the belief</text>
-      <rect x="150" y="102" width="300" height="56" rx="8" fill="#e6f3ef" stroke="#1b7f76"/>
-      <text x="300" y="126" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#12695f">L2 · Skills  (library)</text>
-      <text x="300" y="145" text-anchor="middle" font-family="system-ui" font-size="12" fill="#33414d">disperse · relay-backbone · flock</text>
-      <rect x="150" y="188" width="300" height="56" rx="8" fill="#f1f4f7" stroke="#7a8794"/>
-      <text x="300" y="209" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#3a4652">L1 · Controller + perception  (scripted)</text>
-      <text x="300" y="228" text-anchor="middle" font-family="system-ui" font-size="12" fill="#33414d">greedy/A* move-to-goal · SLAM · λ̂₂</text>
-      <rect x="238" y="268" width="124" height="24" rx="6" fill="#0b1f3a"/>
-      <text x="300" y="284" text-anchor="middle" font-family="system-ui" font-size="12" font-weight="600" fill="#eaf1fb">environment</text>
-      <g stroke="#0b4fb8" stroke-width="2" fill="none" marker-end="url(#dn)">
-        <line x1="250" y1="72" x2="250" y2="100"/><line x1="250" y1="158" x2="250" y2="186"/><line x1="250" y1="244" x2="250" y2="266"/>
+    <svg viewBox="0 0 560 296" role="img" aria-labelledby="figstk">
+      <title id="figstk">Multi-layer cognition: L3 decision on top, then L2 skills, then L1 controller and perception, then the environment; decisions flow down the centre, the belief flows up the right margin outside the boxes.</title>
+      <rect x="120" y="18" width="300" height="54" rx="10" fill="#eaf1fb" stroke="#1f6feb" stroke-width="1.5"/>
+      <text x="270" y="41" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">L3 · Decision  (learned)</text>
+      <text x="270" y="60" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">pick a role · a skill · a goal — from the belief</text>
+      <rect x="120" y="112" width="300" height="54" rx="10" fill="#e6f3ef" stroke="#1b7f76" stroke-width="1.5"/>
+      <text x="270" y="135" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#12695f">L2 · Skills  (library)</text>
+      <text x="270" y="154" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">disperse · relay-backbone · flock</text>
+      <rect x="120" y="206" width="300" height="54" rx="10" fill="#eef1f4" stroke="#7a8794" stroke-width="1.5"/>
+      <text x="270" y="229" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#3a4652">L1 · Controller + perception  (scripted)</text>
+      <text x="270" y="248" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">greedy/A* move-to-goal · SLAM · λ̂₂</text>
+      <rect x="205" y="280" width="130" height="24" rx="6" fill="#0b1f3a"/>
+      <text x="270" y="296" text-anchor="middle" font-family="system-ui" font-size="11.5" font-weight="600" fill="#eaf1fb">environment</text>
+      <g stroke="#0b4fb8" stroke-width="2.2" fill="none" marker-end="url(#dn)">
+        <line x1="240" y1="72" x2="240" y2="109"/><line x1="240" y1="166" x2="240" y2="203"/><line x1="240" y1="260" x2="240" y2="278"/>
       </g>
-      <text x="244" y="90" text-anchor="end" font-family="system-ui" font-size="10.5" fill="#0b4fb8">goal/skill/role</text>
-      <text x="244" y="176" text-anchor="end" font-family="system-ui" font-size="10.5" fill="#0b4fb8">behaviour</text>
-      <text x="244" y="262" text-anchor="end" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#0b4fb8">move a_{i,t}</text>
-      <g stroke="#c05512" stroke-width="2" fill="none" marker-end="url(#up)"><line x1="360" y1="266" x2="360" y2="74"/></g>
-      <text x="368" y="172" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#c05512">belief b_{i,t}</text>
+      <text x="252" y="95" font-family="system-ui" font-size="10.5" fill="#0b4fb8">goal / skill / role</text>
+      <text x="252" y="189" font-family="system-ui" font-size="10.5" fill="#0b4fb8">behaviour</text>
+      <text x="252" y="273" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#0b4fb8">move a_{i,t}</text>
+      <path d="M420,233 H452 V45 H426" fill="none" stroke="#c05512" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M424,45 l10,-5 v10 z" fill="#c05512"/>
+      <text x="464" y="150" font-family="ui-monospace,Menlo,monospace" font-size="10" fill="#c05512" transform="rotate(90 464 150)" text-anchor="middle">belief b_{i,t}</text>
       <defs>
-        <marker id="dn" markerWidth="9" markerHeight="9" refX="4.5" refY="6" orient="auto"><path d="M1,1 L4.5,6 L8,1" fill="none" stroke="#0b4fb8" stroke-width="1.6"/></marker>
-        <marker id="up" markerWidth="9" markerHeight="9" refX="4.5" refY="3" orient="auto"><path d="M1,7 L4.5,2 L8,7" fill="none" stroke="#c05512" stroke-width="1.6"/></marker>
+        <marker id="dn" markerWidth="9" markerHeight="9" refX="4.5" refY="6" orient="auto"><path d="M1,1 L4.5,6 L8,1" fill="none" stroke="#0b4fb8" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
       </defs>
     </svg>
     <figcaption><b>Multi-layer cognition.</b> The learned policy (L3) chooses a role/skill/goal from the belief;
@@ -475,21 +474,21 @@
       <title id="figac">Actor-critic: the actor maps a local observation to action probabilities; the critic maps the global state to a scalar value; their difference is the advantage.</title>
       <rect x="12" y="44" width="92" height="50" rx="7" fill="#eef1f4" stroke="#7a8794"/>
       <text x="58" y="65" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">local obs</text>
-      <text x="58" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">o_{i,t} ∈ ℝ^d</text>
+      <text x="58" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">o_{i,t}: 5×H×W</text>
       <rect x="140" y="38" width="146" height="62" rx="8" fill="#eaf1fb" stroke="#1f6feb"/>
       <text x="213" y="63" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#0b4fb8">Actor  π_θ</text>
-      <text x="213" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">MLP  d→h→|A|</text>
+      <text x="213" y="82" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">CNN+GNN · 64d · ≈114k</text>
       <rect x="322" y="44" width="150" height="50" rx="7" fill="#fff" stroke="#1f6feb"/>
       <text x="397" y="64" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#0b4fb8">π_θ(·|o)</text>
-      <text x="397" y="81" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">|A| probabilities</text>
+      <text x="397" y="81" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">9 goal logits</text>
       <text x="540" y="62" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">sample</text>
       <text x="540" y="78" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#3a4652">a_{i,t}</text>
       <rect x="12" y="206" width="92" height="50" rx="7" fill="#eef1f4" stroke="#7a8794"/>
       <text x="58" y="227" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#3a4652">global state</text>
-      <text x="58" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#12695f">s ∈ ℝ^D</text>
+      <text x="58" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#12695f">s: 3×H×W</text>
       <rect x="140" y="200" width="146" height="62" rx="8" fill="#e6f3ef" stroke="#1b7f76"/>
       <text x="213" y="225" text-anchor="middle" font-family="system-ui" font-size="13.5" font-weight="700" fill="#12695f">Critic  V_φ</text>
-      <text x="213" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">MLP  D→h→1</text>
+      <text x="213" y="244" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#33414d">CNN · 64d · ≈39k</text>
       <rect x="322" y="206" width="150" height="50" rx="7" fill="#fff" stroke="#1b7f76"/>
       <text x="397" y="226" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11" fill="#12695f">V_φ(s)</text>
       <text x="397" y="243" text-anchor="middle" font-family="system-ui" font-size="11.5" fill="#33414d">scalar value</text>
@@ -514,6 +513,27 @@
     weights <span class="sym">θ</span>; a mean-squared value loss flows into the critic's weights
     <span class="sym">φ</span>; at deployment the critic is discarded and only the actor runs, on local obs.</figcaption>
   </figure>
+
+  <p><b>How big is it?</b> Real counts from the built model (width 64, depth 2, 2 message-passing rounds).
+  The actor's input is a <b>5-channel</b> egocentric map (<span class="sym">5×H×W</span>); the critic's is the
+  <b>3-channel</b> global map; both pool to a 64-dimensional belief. Outputs: 9 goal-candidate logits (plus a
+  2-way role logit and a scalar value) for the actor, one scalar for the critic.</p>
+
+  <table>
+    <tr><th>Component (width 64)</th><th>params</th><th>role</th></tr>
+    <tr><td>backbone — CNN local perception + GNN message-passing</td><td>81,472</td><td>the shared trunk → 64-d belief</td></tr>
+    <tr><td>heads — goal (64→9) · role (64→2) · value + aux (64→1)</td><td>845</td><td>always-on outputs</td></tr>
+    <tr><td>optional modules — GRU memory 24,832 · goal-residual · frontier-attn · compass · selector · flock</td><td>31,640</td><td>built for a stable param tree; each used only when its §3 axis is on</td></tr>
+    <tr><td><b>Actor total</b> — one network, <b>shared by all N agents</b></td><td><b>113,957</b></td><td>the only network deployed</td></tr>
+    <tr><td><b>Critic</b> — CNN over the 3-channel global map → scalar</td><td><b>38,913</b></td><td>centralized, <i>training-only</i>, discarded at deployment</td></tr>
+    <tr><td><b>Total trainable</b></td><td><b>152,870</b></td><td>≈ 0.15 M</td></tr>
+  </table>
+  <p class="meta"><b>How heavy:</b> ≈ <b>0.15 M</b> parameters total — tiny by deep-learning standards (a ResNet-50
+  is ~25 M, ~160× larger). The backbone is 71% of the actor; the GRU is the next largest and is off by default,
+  so a typical run is lighter still. One shared actor runs a forward pass per agent per step (N = 4–10), so a full
+  100-step episode is well under a million forward passes of a 0.1 M-param net — it trains on a single GPU in
+  minutes and runs on CPU. Parameter count is <b>size-invariant</b>: the conv-plus-global-pool backbone yields the
+  same 64-d belief on any grid, so 16²/4 and 32²/10 use the identical network.</p>
 
   <p><b>Policy gradient — nudge good actions up.</b> The basic rule (the policy-gradient theorem / REINFORCE)
   raises the probability of actions that beat expectation and lowers the rest:</p>
@@ -623,10 +643,19 @@
     <tr><td>congestion price <span class="meta">(free-market)</span></td><td>opt. (off)</td><td>per-agent penalty for picking a skill its in-range neighbours also picked — anti-collapse for the selector</td><td>built; not yet swept at scale</td></tr>
     <tr><td>exploration info-gain <span class="sym">einfo</span></td><td>opt.</td><td>uncovered cells in sensor range</td><td class="lose">⚠ reward-hacked (below)</td></tr>
   </table>
-  <p class="meta">Two further connectivity-side knobs round out the reward accounting: a <b>soft-<span class="sym">λ₂</span>
-  penalty</b> term (the reward form of the §4.8 masking mechanism, used when the mechanism is <span class="sym">soft_lambda</span>)
-  and a <b>normalized-coverage</b> option (divide the coverage term by the free-cell count). Both are minor and left at
-  their defaults for the runs reported here.</p>
+  <p>Each term, precisely — the full set exposed by the code:</p>
+  <dl class="gloss">
+    <dt>w_coverage · ΔG (+1.0)</dt><dd>the new certainty gained this step (the submodular <span class="sym">G</span>, §2) — the deliverable everything else serves.</dd>
+    <dt>w_connectivity · ρ_reach (+2.0)</dt><dd>each agent's <i>reach-fraction</i>: the share of the rest of the team it can still reach over the comm graph. A local, per-agent proxy — no global <span class="sym">λ₂</span> at run time (§2). Weighted 2× coverage, itself a "scale-huddle" suspect: over-pay proximity and the team clumps.</dd>
+    <dt>w_collision (−4.0)</dt><dd>penalty for two agents on one cell — reinforces the disjoint partition coverage wants.</dd>
+    <dt>anti_overlap</dt><dd>optional shaping: subtract a penalty proportional to same-step overlap (two agents claiming the same fresh cell at once). A 2nd-order nudge toward non-overlapping ground.</dd>
+    <dt>barrier_* (Hyper-Singularity)</dt><dd>a per-agent connectivity <i>floor</i>: exactly 0 while a link is safely in range, rising explosively-but-finitely as a link nears its break distance, capped at a ceiling. A silent guard that composes with every other term; strength <span class="sym">k = barrier_weight</span>, off (0) by default.</dd>
+    <dt>congestion (free-market price)</dt><dd>a per-agent penalty for picking a skill that in-range neighbours also picked — a local congestion price that stops the team collapsing onto one skill. Off by default; pairs with the L2 selector.</dd>
+    <dt>explore_infogain (einfo)</dt><dd>optional bonus for uncovered cells within sensor range — the reward-hacking example below (it pays for <i>proximity</i>, not entry).</dd>
+    <dt>soft_lambda_penalty</dt><dd>when the connectivity mechanism is <span class="sym">soft_lambda</span> (§4.8), the weight on the λ-penalty added to the reward — the reward form of that mechanism.</dd>
+    <dt>normalized</dt><dd>divide the coverage term by the free-cell count, so the reward is a fraction (comparable across grid sizes) rather than a raw cell count.</dd>
+    <dt>credit {shared, agent}</dt><dd>the decomposition — this section's headline: <i>shared</i> = one team-mean advantage broadcast to all; <i>agent</i> = each agent's own difference reward <span class="sym">D_i</span> (eq. 9 below).</dd>
+  </dl>
 
   <p><b>A cautionary term.</b> An "information-gain" bonus (<span class="sym">einfo</span>) that paid for
   <i>uncovered cells within sensor range</i> looked principled and <i>reward-hacked</i>: the optimum is to sit
