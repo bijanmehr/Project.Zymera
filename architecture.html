@@ -15,7 +15,6 @@
   <a class="brand" href="index.html">ZY<span>MERA</span></a>
   <a class="lnk" href="report/index.html">Simulator</a>
   <a class="lnk" href="index.html">Home</a>
-  <a class="lnk" href="whitepaper.html">White Paper</a>
   <a class="lnk" href="theory.html">Theory</a>
   <a class="lnk active" href="architecture.html">Architecture</a>
   <a class="lnk" href="findings.html">Findings</a>
@@ -135,7 +134,7 @@
   <p class="meta"><b>Size:</b> ≈ 114k actor params (shared across all N agents) + ≈ 39k critic (training-only) ≈
   <b>0.15 M</b> — tiny, size-invariant, CPU-runnable. The full technical build-out — CNN/GNN internals, exact
   parameter tables, the composite training loss (policy + value + connectivity-aux + regularizers), the
-  Lagrangian, and the adversarial threat model — is in the <a href="whitepaper.html">White Paper, §4</a>.</p>
+  Lagrangian, and the adversarial threat model — is in the White Paper, §4.</p>
 
   <h2>The training signal — difference-reward credit <span class="tag">the coverage lever</span></h2>
   <p>Each agent is paid its <b>marginal contribution</b> <code>D<sub>i</sub> = G(team) − G(team without i)</code>, not one shared team reward. At <code>cover_r = 0</code> that is the fresh cells <i>only it</i> covered (coverage) plus its Fiedler-centrality (connectivity). This is the <b>coverage lever</b>: it breaks the <b>huddle</b> (agents clumped — connectivity satisfied, coverage dead) into a <b>sweep</b>, <b>+7 to +23 coverage points at 32²/10, 2–6×</b> over a shared reward (see <a href="findings.html">findings</a>). Under CTDE the central critic still trains on the team return; only the <i>policy</i> advantage becomes per-agent.</p>
